@@ -58,4 +58,4 @@ src/
 - React Navigation
 - OpenStreetMap (via WebView)
 - Expo Notifications
-- React i18next 
+- React i18next
