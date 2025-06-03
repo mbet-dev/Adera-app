@@ -1,183 +1,209 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Platform, ScrollView } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../../hooks/useAuth';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Text } from '../../components/ui/Text';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../types/navigation';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthStackParamList } from '../../types/navigation';
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
 
-const schema = yup.object().shape({
-  fullName: yup.string().required('Full name is required'),
-  email: yup.string().email('Invalid email').required('Email is required'),
-  password: yup
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .required('Password is required'),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref('password')], 'Passwords must match')
-    .required('Confirm password is required'),
-  role: yup.string().required('Role is required'),
-});
-
-type FormData = yup.InferType<typeof schema>;
-
-export const RegisterScreen = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+export default function RegisterScreen({ navigation }: Props) {
+  const { colors } = useTheme();
   const { signUp } = useAuth();
-  const navigation = useNavigation<NavigationProp>();
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: yupResolver(schema),
-  });
+  const handleRegister = async () => {
+    if (!fullName || !email || !password || !phoneNumber) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
 
-  const onSubmit = async (data: FormData) => {
+    // Validate phone number format
+    const phoneRegex = /^9\d{8}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      Alert.alert('Error', 'Please enter a valid Ethiopian phone number (9XXXXXXXX)');
+      return;
+    }
+
     try {
-      await signUp(data);
-    } catch (error) {
-      console.error('Registration error:', error);
+      setLoading(true);
+      await signUp(email, password, { 
+        full_name: fullName,
+        phone_number: `+251${phoneNumber}`
+      });
+      navigation.navigate('OTP', { email });
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.form}>
-        <Text variant="h1" style={styles.title}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.header}>
+        <Text style={[styles.title, { color: colors.text }]}>
           Create Account
         </Text>
+        <Text style={[styles.subtitle, { color: colors.text }]}>
+          Sign up to get started
+        </Text>
+      </View>
 
-        <Controller
-          control={control}
-          name="fullName"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label="Full Name"
-              value={value}
-              onChangeText={onChange}
-              error={errors.fullName?.message}
-              autoCapitalize="words"
-            />
-          )}
+      <View style={styles.form}>
+        <TextInput
+          style={[styles.input, { 
+            backgroundColor: colors.card,
+            color: colors.text,
+            borderColor: colors.border
+          }]}
+          placeholder="Full Name"
+          placeholderTextColor={colors.placeholder}
+          value={fullName}
+          onChangeText={setFullName}
         />
 
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label="Email"
-              value={value}
-              onChangeText={onChange}
-              error={errors.email?.message}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          )}
+        <TextInput
+          style={[styles.input, { 
+            backgroundColor: colors.card,
+            color: colors.text,
+            borderColor: colors.border
+          }]}
+          placeholder="Email"
+          placeholderTextColor={colors.placeholder}
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
         />
 
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label="Password"
-              value={value}
-              onChangeText={onChange}
-              error={errors.password?.message}
-              secureTextEntry={!showPassword}
-              rightIcon={showPassword ? 'eye-off' : 'eye'}
-              onRightIconPress={() => setShowPassword(!showPassword)}
-            />
-          )}
+        <View style={styles.phoneInputContainer}>
+          <Text style={[styles.phonePrefix, { color: colors.text }]}>+251</Text>
+          <TextInput
+            style={[styles.phoneInput, { 
+              backgroundColor: colors.card,
+              color: colors.text,
+              borderColor: colors.border
+            }]}
+            placeholder="9XXXXXXXX"
+            placeholderTextColor={colors.placeholder}
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+            keyboardType="phone-pad"
+            maxLength={9}
+          />
+        </View>
+
+        <TextInput
+          style={[styles.input, { 
+            backgroundColor: colors.card,
+            color: colors.text,
+            borderColor: colors.border
+          }]}
+          placeholder="Password"
+          placeholderTextColor={colors.placeholder}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
         />
 
-        <Controller
-          control={control}
-          name="confirmPassword"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label="Confirm Password"
-              value={value}
-              onChangeText={onChange}
-              error={errors.confirmPassword?.message}
-              secureTextEntry={!showConfirmPassword}
-              rightIcon={showConfirmPassword ? 'eye-off' : 'eye'}
-              onRightIconPress={() => setShowConfirmPassword(!showConfirmPassword)}
-            />
-          )}
-        />
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.primary }]}
+          onPress={handleRegister}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? 'Creating Account...' : 'Create Account'}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-        <Controller
-          control={control}
-          name="role"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label="Role"
-              value={value}
-              onChangeText={onChange}
-              error={errors.role?.message}
-              placeholder="customer, driver, or admin"
-              autoCapitalize="none"
-            />
-          )}
-        />
-
-        <Button
-          title="Sign Up"
-          onPress={handleSubmit(onSubmit)}
-          style={styles.button}
-        />
-
-        <View style={styles.footer}>
-          <Text>Already have an account? </Text>
-          <Text
-            style={styles.link}
-            onPress={() => navigation.navigate('Login')}
-          >
+      <View style={styles.footer}>
+        <Text style={[styles.footerText, { color: colors.text }]}>
+          Already have an account?{' '}
+        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <Text style={[styles.footerLink, { color: colors.primary }]}>
             Sign In
           </Text>
-        </View>
+        </TouchableOpacity>
       </View>
-    </ScrollView>
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    backgroundColor: '#fff',
+    flex: 1,
+    padding: 20
   },
-  form: {
-    padding: 20,
-    maxWidth: 400,
-    width: '100%',
-    alignSelf: 'center',
+  header: {
+    marginTop: 60,
+    marginBottom: 40
   },
   title: {
-    marginBottom: 24,
-    textAlign: 'center',
+    fontSize: 32,
+    fontWeight: 'bold',
+    marginBottom: 8
+  },
+  subtitle: {
+    fontSize: 16,
+    opacity: 0.7
+  },
+  form: {
+    gap: 16
+  },
+  input: {
+    height: 50,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    fontSize: 16
+  },
+  phoneInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8
+  },
+  phonePrefix: {
+    fontSize: 16,
+    fontWeight: '600'
+  },
+  phoneInput: {
+    flex: 1,
+    height: 50,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    fontSize: 16
   },
   button: {
-    marginTop: 24,
+    height: 50,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600'
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 24,
+    marginTop: 'auto',
+    marginBottom: 20
   },
-  link: {
-    color: '#007AFF',
+  footerText: {
+    fontSize: 16
   },
+  footerLink: {
+    fontSize: 16,
+    fontWeight: '600'
+  }
 }); 

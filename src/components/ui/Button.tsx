@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { isWeb } from '../../utils/platform';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface ButtonProps {
   onPress: () => void;
@@ -11,6 +12,8 @@ interface ButtonProps {
   loading?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
+  leftIcon?: string;
+  rightIcon?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -22,6 +25,8 @@ export const Button: React.FC<ButtonProps> = ({
   loading = false,
   style,
   textStyle,
+  leftIcon,
+  rightIcon,
 }) => {
   const getVariantStyles = () => {
     switch (variant) {
@@ -86,17 +91,35 @@ export const Button: React.FC<ButtonProps> = ({
       {loading ? (
         <ActivityIndicator color={variant === 'outline' ? '#007AFF' : '#FFFFFF'} />
       ) : (
-        <Text
-          style={[
-            styles.text,
-            variantStyles.text,
-            sizeStyles.text,
-            disabled && styles.disabledText,
-            textStyle,
-          ]}
-        >
-          {title}
-        </Text>
+        <>
+          {leftIcon && (
+            <Icon
+              name={leftIcon}
+              size={24}
+              color={variant === 'outline' ? '#007AFF' : '#FFFFFF'}
+              style={styles.leftIcon}
+            />
+          )}
+          <Text
+            style={[
+              styles.text,
+              variantStyles.text,
+              sizeStyles.text,
+              disabled && styles.disabledText,
+              textStyle,
+            ]}
+          >
+            {title}
+          </Text>
+          {rightIcon && (
+            <Icon
+              name={rightIcon}
+              size={24}
+              color={variant === 'outline' ? '#007AFF' : '#FFFFFF'}
+              style={styles.rightIcon}
+            />
+          )}
+        </>
       )}
     </TouchableOpacity>
   );
@@ -107,6 +130,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
+    flexDirection: 'row',
     ...(isWeb && { cursor: 'pointer' }),
   },
   primaryButton: {
@@ -158,5 +182,11 @@ const styles = StyleSheet.create({
   },
   disabledText: {
     opacity: 0.5,
+  },
+  leftIcon: {
+    marginRight: 8,
+  },
+  rightIcon: {
+    marginLeft: 8,
   },
 }); 

@@ -1,119 +1,82 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-
-interface AuthUser {
-  id: string;
-  email: string;
-  role: string;
-}
-
-interface SignUpData {
-  email: string;
-  password: string;
-  fullName: string;
-  role: string;
-}
+import { Session, User } from '@supabase/supabase-js';
 
 export const useAuth = () => {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const signIn = async (email: string, password: string) => {
-    try {
-      setLoading(true);
-      setError(null);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      if (data.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
-
-        setUser({
-          id: data.user.id,
-          email: data.user.email!,
-          role: profile?.role || 'customer',
-        });
-      }
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
+    if (error) throw error;
   };
 
-  const signUp = async ({ email, password, fullName, role }: SignUpData) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              id: data.user.id,
-              full_name: fullName,
-              role,
-            },
-          ]);
-
-        if (profileError) throw profileError;
-
-        setUser({
-          id: data.user.id,
-          email: data.user.email!,
-          role,
-        });
+  const signUp = async (email: string, password: string, metadata?: { [key: string]: any }) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata
       }
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
+    });
+
+    if (error) throw error;
   };
 
   const signOut = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+  };
 
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'adera://reset-password'
+    });
 
-      setUser(null);
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
+    if (error) throw error;
+  };
+
+  const verifyOTP = async (email: string, token: string) => {
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'email'
+    });
+
+    if (error) throw error;
   };
 
   return {
     user,
+    session,
     loading,
-    error,
     signIn,
     signUp,
     signOut,
+    resetPassword,
+    verifyOTP
   };
 }; 

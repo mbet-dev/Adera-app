@@ -1,152 +1,166 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../../hooks/useAuth';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { isWeb } from '../../utils/platform';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthStackParamList } from '../../types/navigation';
 
-const schema = yup.object().shape({
-  email: yup.string().email('Invalid email').required('Email is required'),
-  password: yup.string().required('Password is required'),
-});
+type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
-type FormData = yup.InferType<typeof schema>;
+export default function LoginScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const { signIn } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-export const LoginScreen = ({ navigation }: any) => {
-  const { signIn, isLoading, error } = useAuth();
-  const [showPassword, setShowPassword] = useState(false);
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: yupResolver(schema),
-  });
-
-  const onSubmit = async (data: FormData) => {
-    await signIn(data.email, data.password);
+    try {
+      setLoading(true);
+      await signIn(email, password);
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Welcome Back</Text>
-        <Text style={styles.subtitle}>Sign in to continue</Text>
+        <Text style={[styles.title, { color: colors.text }]}>
+          Welcome Back
+        </Text>
+        <Text style={[styles.subtitle, { color: colors.text }]}>
+          Sign in to continue
+        </Text>
       </View>
 
       <View style={styles.form}>
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label="Email"
-              value={value}
-              onChangeText={onChange}
-              placeholder="Enter your email"
-              keyboardType="email-address"
-              error={errors.email?.message}
-            />
-          )}
+        <TextInput
+          style={[styles.input, { 
+            backgroundColor: colors.card,
+            color: colors.text,
+            borderColor: colors.border
+          }]}
+          placeholder="Email"
+          placeholderTextColor={colors.placeholder}
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
         />
 
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, value } }) => (
-            <Input
-              label="Password"
-              value={value}
-              onChangeText={onChange}
-              placeholder="Enter your password"
-              secureTextEntry={!showPassword}
-              error={errors.password?.message}
-            />
-          )}
+        <TextInput
+          style={[styles.input, { 
+            backgroundColor: colors.card,
+            color: colors.text,
+            borderColor: colors.border
+          }]}
+          placeholder="Password"
+          placeholderTextColor={colors.placeholder}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
         />
 
-        {error && <Text style={styles.error}>{error}</Text>}
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.primary }]}
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? 'Signing in...' : 'Sign In'}
+          </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => navigation.navigate('ForgotPassword')}
           style={styles.forgotPassword}
         >
-          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          <Text style={[styles.forgotPasswordText, { color: colors.primary }]}>
+            Forgot Password?
+          </Text>
         </TouchableOpacity>
+      </View>
 
-        <Button
-          title="Sign In"
-          onPress={handleSubmit(onSubmit)}
-          loading={isLoading}
-          style={styles.button}
-        />
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Don't have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.footerLink}>Sign Up</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={styles.footer}>
+        <Text style={[styles.footerText, { color: colors.text }]}>
+          Don't have an account?{' '}
+        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+          <Text style={[styles.footerLink, { color: colors.primary }]}>
+            Sign Up
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
-    backgroundColor: '#FFFFFF',
+    padding: 20
   },
   header: {
-    marginTop: 48,
-    marginBottom: 32,
+    marginTop: 60,
+    marginBottom: 40
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#000000',
-    marginBottom: 8,
+    marginBottom: 8
   },
   subtitle: {
     fontSize: 16,
-    color: '#666666',
+    opacity: 0.7
   },
   form: {
-    flex: 1,
+    gap: 16
   },
-  error: {
-    color: '#FF3B30',
-    fontSize: 14,
-    marginBottom: 16,
-  },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginBottom: 24,
-  },
-  forgotPasswordText: {
-    color: '#007AFF',
-    fontSize: 14,
+  input: {
+    height: 50,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    fontSize: 16
   },
   button: {
-    marginBottom: 24,
+    height: 50,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600'
+  },
+  forgotPassword: {
+    alignItems: 'center',
+    marginTop: 16
+  },
+  forgotPasswordText: {
+    fontSize: 16
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
+    marginTop: 'auto',
+    marginBottom: 20
   },
   footerText: {
-    color: '#666666',
-    fontSize: 14,
+    fontSize: 16
   },
   footerLink: {
-    color: '#007AFF',
-    fontSize: 14,
-    fontWeight: '600',
-  },
+    fontSize: 16,
+    fontWeight: '600'
+  }
 }); 

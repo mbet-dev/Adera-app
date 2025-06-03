@@ -26,7 +26,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: 'com.adera.app'
   },
   web: {
-    favicon: './assets/favicon.png'
+    favicon: './assets/favicon.png',
+    bundler: 'metro',
+    output: 'static',
+    build: {
+      babel: {
+        include: ['@expo/vector-icons']
+      }
+    }
   },
   extra: {
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,

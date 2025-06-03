@@ -72,6 +72,6 @@
 5. Enhancement
    - [ ] Add multilingual support
    - [ ] Implement real-time features
-   - [ ] Optimize performance
-   - [ ] Enhance security
-   - [ ] Improve user experience 
+- [ ] Optimize performance
+- [ ] Enhance security
+- [ ] Improve user experience
