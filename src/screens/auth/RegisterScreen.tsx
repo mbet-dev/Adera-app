@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { useTheme } from '../../hooks/useTheme';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Modal } from 'react-native';
+import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../types/navigation';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
+
+type UserRole = 'customer' | 'partner' | 'driver';
 
 export default function RegisterScreen({ navigation }: Props) {
   const { colors } = useTheme();
@@ -13,12 +15,26 @@ export default function RegisterScreen({ navigation }: Props) {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [role, setRole] = useState<UserRole>('customer');
   const [loading, setLoading] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const handleRegister = async () => {
-    if (!fullName || !email || !password || !phoneNumber) {
+    if (!fullName || !email || !password || !confirmPassword || !phoneNumber) {
       Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+
+    // Validate password strength
+    if (password.length < 8) {
+      Alert.alert('Error', 'Password must be at least 8 characters long');
       return;
     }
 
@@ -29,15 +45,46 @@ export default function RegisterScreen({ navigation }: Props) {
       return;
     }
 
+    setShowConfirmation(true);
+  };
+
+  const confirmSignUp = async () => {
+    const formattedPhoneNumber = phoneNumber.trim().startsWith('+251') ? 
+      phoneNumber.trim() : 
+      phoneNumber.trim().startsWith('0') ? 
+        '+251' + phoneNumber.trim().slice(1) : 
+        '+251' + phoneNumber.trim();
+
+    const userData = { 
+      full_name: fullName.trim(),
+      phone_number: formattedPhoneNumber,
+      role: role.toLowerCase()
+    };
+    
     try {
       setLoading(true);
-      await signUp(email, password, { 
-        full_name: fullName,
-        phone_number: `+251${phoneNumber}`
+      console.log('Starting signup process with data:', {
+        email: email.trim(),
+        fullName: fullName.trim(),
+        phoneNumber: formattedPhoneNumber,
+        role: role.toLowerCase()
       });
-      navigation.navigate('OTP', { email });
+      
+      console.log('User data being sent:', userData);
+      
+      const result = await signUp(email.trim(), password, userData);
+      console.log('Signup successful:', result);
+      
+      setShowConfirmation(false);
+      navigation.navigate('OTP', { email: email.trim() });
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      console.error('Signup error details:', {
+        message: error.message,
+        code: error.code,
+        fullError: error,
+        userData
+      });
+      Alert.alert('Error', error.message || 'Failed to create account. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -111,6 +158,45 @@ export default function RegisterScreen({ navigation }: Props) {
           secureTextEntry
         />
 
+        <TextInput
+          style={[styles.input, { 
+            backgroundColor: colors.card,
+            color: colors.text,
+            borderColor: colors.border
+          }]}
+          placeholder="Confirm Password"
+          placeholderTextColor={colors.placeholder}
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+        />
+
+        <View style={styles.roleContainer}>
+          <Text style={[styles.roleLabel, { color: colors.text }]}>Select Role:</Text>
+          <View style={styles.roleButtons}>
+            {(['customer', 'partner', 'driver'] as UserRole[]).map((r) => (
+              <TouchableOpacity
+                key={r}
+                style={[
+                  styles.roleButton,
+                  { 
+                    backgroundColor: role === r ? colors.primary : colors.card,
+                    borderColor: colors.border
+                  }
+                ]}
+                onPress={() => setRole(r)}
+              >
+                <Text style={[
+                  styles.roleButtonText,
+                  { color: role === r ? '#FFFFFF' : colors.text }
+                ]}>
+                  {r.charAt(0).toUpperCase() + r.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
         <TouchableOpacity
           style={[styles.button, { backgroundColor: colors.primary }]}
           onPress={handleRegister}
@@ -132,6 +218,55 @@ export default function RegisterScreen({ navigation }: Props) {
           </Text>
         </TouchableOpacity>
       </View>
+
+      <Modal
+        visible={showConfirmation}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowConfirmation(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>
+              Confirm Registration
+            </Text>
+            <Text style={[styles.modalText, { color: colors.text }]}>
+              Are you sure you want to create an account with the following details?
+            </Text>
+            <View style={styles.modalDetails}>
+              <Text style={[styles.modalDetail, { color: colors.text }]}>
+                Name: {fullName}
+              </Text>
+              <Text style={[styles.modalDetail, { color: colors.text }]}>
+                Email: {email}
+              </Text>
+              <Text style={[styles.modalDetail, { color: colors.text }]}>
+                Phone: +251{phoneNumber}
+              </Text>
+              <Text style={[styles.modalDetail, { color: colors.text }]}>
+                Role: {role.charAt(0).toUpperCase() + role.slice(1)}
+              </Text>
+            </View>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: colors.error }]}
+                onPress={() => setShowConfirmation(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: colors.primary }]}
+                onPress={confirmSignUp}
+                disabled={loading}
+              >
+                <Text style={styles.modalButtonText}>
+                  {loading ? 'Creating...' : 'Confirm'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -181,6 +316,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 16
   },
+  roleContainer: {
+    gap: 8
+  },
+  roleLabel: {
+    fontSize: 16,
+    fontWeight: '600'
+  },
+  roleButtons: {
+    flexDirection: 'row',
+    gap: 8
+  },
+  roleButton: {
+    flex: 1,
+    height: 40,
+    borderRadius: 8,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  roleButtonText: {
+    fontSize: 14,
+    fontWeight: '600'
+  },
   button: {
     height: 50,
     borderRadius: 12,
@@ -203,6 +361,50 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
   footerLink: {
+    fontSize: 16,
+    fontWeight: '600'
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalContent: {
+    width: '90%',
+    borderRadius: 16,
+    padding: 20,
+    gap: 16
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  modalText: {
+    fontSize: 16,
+    textAlign: 'center'
+  },
+  modalDetails: {
+    gap: 8
+  },
+  modalDetail: {
+    fontSize: 16
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8
+  },
+  modalButton: {
+    flex: 1,
+    height: 44,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalButtonText: {
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600'
   }

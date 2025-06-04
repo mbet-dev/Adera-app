@@ -13,7 +13,8 @@ $$;
 CREATE TABLE IF NOT EXISTS profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   full_name TEXT,
-  role TEXT CHECK (role IN ('customer', 'driver', 'admin')),
+  phone_number TEXT,
+  role TEXT CHECK (role IN ('customer', 'partner', 'driver')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
@@ -93,12 +94,26 @@ CREATE POLICY "Drivers can create tracking updates"
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, full_name, role)
+  -- Check if required metadata fields exist
+  IF new.raw_user_meta_data->>'full_name' IS NULL THEN
+    RAISE EXCEPTION 'full_name is required in user metadata';
+  END IF;
+
+  IF new.raw_user_meta_data->>'phone_number' IS NULL THEN
+    RAISE EXCEPTION 'phone_number is required in user metadata';
+  END IF;
+
+  -- Insert into profiles table with role defaulting to 'customer' if not provided
+  INSERT INTO public.profiles (id, full_name, phone_number, role)
   VALUES (
-    NEW.id,
-    NEW.raw_user_meta_data->>'full_name',
-    NEW.raw_user_meta_data->>'role'
+    new.id,
+    new.raw_user_meta_data->>'full_name',
+    CASE 
+      WHEN (new.raw_user_meta_data->>'phone_number') LIKE '+251%' THEN new.raw_user_meta_data->>'phone_number'
+      ELSE '+251' || (new.raw_user_meta_data->>'phone_number')
+    END,
+    COALESCE(new.raw_user_meta_data->>'role', 'customer')
   );
-  RETURN NEW;
+  RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER; 
