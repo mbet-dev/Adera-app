@@ -4,7 +4,6 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 import { useBiometric } from '../../hooks/useBiometric';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../types/navigation';
 
@@ -13,61 +12,68 @@ type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 export default function LoginScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const { signIn } = useAuth();
-  const { authenticate, checkBiometricAvailability } = useBiometric();
+  const { isAvailable, loading: biometricLoading, authenticate, hasBiometricCredentials } = useBiometric();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showBiometric, setShowBiometric] = useState(false);
+  const [showManualLogin, setShowManualLogin] = useState(false);
+  const [biometricsEnabled, setBiometricsEnabled] = useState(false);
+  const [initialCheckDone, setInitialCheckDone] = useState(false);
 
+  // Check biometric status immediately on mount
   useEffect(() => {
-    checkBiometricSupport();
-  }, [email]);
+    const initBiometrics = async () => {
+      try {
+        console.log('Starting biometric initialization...');
+        if (isAvailable) {
+          const hasCredentials = await hasBiometricCredentials();
+          console.log('Initial biometric check:', { isAvailable, hasCredentials });
+          setBiometricsEnabled(hasCredentials);
+          
+          if (hasCredentials) {
+            // Trigger biometric auth immediately
+            handleBiometricLogin();
+          } else {
+            setShowManualLogin(true);
+          }
+        } else {
+          console.log('Biometrics not available');
+          setShowManualLogin(true);
+        }
+      } catch (error) {
+        console.error('Biometric initialization error:', error);
+        setShowManualLogin(true);
+      } finally {
+        setInitialCheckDone(true);
+      }
+    };
 
-  const checkBiometricSupport = async () => {
-    if (!email) {
-      setShowBiometric(false);
-      return;
-    }
-
-    try {
-      // First check if biometrics are available on the device
-      await checkBiometricAvailability();
-      
-      // Then check if this user has enabled biometrics
-      const biometricKey = `@biometric_${email}`;
-      const status = await AsyncStorage.getItem(biometricKey);
-      
-      console.log('Checking biometric status for:', email);
-      console.log('Biometric status:', status);
-      
-      setShowBiometric(status === 'enabled');
-    } catch (error: any) {
-      console.error('Biometric check error:', error);
-      setShowBiometric(false);
-    }
-  };
+    initBiometrics();
+  }, [isAvailable]); // Re-run when isAvailable changes
 
   const handleBiometricLogin = async () => {
-    if (!email) {
-      Alert.alert('Error', 'Please enter your email first');
-      return;
-    }
-
     try {
+      console.log('Starting biometric login...');
       setLoading(true);
-      const authenticated = await authenticate();
+      const credentials = await authenticate();
       
-      if (authenticated) {
-        await signIn(email, password);
+      if (credentials) {
+        console.log('Biometric authentication successful, signing in...');
+        await signIn(credentials.email, credentials.password);
+      } else {
+        console.log('No credentials or authentication cancelled');
+        setShowManualLogin(true);
       }
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to authenticate');
+      console.error('Biometric login error:', error);
+      Alert.alert('Error', 'Biometric authentication failed. Please log in manually.');
+      setShowManualLogin(true);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLogin = async () => {
+  const handleManualLogin = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
@@ -83,6 +89,48 @@ export default function LoginScreen({ navigation }: Props) {
     }
   };
 
+  // Show loading state while initial check is in progress
+  if (!initialCheckDone) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.biometricPrompt}>
+          <Icon name="fingerprint" size={64} color={colors.primary} />
+          <Text style={[styles.subtitle, { color: colors.text }]}>
+            Checking login options...
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  // Show biometric prompt screen
+  if (!showManualLogin && biometricsEnabled) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.biometricPrompt}>
+          <Icon name="fingerprint" size={64} color={colors.primary} />
+          <Text style={[styles.title, { color: colors.text }]}>
+            Login with Biometrics
+          </Text>
+          {loading && (
+            <Text style={[styles.subtitle, { color: colors.text }]}>
+              Authenticating...
+            </Text>
+          )}
+          <TouchableOpacity
+            style={styles.switchToManual}
+            onPress={() => setShowManualLogin(true)}
+          >
+            <Text style={[styles.switchToManualText, { color: colors.primary }]}>
+              Use email and password instead
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  // Show traditional login screen
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
@@ -104,11 +152,7 @@ export default function LoginScreen({ navigation }: Props) {
           placeholder="Email"
           placeholderTextColor={colors.placeholder}
           value={email}
-          onChangeText={(text) => {
-            setEmail(text);
-            // Clear password when email changes
-            setPassword('');
-          }}
+          onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
         />
@@ -126,7 +170,7 @@ export default function LoginScreen({ navigation }: Props) {
           secureTextEntry
         />
 
-        {showBiometric && (
+        {biometricsEnabled && (
           <TouchableOpacity
             style={[styles.biometricButton, { borderColor: colors.border }]}
             onPress={handleBiometricLogin}
@@ -134,14 +178,14 @@ export default function LoginScreen({ navigation }: Props) {
           >
             <Icon name="fingerprint" size={24} color={colors.primary} />
             <Text style={[styles.biometricText, { color: colors.text }]}>
-              Sign in with biometrics
+              Use biometric login
             </Text>
           </TouchableOpacity>
         )}
 
         <TouchableOpacity
           style={[styles.button, { backgroundColor: colors.primary }]}
-          onPress={handleLogin}
+          onPress={handleManualLogin}
           disabled={loading}
         >
           <Text style={styles.buttonText}>
@@ -177,6 +221,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20
+  },
+  biometricPrompt: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 20
+  },
+  switchToManual: {
+    marginTop: 20
+  },
+  switchToManualText: {
+    fontSize: 16
   },
   header: {
     marginTop: 60,

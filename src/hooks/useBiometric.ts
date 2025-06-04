@@ -1,7 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { Platform } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+
+interface StoredCredentials {
+  e: string; // email
+  p: string; // password
+}
+
+const BIOMETRIC_CREDENTIALS_KEY = 'biometric_credentials';
 
 export const useBiometric = () => {
   const [isAvailable, setIsAvailable] = useState(false);
@@ -19,19 +26,90 @@ export const useBiometric = () => {
         LocalAuthentication.isEnrolledAsync(),
       ]);
 
-      setIsAvailable(hasHardware);
+      console.log('Biometric hardware check:', { hasHardware, isEnrolled });
+      
+      const available = hasHardware && isEnrolled;
+      setIsAvailable(available);
       setIsEnrolled(isEnrolled);
 
-      if (!hasHardware) {
-        throw new Error('Device does not support biometric authentication');
+      return available;
+    } catch (err: any) {
+      console.error('Biometric availability check error:', err);
+      setError(err.message);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Run availability check on mount
+  useEffect(() => {
+    checkBiometricAvailability();
+  }, []);
+
+  const authenticate = async (): Promise<{ email: string; password: string } | null> => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // First check if we have stored credentials
+      const storedCredentials = await SecureStore.getItemAsync(BIOMETRIC_CREDENTIALS_KEY);
+      console.log('Checking stored credentials:', { hasCredentials: !!storedCredentials });
+
+      if (!storedCredentials) {
+        console.log('No stored credentials found');
+        return null;
       }
 
-      if (!isEnrolled) {
-        throw new Error('No biometrics enrolled on this device');
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Login with biometrics',
+        fallbackLabel: 'Use password instead',
+        cancelLabel: 'Cancel',
+        disableDeviceFallback: false,
+      });
+
+      console.log('Biometric authentication result:', { success: result.success });
+
+      if (result.success) {
+        const { e, p } = JSON.parse(storedCredentials) as StoredCredentials;
+        return { email: e, password: p };
+      }
+      return null;
+    } catch (err: any) {
+      console.error('Authentication error:', err);
+      setError(err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const enableBiometric = async (email: string, password: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // First verify biometric
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Verify your fingerprint',
+        fallbackLabel: 'Use password instead',
+        cancelLabel: 'Cancel',
+        disableDeviceFallback: false,
+      });
+
+      console.log('Biometric verification result:', { success: result.success });
+
+      if (!result.success) {
+        throw new Error('Biometric verification failed');
       }
 
+      // Store credentials in compressed format
+      const credentials: StoredCredentials = { e: email, p: password };
+      await SecureStore.setItemAsync(BIOMETRIC_CREDENTIALS_KEY, JSON.stringify(credentials));
+      console.log('Credentials stored successfully');
       return true;
     } catch (err: any) {
+      console.error('Enable biometric error:', err);
       setError(err.message);
       throw err;
     } finally {
@@ -39,60 +117,28 @@ export const useBiometric = () => {
     }
   };
 
-  const authenticate = async () => {
+  const hasBiometricCredentials = async () => {
     try {
-      setLoading(true);
-      setError(null);
-
-      const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Authenticate to continue',
-        fallbackLabel: 'Use passcode',
-        cancelLabel: 'Cancel',
-        disableDeviceFallback: false,
-      });
-
-      return result.success;
+      const credentials = await SecureStore.getItemAsync(BIOMETRIC_CREDENTIALS_KEY);
+      const hasCredentials = !!credentials;
+      console.log('Checking biometric credentials:', { hasCredentials });
+      return hasCredentials;
     } catch (err: any) {
+      console.error('Check credentials error:', err);
       setError(err.message);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
-  const enableBiometric = async (userId: string) => {
+  const disableBiometric = async () => {
     try {
-      setLoading(true);
-      setError(null);
-
-      // Store biometric preference
-      await AsyncStorage.setItem(`@biometric_${userId}`, 'enabled');
+      await SecureStore.deleteItemAsync(BIOMETRIC_CREDENTIALS_KEY);
+      console.log('Biometric credentials removed');
       return true;
     } catch (err: any) {
+      console.error('Disable biometric error:', err);
       setError(err.message);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const checkBiometricEnabled = async (userId: string) => {
-    try {
-      const status = await AsyncStorage.getItem(`@biometric_${userId}`);
-      return status === 'enabled';
-    } catch (err: any) {
-      setError(err.message);
-      return false;
-    }
-  };
-
-  const disableBiometric = async (userId: string) => {
-    try {
-      await AsyncStorage.removeItem(`@biometric_${userId}`);
-      return true;
-    } catch (err: any) {
-      setError(err.message);
-      return false;
+      throw err;
     }
   };
 
@@ -101,10 +147,9 @@ export const useBiometric = () => {
     isEnrolled,
     loading,
     error,
-    checkBiometricAvailability,
     authenticate,
     enableBiometric,
-    checkBiometricEnabled,
+    hasBiometricCredentials,
     disableBiometric,
   };
 }; 
