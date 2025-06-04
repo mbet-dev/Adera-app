@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
+import { useBiometric } from '../../hooks/useBiometric';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../types/navigation';
 
@@ -10,9 +12,45 @@ type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 export default function LoginScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const { signIn } = useAuth();
+  const { authenticate, checkBiometricEnabled, isAvailable, checkBiometricAvailability } = useBiometric();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showBiometric, setShowBiometric] = useState(false);
+
+  useEffect(() => {
+    checkBiometricSupport();
+  }, [email]);
+
+  const checkBiometricSupport = async () => {
+    try {
+      await checkBiometricAvailability();
+      if (email) {
+        const isEnabled = await checkBiometricEnabled(email);
+        setShowBiometric(isEnabled);
+      } else {
+        setShowBiometric(false);
+      }
+    } catch (error: any) {
+      console.error('Biometric check error:', error);
+      setShowBiometric(false);
+    }
+  };
+
+  const handleBiometricLogin = async () => {
+    try {
+      setLoading(true);
+      const authenticated = await authenticate();
+      
+      if (authenticated) {
+        await signIn(email, password);
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to authenticate');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -79,6 +117,19 @@ export default function LoginScreen({ navigation }: Props) {
           </Text>
         </TouchableOpacity>
 
+        {showBiometric && (
+          <TouchableOpacity
+            style={[styles.biometricButton, { borderColor: colors.border }]}
+            onPress={handleBiometricLogin}
+            disabled={loading}
+          >
+            <Icon name="fingerprint" size={24} color={colors.primary} />
+            <Text style={[styles.biometricText, { color: colors.text }]}>
+              Sign in with biometrics
+            </Text>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
           onPress={() => navigation.navigate('ForgotPassword')}
           style={styles.forgotPassword}
@@ -142,6 +193,19 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600'
+  },
+  biometricButton: {
+    height: 50,
+    borderRadius: 12,
+    borderWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8
+  },
+  biometricText: {
+    fontSize: 16,
+    fontWeight: '500'
   },
   forgotPassword: {
     alignItems: 'center',
