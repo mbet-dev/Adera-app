@@ -1,4 +1,24 @@
-# Active Context
+# Active Development Context
+
+## Current Focus
+- Parallel development of web and native app versions
+- Optimizing project structure and size
+- Maintaining cross-platform compatibility
+
+## Recent Changes
+- Removed Docker and Supabase CLI implementations
+- Cleaned up unnecessary files and dependencies
+- Preserved web-specific components and functionality
+
+## Next Steps
+- Continue enhancing both web and native features
+- Ensure optimal performance across platforms
+- Maintain clean and efficient codebase
+
+## Active Decisions
+- Using Supabase dashboard for database management instead of CLI
+- Keeping web-specific code for parallel development
+- Focusing on cross-platform compatibility in all new features
 
 ## Current Focus
 - Role-based authentication implementation
