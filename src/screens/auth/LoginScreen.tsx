@@ -4,6 +4,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 import { useBiometric } from '../../hooks/useBiometric';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../types/navigation';
 
@@ -12,7 +13,7 @@ type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 export default function LoginScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const { signIn } = useAuth();
-  const { authenticate, checkBiometricEnabled, isAvailable, checkBiometricAvailability } = useBiometric();
+  const { authenticate, checkBiometricAvailability } = useBiometric();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,14 +24,23 @@ export default function LoginScreen({ navigation }: Props) {
   }, [email]);
 
   const checkBiometricSupport = async () => {
+    if (!email) {
+      setShowBiometric(false);
+      return;
+    }
+
     try {
+      // First check if biometrics are available on the device
       await checkBiometricAvailability();
-      if (email) {
-        const isEnabled = await checkBiometricEnabled(email);
-        setShowBiometric(isEnabled);
-      } else {
-        setShowBiometric(false);
-      }
+      
+      // Then check if this user has enabled biometrics
+      const biometricKey = `@biometric_${email}`;
+      const status = await AsyncStorage.getItem(biometricKey);
+      
+      console.log('Checking biometric status for:', email);
+      console.log('Biometric status:', status);
+      
+      setShowBiometric(status === 'enabled');
     } catch (error: any) {
       console.error('Biometric check error:', error);
       setShowBiometric(false);
@@ -38,6 +48,11 @@ export default function LoginScreen({ navigation }: Props) {
   };
 
   const handleBiometricLogin = async () => {
+    if (!email) {
+      Alert.alert('Error', 'Please enter your email first');
+      return;
+    }
+
     try {
       setLoading(true);
       const authenticated = await authenticate();
@@ -61,8 +76,8 @@ export default function LoginScreen({ navigation }: Props) {
     try {
       setLoading(true);
       await signIn(email, password);
-    } catch (error) {
-      Alert.alert('Error', error.message);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to sign in');
     } finally {
       setLoading(false);
     }
@@ -89,7 +104,11 @@ export default function LoginScreen({ navigation }: Props) {
           placeholder="Email"
           placeholderTextColor={colors.placeholder}
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => {
+            setEmail(text);
+            // Clear password when email changes
+            setPassword('');
+          }}
           autoCapitalize="none"
           keyboardType="email-address"
         />
@@ -107,16 +126,6 @@ export default function LoginScreen({ navigation }: Props) {
           secureTextEntry
         />
 
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: colors.primary }]}
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>
-            {loading ? 'Signing in...' : 'Sign In'}
-          </Text>
-        </TouchableOpacity>
-
         {showBiometric && (
           <TouchableOpacity
             style={[styles.biometricButton, { borderColor: colors.border }]}
@@ -129,6 +138,16 @@ export default function LoginScreen({ navigation }: Props) {
             </Text>
           </TouchableOpacity>
         )}
+
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.primary }]}
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? 'Signing in...' : 'Sign In'}
+          </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => navigation.navigate('ForgotPassword')}
