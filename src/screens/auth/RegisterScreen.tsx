@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Modal } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
+import { useBiometric } from '../../hooks/useBiometric';
+import { BiometricPrompt } from '../../components/BiometricPrompt';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../types/navigation';
 
@@ -12,6 +14,7 @@ type UserRole = 'customer' | 'partner' | 'driver';
 export default function RegisterScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const { signUp } = useAuth();
+  const { checkBiometricAvailability, authenticate, enableBiometric } = useBiometric();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,6 +23,7 @@ export default function RegisterScreen({ navigation }: Props) {
   const [role, setRole] = useState<UserRole>('customer');
   const [loading, setLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
 
   const handleRegister = async () => {
     if (!fullName || !email || !password || !confirmPassword || !phoneNumber) {
@@ -45,7 +49,36 @@ export default function RegisterScreen({ navigation }: Props) {
       return;
     }
 
-    setShowConfirmation(true);
+    // Check biometric availability before showing confirmation
+    try {
+      await checkBiometricAvailability();
+      setShowBiometricPrompt(true);
+    } catch (error) {
+      // If biometrics not available, proceed with normal signup
+      setShowConfirmation(true);
+    }
+  };
+
+  const handleBiometricChoice = async (enableBiometrics: boolean) => {
+    setShowBiometricPrompt(false);
+    
+    if (enableBiometrics) {
+      try {
+        const authenticated = await authenticate();
+        if (authenticated) {
+          setShowConfirmation(true);
+        } else {
+          // If biometric auth fails, proceed with normal signup
+          setShowConfirmation(true);
+        }
+      } catch (error) {
+        console.error('Biometric authentication error:', error);
+        setShowConfirmation(true);
+      }
+    } else {
+      // User chose to skip biometrics
+      setShowConfirmation(true);
+    }
   };
 
   const confirmSignUp = async () => {
@@ -58,32 +91,24 @@ export default function RegisterScreen({ navigation }: Props) {
     const userData = { 
       full_name: fullName.trim(),
       phone_number: formattedPhoneNumber,
-      role: role.toLowerCase()
+      role: role.toLowerCase(),
+      biometricEnabled: false // Default to false
     };
     
     try {
       setLoading(true);
-      console.log('Starting signup process with data:', {
-        email: email.trim(),
-        fullName: fullName.trim(),
-        phoneNumber: formattedPhoneNumber,
-        role: role.toLowerCase()
-      });
-      
-      console.log('User data being sent:', userData);
       
       const result = await signUp(email.trim(), password, userData);
-      console.log('Signup successful:', result);
+      
+      // If user enabled biometrics, store the preference
+      if (result?.user?.id) {
+        await enableBiometric(result.user.id);
+      }
       
       setShowConfirmation(false);
       navigation.navigate('OTP', { email: email.trim() });
     } catch (error: any) {
-      console.error('Signup error details:', {
-        message: error.message,
-        code: error.code,
-        fullError: error,
-        userData
-      });
+      console.error('Signup error:', error);
       Alert.alert('Error', error.message || 'Failed to create account. Please try again.');
     } finally {
       setLoading(false);
@@ -218,6 +243,12 @@ export default function RegisterScreen({ navigation }: Props) {
           </Text>
         </TouchableOpacity>
       </View>
+
+      <BiometricPrompt
+        visible={showBiometricPrompt}
+        onConfirm={() => handleBiometricChoice(true)}
+        onSkip={() => handleBiometricChoice(false)}
+      />
 
       <Modal
         visible={showConfirmation}
