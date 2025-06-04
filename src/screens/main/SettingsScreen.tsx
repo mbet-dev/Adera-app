@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
+import { ScreenLayout } from '../../components/ui/ScreenLayout';
 
 export default function SettingsScreen() {
   const { colors, isDark, toggleTheme } = useTheme();
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScreenLayout>
       <View style={[styles.section, { backgroundColor: colors.card }]}>
         <View style={[styles.row, { borderBottomColor: colors.border }]}>
           <Text style={[styles.label, { color: colors.text }]}>
@@ -55,18 +56,15 @@ export default function SettingsScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20
-  },
   section: {
     borderRadius: 12,
-    overflow: 'hidden'
+    overflow: 'hidden',
+    marginTop: 20
   },
   row: {
     flexDirection: 'row',

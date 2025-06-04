@@ -2,13 +2,14 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
+import { ScreenLayout } from '../../components/ui/ScreenLayout';
 
 export default function ProfileScreen() {
   const { colors } = useTheme();
   const { user, signOut } = useAuth();
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScreenLayout>
       <View style={[styles.header, { backgroundColor: colors.card }]}>
         <Text style={[styles.name, { color: colors.text }]}>
           {user?.user_metadata?.full_name || 'User'}
@@ -46,18 +47,17 @@ export default function ProfileScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   header: {
     padding: 20,
     alignItems: 'center',
-    borderBottomWidth: 1
+    borderBottomWidth: 1,
+    marginBottom: 20,
+    borderRadius: 12
   },
   name: {
     fontSize: 24,
@@ -69,7 +69,6 @@ const styles = StyleSheet.create({
     opacity: 0.7
   },
   section: {
-    marginTop: 20,
     borderRadius: 12,
     overflow: 'hidden'
   },
