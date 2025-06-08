@@ -1,0 +1,58 @@
+[
+    {
+      "id": "ee0c6f5a-f492-4d41-b791-e2cd77d338a0",
+      "full_name": "Test Customer",
+      "role": "customer",
+      "created_at": "2025-06-02 23:01:51.259223+00",
+      "updated_at": "2025-06-02 23:01:51.259223+00",
+      "phone_number": "+251919310792"
+    },
+    {
+      "id": "5c76906c-dfcf-4f3d-be2e-937be21df917",
+      "full_name": "Test Driver",
+      "role": "driver",
+      "created_at": "2025-06-02 23:01:51.661258+00",
+      "updated_at": "2025-06-02 23:01:51.661258+00",
+      "phone_number": "+251955074503"
+    },
+    {
+      "id": "caff009c-3e28-4863-838f-6fb31e24983d",
+      "full_name": "Test Admin",
+      "role": "customer",
+      "created_at": "2025-06-02 23:01:52.029812+00",
+      "updated_at": "2025-06-02 23:01:52.029812+00",
+      "phone_number": "+251951772639"
+    },
+    {
+      "id": "1a530f6b-1ffa-4d7e-9874-929356d7708d",
+      "full_name": "Mmm Berm",
+      "role": "driver",
+      "created_at": "2025-06-04 22:43:37.548168+00",
+      "updated_at": "2025-06-04 22:43:37.548168+00",
+      "phone_number": "+251985448630"
+    },
+    {
+      "id": "acdd6e1e-6bac-43cc-a094-f70ace050f11",
+      "full_name": "Surafel Birhanu",
+      "role": "customer",
+      "created_at": "2025-06-02 23:06:05.20379+00",
+      "updated_at": "2025-06-02 23:06:05.20379+00",
+      "phone_number": "+251943075562"
+    },
+    {
+      "id": "3d63aa3f-63e9-437f-9b77-95007ab0290d",
+      "full_name": "Mulu Gonder",
+      "role": "driver",
+      "created_at": "2025-06-02 23:16:23.067501+00",
+      "updated_at": "2025-06-02 23:16:23.067501+00",
+      "phone_number": "+251943075563"
+    },
+    {
+      "id": "5eaf2108-7970-437a-8e81-86a200f13abb",
+      "full_name": "Dudu Bubu",
+      "role": "partner",
+      "created_at": "2025-06-04 19:23:42.414626+00",
+      "updated_at": "2025-06-04 19:23:42.414626+00",
+      "phone_number": "+251943075564"
+    }
+  ]

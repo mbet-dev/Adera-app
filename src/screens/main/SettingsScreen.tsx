@@ -1,83 +1,99 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
+import { View, Text, StyleSheet, Switch, TouchableOpacity } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { ScreenLayout } from '../../components/ui/ScreenLayout';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function SettingsScreen() {
   const { colors, isDark, toggleTheme } = useTheme();
+  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+  const [language, setLanguage] = React.useState('English');
 
   return (
     <ScreenLayout>
-      <View style={[styles.section, { backgroundColor: colors.card }]}>
-        <View style={[styles.row, { borderBottomColor: colors.border }]}>
-          <Text style={[styles.label, { color: colors.text }]}>
-            Dark Mode
-          </Text>
-          <Switch
-            value={isDark}
-            onValueChange={toggleTheme}
-            trackColor={{ false: colors.border, true: colors.primary }}
-          />
+      <View style={styles.container}>
+        <Text style={[styles.title, { color: colors.text }]}>Settings</Text>
+
+        <View style={[styles.section, { borderColor: colors.border }]}>
+          <View style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Icon name="theme-light-dark" size={24} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Dark Theme</Text>
+            </View>
+            <Switch
+              value={isDark}
+              onValueChange={toggleTheme}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={colors.card}
+            />
+          </View>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Icon name="translate" size={24} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Language</Text>
+            </View>
+            <View style={styles.settingRight}>
+              <Text style={[styles.settingValue, { color: colors.text }]}>{language}</Text>
+              <Icon name="chevron-right" size={24} color={colors.text} />
+            </View>
+          </TouchableOpacity>
+
+          <View style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Icon name="bell-outline" size={24} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Notifications</Text>
+            </View>
+            <Switch
+              value={notificationsEnabled}
+              onValueChange={setNotificationsEnabled}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={colors.card}
+            />
+          </View>
         </View>
-
-        <TouchableOpacity
-          style={[styles.row, { borderBottomColor: colors.border }]}
-          onPress={() => {}}
-        >
-          <Text style={[styles.label, { color: colors.text }]}>
-            Notifications
-          </Text>
-          <Text style={[styles.value, { color: colors.text }]}>
-            Enabled
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.row, { borderBottomColor: colors.border }]}
-          onPress={() => {}}
-        >
-          <Text style={[styles.label, { color: colors.text }]}>
-            Language
-          </Text>
-          <Text style={[styles.value, { color: colors.text }]}>
-            English
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.row}
-          onPress={() => {}}
-        >
-          <Text style={[styles.label, { color: colors.text }]}>
-            About
-          </Text>
-          <Text style={[styles.value, { color: colors.text }]}>
-            v1.0.0
-          </Text>
-        </TouchableOpacity>
       </View>
     </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 24,
+  },
   section: {
     borderRadius: 12,
-    overflow: 'hidden',
-    marginTop: 20
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    borderWidth: 1,
     padding: 16,
-    borderBottomWidth: 1
+    marginBottom: 24,
   },
-  label: {
-    fontSize: 16
+  settingItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
   },
-  value: {
+  settingLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  settingRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  settingText: {
     fontSize: 16,
-    opacity: 0.7
-  }
+  },
+  settingValue: {
+    fontSize: 16,
+    opacity: 0.7,
+  },
 }); 

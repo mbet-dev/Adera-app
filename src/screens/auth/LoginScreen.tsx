@@ -1,43 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Platform } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import { useBiometric } from '../../hooks/useBiometric';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AuthStackParamList } from '../../types/navigation';
+import { RootStackParamList } from '../../types/navigation';
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'Auth'>;
 
 export default function LoginScreen({ navigation }: Props) {
   const { colors } = useTheme();
-  const { signIn } = useAuth();
-  const { isAvailable, loading: biometricLoading, authenticate, hasBiometricCredentials } = useBiometric();
+  const { login } = useAuth();
+  const { isAvailable, authenticate, hasBiometricCredentials } = useBiometric();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showManualLogin, setShowManualLogin] = useState(false);
+  const [showManualLogin, setShowManualLogin] = useState(Platform.OS === 'web');
   const [biometricsEnabled, setBiometricsEnabled] = useState(false);
-  const [initialCheckDone, setInitialCheckDone] = useState(false);
+  const [initialCheckDone, setInitialCheckDone] = useState(Platform.OS === 'web');
 
-  // Check biometric status immediately on mount
+  // Check biometric status immediately on mount for native
   useEffect(() => {
+    if (Platform.OS === 'web') return;
+
     const initBiometrics = async () => {
       try {
-        console.log('Starting biometric initialization...');
         if (isAvailable) {
           const hasCredentials = await hasBiometricCredentials();
-          console.log('Initial biometric check:', { isAvailable, hasCredentials });
           setBiometricsEnabled(hasCredentials);
-          
           if (hasCredentials) {
-            // Trigger biometric auth immediately
             handleBiometricLogin();
           } else {
             setShowManualLogin(true);
           }
         } else {
-          console.log('Biometrics not available');
           setShowManualLogin(true);
         }
       } catch (error) {
@@ -49,23 +46,18 @@ export default function LoginScreen({ navigation }: Props) {
     };
 
     initBiometrics();
-  }, [isAvailable]); // Re-run when isAvailable changes
+  }, [isAvailable]);
 
   const handleBiometricLogin = async () => {
     try {
-      console.log('Starting biometric login...');
       setLoading(true);
       const credentials = await authenticate();
-      
       if (credentials) {
-        console.log('Biometric authentication successful, signing in...');
-        await signIn(credentials.email, credentials.password);
+        await login(credentials.email, credentials.password);
       } else {
-        console.log('No credentials or authentication cancelled');
         setShowManualLogin(true);
       }
     } catch (error: any) {
-      console.error('Biometric login error:', error);
       Alert.alert('Error', 'Biometric authentication failed. Please log in manually.');
       setShowManualLogin(true);
     } finally {
@@ -78,15 +70,14 @@ export default function LoginScreen({ navigation }: Props) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
-
     try {
       setLoading(true);
-      await signIn(email, password);
+      await login(email, password);
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to sign in');
-    } finally {
-      setLoading(false);
+      setLoading(false); // Ensure loading is stopped on error
     }
+    // No need to set loading false here, as onAuthStateChange will trigger re-render
   };
 
   // Show loading state while initial check is in progress

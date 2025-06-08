@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Modal, Platform } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import { useBiometric } from '../../hooks/useBiometric';
 import { ScreenLayout } from '../../components/ui/ScreenLayout';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function ProfileScreen() {
   const { colors } = useTheme();
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
   const { isAvailable, hasBiometricCredentials, enableBiometric, disableBiometric } = useBiometric();
   const [biometricsEnabled, setBiometricsEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -17,13 +17,13 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     const checkBiometrics = async () => {
-      if (isAvailable && user?.id) {
+      if (isAvailable) {
         const hasCredentials = await hasBiometricCredentials();
         setBiometricsEnabled(hasCredentials);
       }
     };
     checkBiometrics();
-  }, [isAvailable, user?.id]);
+  }, [isAvailable]);
 
   const handleToggleBiometrics = async () => {
     if (biometricsEnabled) {
@@ -50,36 +50,56 @@ export default function ProfileScreen() {
 
     try {
       setLoading(true);
-      await enableBiometric(user?.email || '', password);
-      setBiometricsEnabled(true);
-      setShowPasswordModal(false);
-      setPassword('');
-      Alert.alert('Success', 'Biometric login enabled');
+      if (user?.email) {
+        await enableBiometric(user.email, password);
+        setBiometricsEnabled(true);
+        setShowPasswordModal(false);
+        setPassword('');
+        Alert.alert('Success', 'Biometric login enabled');
+      } else {
+        Alert.alert('Error', 'User email not found.');
+      }
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to enable biometric login');
     } finally {
       setLoading(false);
     }
   };
+  
+  const handleSignOut = () => {
+    if (logout) {
+      logout();
+    }
+  };
+
+  if (!user) {
+    // Render a loading state or a placeholder if the user is not available yet
+    return (
+      <ScreenLayout>
+        <View style={styles.loadingContainer}>
+          <Text style={{ color: colors.text }}>Loading profile...</Text>
+        </View>
+      </ScreenLayout>
+    );
+  }
 
   return (
     <ScreenLayout>
-      <View style={[styles.header, { backgroundColor: colors.card }]}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <Text style={[styles.name, { color: colors.text }]}>
-          {user?.user_metadata?.full_name || 'User'}
+          {user.fullName || 'User'}
         </Text>
         <Text style={[styles.email, { color: colors.text }]}>
-          {user?.email}
+          {user.email}
         </Text>
         <Text style={[styles.role, { color: colors.text }]}>
-          {user?.user_metadata?.role?.charAt(0).toUpperCase() + user?.user_metadata?.role?.slice(1) || 'User'}
+          {(user.role?.charAt(0).toUpperCase() + user.role?.slice(1)) || 'User'}
         </Text>
       </View>
 
-      <View style={[styles.section, { backgroundColor: colors.card }]}>
+      <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <TouchableOpacity
           style={[styles.button, { borderBottomColor: colors.border }]}
-          onPress={() => {}}
         >
           <View style={styles.buttonContent}>
             <Icon name="account-edit" size={24} color={colors.text} />
@@ -92,7 +112,6 @@ export default function ProfileScreen() {
 
         <TouchableOpacity
           style={[styles.button, { borderBottomColor: colors.border }]}
-          onPress={() => {}}
         >
           <View style={styles.buttonContent}>
             <Icon name="lock-reset" size={24} color={colors.text} />
@@ -102,8 +121,8 @@ export default function ProfileScreen() {
           </View>
           <Icon name="chevron-right" size={24} color={colors.text} />
         </TouchableOpacity>
-
-        {isAvailable && (
+        
+        {Platform.OS !== 'web' && isAvailable && (
           <TouchableOpacity
             style={[styles.button, { borderBottomColor: colors.border }]}
             onPress={handleToggleBiometrics}
@@ -127,10 +146,10 @@ export default function ProfileScreen() {
             </View>
           </TouchableOpacity>
         )}
-
+        
         <TouchableOpacity
           style={styles.button}
-          onPress={signOut}
+          onPress={handleSignOut}
         >
           <View style={styles.buttonContent}>
             <Icon name="logout" size={24} color={colors.error} />
@@ -152,18 +171,10 @@ export default function ProfileScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>
-              Enable Biometric Login
-            </Text>
-            <Text style={[styles.modalDescription, { color: colors.text }]}>
-              Please enter your password to enable biometric login
-            </Text>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Enable Biometric Login</Text>
+            <Text style={[styles.modalDescription, { color: colors.text }]}>Please enter your password to enable biometric login</Text>
             <TextInput
-              style={[styles.modalInput, { 
-                backgroundColor: colors.background,
-                color: colors.text,
-                borderColor: colors.border
-              }]}
+              style={[styles.modalInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
               placeholder="Enter your password"
               placeholderTextColor={colors.placeholder}
               value={password}
@@ -174,23 +185,15 @@ export default function ProfileScreen() {
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalCancelButton, { borderColor: colors.border }]}
-                onPress={() => {
-                  setShowPasswordModal(false);
-                  setPassword('');
-                }}
-              >
-                <Text style={[styles.modalButtonText, { color: colors.text }]}>
-                  Cancel
-                </Text>
+                onPress={() => { setShowPasswordModal(false); setPassword(''); }}>
+                <Text style={[styles.modalButtonText, { color: colors.text }]}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, { backgroundColor: colors.primary }]}
                 onPress={handleEnableBiometrics}
                 disabled={loading}
               >
-                <Text style={[styles.modalButtonText, { color: '#FFFFFF' }]}>
-                  {loading ? 'Enabling...' : 'Enable'}
-                </Text>
+                <Text style={[styles.modalButtonText, { color: '#FFFFFF' }]}>{loading ? 'Enabling...' : 'Enable'}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -201,6 +204,11 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   header: {
     padding: 20,
     alignItems: 'center',
@@ -220,10 +228,12 @@ const styles = StyleSheet.create({
   },
   role: {
     fontSize: 14,
-    opacity: 0.5
+    opacity: 0.5,
+    textTransform: 'capitalize'
   },
   section: {
     borderRadius: 12,
+    borderWidth: 1,
     overflow: 'hidden'
   },
   button: {
@@ -241,66 +251,15 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16
   },
-  toggleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8
-  },
-  toggleText: {
-    fontSize: 14,
-    opacity: 0.7
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  modalContent: {
-    width: '80%',
-    padding: 24,
-    borderRadius: 16,
-    alignItems: 'center'
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 8
-  },
-  modalDescription: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 24,
-    opacity: 0.8
-  },
-  modalInput: {
-    width: '100%',
-    height: 50,
-    borderRadius: 12,
-    borderWidth: 1,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    marginBottom: 24
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    gap: 12
-  },
-  modalButton: {
-    flex: 1,
-    height: 50,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  modalCancelButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1
-  },
-  modalButtonText: {
-    fontSize: 16,
-    fontWeight: '600'
-  }
+  toggleContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  toggleText: { fontSize: 14, opacity: 0.7 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'center', alignItems: 'center' },
+  modalContent: { width: '80%', padding: 24, borderRadius: 16, alignItems: 'center' },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 8 },
+  modalDescription: { fontSize: 16, textAlign: 'center', marginBottom: 24, opacity: 0.8 },
+  modalInput: { width: '100%', height: 50, borderRadius: 12, borderWidth: 1, paddingHorizontal: 16, fontSize: 16, marginBottom: 24 },
+  modalButtons: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', gap: 12 },
+  modalButton: { flex: 1, height: 50, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  modalCancelButton: { backgroundColor: 'transparent', borderWidth: 1 },
+  modalButtonText: { fontSize: 16, fontWeight: '600' }
 }); 

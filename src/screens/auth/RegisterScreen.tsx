@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Modal } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Modal, Platform } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import { useBiometric } from '../../hooks/useBiometric';
 import { BiometricPrompt } from '../../components/BiometricPrompt';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AuthStackParamList } from '../../types/navigation';
+import { RootStackParamList } from '../../types/navigation';
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
-
+type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 type UserRole = 'customer' | 'partner' | 'driver';
 
 export default function RegisterScreen({ navigation }: Props) {
   const { colors } = useTheme();
-  const { signUp } = useAuth();
-  const { checkBiometricAvailability, authenticate, enableBiometric } = useBiometric();
+  const { register, user } = useAuth();
+  const { isAvailable, authenticate, enableBiometric } = useBiometric();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,6 +23,7 @@ export default function RegisterScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
+  const [biometricChoiceMade, setBiometricChoiceMade] = useState(false);
 
   const handleRegister = async () => {
     if (!fullName || !email || !password || !confirmPassword || !phoneNumber) {
@@ -49,67 +49,64 @@ export default function RegisterScreen({ navigation }: Props) {
       return;
     }
 
-    // Check biometric availability before showing confirmation
-    try {
-      await checkBiometricAvailability();
-      setShowBiometricPrompt(true);
-    } catch (error) {
-      // If biometrics not available, proceed with normal signup
+    // Skip biometric check on web
+    if (Platform.OS === 'web' || !isAvailable) {
       setShowConfirmation(true);
+      return;
     }
+    
+    // On native, prompt for biometrics
+    setShowBiometricPrompt(true);
   };
 
-  const handleBiometricChoice = async (enableBiometrics: boolean) => {
+  const handleBiometricChoice = async (enable: boolean) => {
     setShowBiometricPrompt(false);
+    setBiometricChoiceMade(enable);
     
-    if (enableBiometrics) {
+    if (enable) {
       try {
         const authenticated = await authenticate();
         if (authenticated) {
-          setShowConfirmation(true);
+          setShowConfirmation(true); // Proceed to confirmation
         } else {
-          // If biometric auth fails, proceed with normal signup
+          setBiometricChoiceMade(false); // If they cancel, don't force it
           setShowConfirmation(true);
         }
       } catch (error) {
-        console.error('Biometric authentication error:', error);
-        setShowConfirmation(true);
+        console.error('Biometric authentication error during registration:', error);
+        setBiometricChoiceMade(false);
+        setShowConfirmation(true); // Still allow signup
       }
     } else {
-      // User chose to skip biometrics
-      setShowConfirmation(true);
+      setShowConfirmation(true); // User skipped
     }
   };
 
   const confirmSignUp = async () => {
-    const formattedPhoneNumber = phoneNumber.trim().startsWith('+251') ? 
-      phoneNumber.trim() : 
-      phoneNumber.trim().startsWith('0') ? 
-        '+251' + phoneNumber.trim().slice(1) : 
-        '+251' + phoneNumber.trim();
-
-    const userData = { 
-      full_name: fullName.trim(),
-      phone_number: formattedPhoneNumber,
+    const userData = {
+      fullName: fullName.trim(),
+      email: email.trim(),
+      password: password,
+      phoneNumber: `+251${phoneNumber.trim()}`,
       role: role.toLowerCase(),
-      biometricEnabled: false // Default to false
     };
     
     try {
       setLoading(true);
+      await register(userData);
       
-      const result = await signUp(email.trim(), password, userData);
-      
-      // If user enabled biometrics, store the preference
-      if (result?.user?.id) {
-        await enableBiometric(result.user.id);
+      if (biometricChoiceMade && user?.email) {
+        await enableBiometric(userData.email, userData.password);
       }
       
       setShowConfirmation(false);
-      navigation.navigate('OTP', { email: email.trim() });
+      Alert.alert(
+        'Registration Successful',
+        'Please check your email to verify your account.',
+        [{ text: 'OK', onPress: () => navigation.navigate('Auth') }]
+      );
     } catch (error: any) {
-      console.error('Signup error:', error);
-      Alert.alert('Error', error.message || 'Failed to create account. Please try again.');
+      Alert.alert('Registration Error', error.message || 'Failed to create account.');
     } finally {
       setLoading(false);
     }
@@ -237,7 +234,7 @@ export default function RegisterScreen({ navigation }: Props) {
         <Text style={[styles.footerText, { color: colors.text }]}>
           Already have an account?{' '}
         </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Auth')}>
           <Text style={[styles.footerLink, { color: colors.primary }]}>
             Sign In
           </Text>

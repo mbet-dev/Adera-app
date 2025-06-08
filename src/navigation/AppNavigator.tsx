@@ -1,48 +1,62 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useAuth } from '../hooks/useAuth';
-import { RootStackParamList, AuthStackParamList, MainTabParamList } from '../types/navigation';
+import { useAuth } from '../contexts/AuthContext';
+import { CustomerNavigator, PartnerNavigator, DriverNavigator, AdminNavigator } from './RoleNavigators';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 import OTPScreen from '../screens/auth/OTPScreen';
-import TabNavigator from './TabNavigator';
+import { RootStackParamList } from '../types/navigation';
+import { LoadingIndicator } from '../components/ui/LoadingIndicator';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
-const AuthNavigator = () => {
-  return (
-    <AuthStack.Navigator
-      screenOptions={{
-        headerShown: false
-      }}
-    >
-      <AuthStack.Screen name="Login" component={LoginScreen} />
-      <AuthStack.Screen name="Register" component={RegisterScreen} />
-      <AuthStack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-      <AuthStack.Screen name="OTP" component={OTPScreen} />
-    </AuthStack.Navigator>
-  );
-};
+export default function AppNavigator() {
+  const { isAuthenticated, userRole, isLoading } = useAuth();
+  console.log('[AppNavigator] State:', { isAuthenticated, userRole, isLoading });
 
-export const AppNavigator = () => {
-  const { user } = useAuth();
+  if (isLoading) {
+    return <LoadingIndicator />;
+  }
+
+  // Render the appropriate navigator based on user role
+  const renderAuthenticatedStack = () => {
+    const role = userRole?.toUpperCase();
+    console.log(`[AppNavigator] Rendering authenticated stack. Role from context: '${userRole}', Uppercased role for switch: '${role}'`);
+    
+    switch (role) {
+      case 'CUSTOMER':
+        return <Stack.Screen name="CustomerTabs" component={CustomerNavigator} />;
+      case 'PARTNER':
+        return <Stack.Screen name="PartnerTabs" component={PartnerNavigator} />;
+      case 'DRIVER':
+        return <Stack.Screen name="DriverTabs" component={DriverNavigator} />;
+      case 'ADMIN':
+        return <Stack.Screen name="AdminTabs" component={AdminNavigator} />;
+      default:
+        console.warn(`[AppNavigator] Role '${role}' not matched in switch. Defaulting to Customer view as a fallback.`);
+        return <Stack.Screen name="CustomerTabs" component={CustomerNavigator} />;
+    }
+  };
 
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false
-        }}
-      >
-        {!user ? (
-          <Stack.Screen name="Auth" component={AuthNavigator} />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {!isAuthenticated ? (
+          // Auth Stack
+          <Stack.Group>
+            <Stack.Screen name="Auth" component={LoginScreen} />
+            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+            <Stack.Screen name="OTP" component={OTPScreen} />
+          </Stack.Group>
         ) : (
-          <Stack.Screen name="Main" component={TabNavigator} />
+          <Stack.Group>
+            {renderAuthenticatedStack()}
+          </Stack.Group>
         )}
       </Stack.Navigator>
     </NavigationContainer>
   );
-}; 
+} 

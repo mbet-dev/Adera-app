@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AuthStackParamList } from '../../types/navigation';
+import { RootStackParamList } from '../../types/navigation';
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'OTP'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'OTP'>;
 
 export default function OTPScreen({ route, navigation }: Props) {
   const { colors } = useTheme();
@@ -39,7 +39,12 @@ export default function OTPScreen({ route, navigation }: Props) {
         [
           {
             text: 'OK',
-            onPress: () => navigation.navigate('Login')
+            onPress: () => {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Auth' }]
+              });
+            }
           }
         ]
       );
