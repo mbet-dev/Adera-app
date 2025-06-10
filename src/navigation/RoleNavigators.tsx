@@ -1,11 +1,13 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../contexts/ThemeContext';
 
 // Customer Screens
 import HomeScreen from '../screens/main/HomeScreen';
 import CreateDeliveryScreen from '../screens/customer/CreateDeliveryScreen';
+import DeliveryParametersScreen from '../screens/customer/DeliveryParametersScreen';
 import TrackParcelScreen from '../screens/customer/TrackParcelScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
 import SettingsScreen from '../screens/main/SettingsScreen';
@@ -42,6 +44,21 @@ import {
   DriverStackParamList,
   AdminStackParamList,
 } from '../types/navigation';
+import { Partner } from '../types/database';
+
+// New Stack for Delivery Flow
+type DeliveryStackParamList = {
+    CreateDeliveryHome: undefined;
+    DeliveryParameters: { partner: Partner };
+};
+const DeliveryStack = createStackNavigator<DeliveryStackParamList>();
+
+const DeliveryStackNavigator = () => (
+    <DeliveryStack.Navigator screenOptions={{ headerShown: false }}>
+        <DeliveryStack.Screen name="CreateDeliveryHome" component={CreateDeliveryScreen} />
+        <DeliveryStack.Screen name="DeliveryParameters" component={DeliveryParametersScreen} />
+    </DeliveryStack.Navigator>
+);
 
 type TabIconProps = {
   color: string;
@@ -79,7 +96,7 @@ export const CustomerNavigator = () => {
       />
       <CustomerTab.Screen
         name="CreateDelivery"
-        component={CreateDeliveryScreen}
+        component={DeliveryStackNavigator}
         options={{
           tabBarIcon: ({ color, size }: TabIconProps) => (
             <Icon name="plus-box" size={size} color={color} />

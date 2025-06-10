@@ -1,4 +1,5 @@
 import type { NavigatorScreenParams } from '@react-navigation/native';
+import { Partner } from './database';
 
 export type AuthStackParamList = {
   Auth: undefined;
@@ -10,6 +11,7 @@ export type AuthStackParamList = {
 export type CustomerStackParamList = {
   Home: undefined;
   CreateDelivery: undefined;
+  DeliveryParameters: { partner: Partner };
   TrackParcel: undefined;
   Profile: undefined;
   Settings: undefined;

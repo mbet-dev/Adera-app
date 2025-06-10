@@ -27,4 +27,14 @@ export type ParcelTracking = {
   location?: string;
   notes?: string;
   created_at: string;
-}; 
+};
+
+export interface Partner {
+  id: string;
+  location: string;
+  latitude: number;
+  longitude: number;
+  profile: {
+    full_name: string;
+  }[];
+} 

@@ -1,140 +1,422 @@
 [
-    {
-      "table_name": "parcel_tracking",
-      "column_name": "id",
-      "data_type": "uuid",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "parcel_tracking",
-      "column_name": "parcel_id",
-      "data_type": "uuid",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "parcel_tracking",
-      "column_name": "status",
-      "data_type": "text",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "parcel_tracking",
-      "column_name": "location",
-      "data_type": "text",
-      "is_nullable": "YES"
-    },
-    {
-      "table_name": "parcel_tracking",
-      "column_name": "notes",
-      "data_type": "text",
-      "is_nullable": "YES"
-    },
-    {
-      "table_name": "parcel_tracking",
-      "column_name": "created_at",
-      "data_type": "timestamp with time zone",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "parcels",
-      "column_name": "id",
-      "data_type": "uuid",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "parcels",
-      "column_name": "sender_id",
-      "data_type": "uuid",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "parcels",
-      "column_name": "receiver_id",
-      "data_type": "uuid",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "parcels",
-      "column_name": "driver_id",
-      "data_type": "uuid",
-      "is_nullable": "YES"
-    },
-    {
-      "table_name": "parcels",
-      "column_name": "status",
-      "data_type": "text",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "parcels",
-      "column_name": "pickup_address",
-      "data_type": "text",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "parcels",
-      "column_name": "delivery_address",
-      "data_type": "text",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "parcels",
-      "column_name": "pickup_instructions",
-      "data_type": "text",
-      "is_nullable": "YES"
-    },
-    {
-      "table_name": "parcels",
-      "column_name": "delivery_instructions",
-      "data_type": "text",
-      "is_nullable": "YES"
-    },
-    {
-      "table_name": "parcels",
-      "column_name": "created_at",
-      "data_type": "timestamp with time zone",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "parcels",
-      "column_name": "updated_at",
-      "data_type": "timestamp with time zone",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "profiles",
-      "column_name": "id",
-      "data_type": "uuid",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "profiles",
-      "column_name": "full_name",
-      "data_type": "text",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "profiles",
-      "column_name": "role",
-      "data_type": "text",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "profiles",
-      "column_name": "created_at",
-      "data_type": "timestamp with time zone",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "profiles",
-      "column_name": "updated_at",
-      "data_type": "timestamp with time zone",
-      "is_nullable": "NO"
-    },
-    {
-      "table_name": "profiles",
-      "column_name": "phone_number",
-      "data_type": "text",
-      "is_nullable": "NO"
-    }
-  ]
+  {
+    "table_name": "drivers",
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "drivers",
+    "column_name": "vehicle_details",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "drivers",
+    "column_name": "is_active",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "true"
+  },
+  {
+    "table_name": "drivers",
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "drivers",
+    "column_name": "updated_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "id",
+    "data_type": "bigint",
+    "is_nullable": "NO",
+    "column_default": "nextval('messages_id_seq'::regclass)"
+  },
+  {
+    "table_name": "messages",
+    "column_name": "parcel_id",
+    "data_type": "uuid",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "sender_id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "receiver_id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "content",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "messages",
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "parcel_tracking",
+    "column_name": "id",
+    "data_type": "bigint",
+    "is_nullable": "NO",
+    "column_default": "nextval('parcel_tracking_id_seq'::regclass)"
+  },
+  {
+    "table_name": "parcel_tracking",
+    "column_name": "parcel_id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "parcel_tracking",
+    "column_name": "status",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "parcel_tracking",
+    "column_name": "location",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "parcel_tracking",
+    "column_name": "notes",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "parcel_tracking",
+    "column_name": "actor_id",
+    "data_type": "uuid",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "parcel_tracking",
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "sender_id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "receiver_id",
+    "data_type": "uuid",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "pickup_partner_id",
+    "data_type": "uuid",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "delivery_partner_id",
+    "data_type": "uuid",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "assigned_driver_id",
+    "data_type": "uuid",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "receiver_name_unregistered",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "receiver_phone_unregistered",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "status",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "pickup_address",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "delivery_address",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "pickup_instructions",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "delivery_instructions",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "tracking_code",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "pickup_code",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "delivery_code",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "size",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "photos_urls",
+    "data_type": "ARRAY",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "parcels",
+    "column_name": "updated_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "partners",
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "partners",
+    "column_name": "location",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "partners",
+    "column_name": "location_pic_url",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "partners",
+    "column_name": "working_hours",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "partners",
+    "column_name": "is_facility",
+    "data_type": "boolean",
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "partners",
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "partners",
+    "column_name": "updated_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "profiles",
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "profiles",
+    "column_name": "full_name",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "profiles",
+    "column_name": "phone_number",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "profiles",
+    "column_name": "role",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "profiles",
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "profiles",
+    "column_name": "updated_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "transactions",
+    "column_name": "id",
+    "data_type": "bigint",
+    "is_nullable": "NO",
+    "column_default": "nextval('transactions_id_seq'::regclass)"
+  },
+  {
+    "table_name": "transactions",
+    "column_name": "parcel_id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "transactions",
+    "column_name": "payer_id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "transactions",
+    "column_name": "amount",
+    "data_type": "numeric",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "transactions",
+    "column_name": "payment_method",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "transactions",
+    "column_name": "status",
+    "data_type": "text",
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "transactions",
+    "column_name": "provider_txn_id",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "transactions",
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "transactions",
+    "column_name": "updated_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "NO",
+    "column_default": "now()"
+  }
+]
