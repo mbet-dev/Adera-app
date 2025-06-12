@@ -37,4 +37,15 @@ export interface Partner {
   profile: {
     full_name: string;
   }[];
+  address?: string;
+  working_hours?: string;
+  location_pic_url?: string;
+  gallery_urls?: string[];
+  contact_person?: string;
+  contact_phone?: string;
+  accepts_cash?: boolean;
+  accepts_card?: boolean;
+  allows_payment_processing?: boolean;
+  allows_proxy_payment?: boolean;
+  payment_methods?: string[];
 } 
