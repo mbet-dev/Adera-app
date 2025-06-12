@@ -106,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const register = async (userData: { email: string; password: string; role: string; fullName: string; phoneNumber: string }) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: userData.email,
       password: userData.password,
       options: {
@@ -117,7 +117,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     });
+
     if (error) throw error;
+
+    // Create a matching profile row immediately so that first login can succeed
+    const userId = data?.user?.id;
+    if (userId) {
+      const { error: profileError } = await supabase.from('profiles').insert({
+        id: userId,
+        full_name: userData.fullName,
+        role: userData.role.toLowerCase(),
+        phone_number: userData.phoneNumber,
+      });
+
+      if (profileError && profileError.code !== '23505') { // Ignore duplicate inserts
+        throw profileError;
+      }
+    }
     // The onAuthStateChange listener will handle setting the session
   };
 

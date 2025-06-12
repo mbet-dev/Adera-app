@@ -315,6 +315,20 @@
     "column_default": "now()"
   },
   {
+    "table_name": "partners",
+    "column_name": "latitude",
+    "data_type": "numeric",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "partners",
+    "column_name": "longitude",
+    "data_type": "numeric",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
     "table_name": "profiles",
     "column_name": "id",
     "data_type": "uuid",

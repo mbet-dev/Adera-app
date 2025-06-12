@@ -95,7 +95,7 @@ export default function RegisterScreen({ navigation }: Props) {
       setLoading(true);
       await register(userData);
       
-      if (biometricChoiceMade && user?.email) {
+      if (biometricChoiceMade) {
         await enableBiometric(userData.email, userData.password);
       }
       
