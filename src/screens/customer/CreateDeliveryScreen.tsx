@@ -11,6 +11,7 @@ import { Partner } from '../../types/database';
 import { CustomerStackParamList } from '../../types/navigation';
 import DeliveryMapView from '../../components/map/DeliveryMapView';
 import MapControls, { MapType } from '../../components/map/MapControls';
+import PartnerDetailsModal from '../../components/PartnerDetailsModal';
 
 const { width, height } = Dimensions.get('window');
 
@@ -38,6 +39,8 @@ export default function CreateDeliveryScreen() {
     longitudeDelta: LONGITUDE_DELTA,
   });
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
+  const [detailsPartner, setDetailsPartner] = useState<Partner | null>(null);
+  const [detailsVisible, setDetailsVisible] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -166,6 +169,13 @@ export default function CreateDeliveryScreen() {
     }
   };
 
+  const openDetails = (partner: Partner) => {
+    setDetailsPartner(partner);
+    setDetailsVisible(true);
+  };
+
+  const closeDetails = () => setDetailsVisible(false);
+
   if (loading) {
       return (
           <View style={[styles.container, styles.centerContent]}>
@@ -241,7 +251,7 @@ export default function CreateDeliveryScreen() {
             renderItem={({ item: partner }) => {
               const partnerName = partner.profile[0]?.full_name || 'Partner Location';
               return (
-                  <TouchableOpacity style={styles.partnerItem} onPress={() => handleMarkerPress(partner)}>
+                  <TouchableOpacity style={[styles.partnerItem, selectedPartner?.id === partner.id && styles.partnerItemSelected]} onPress={() => handleMarkerPress(partner)}>
                       <View style={styles.partnerIconContainer}>
                           <Feather name="map-pin" size={24} color={ADERA_RED} />
                       </View>
@@ -249,6 +259,9 @@ export default function CreateDeliveryScreen() {
                           <Text style={styles.partnerName}>{partnerName}</Text>
                           <Text style={styles.partnerAddress}>{partner.location}</Text>
                       </View>
+                      <TouchableOpacity onPress={() => openDetails(partner)} style={styles.infoButton}>
+                          <Feather name="info" size={20} color={ADERA_RED} />
+                      </TouchableOpacity>
                       <Feather name="chevron-right" size={24} color="#ccc" />
                   </TouchableOpacity>
               )
@@ -257,6 +270,13 @@ export default function CreateDeliveryScreen() {
           />
         </View>
       </View>
+
+      {/* Partner Details Modal */}
+      <PartnerDetailsModal
+        visible={detailsVisible}
+        partner={detailsPartner as any}
+        onClose={closeDetails}
+      />
     </View>
   );
 }
@@ -445,5 +465,11 @@ const styles = StyleSheet.create({
       width: 14,
       height: 14,
       borderRadius: 7,
-  }
+  },
+  partnerItemSelected: {
+    backgroundColor: '#e6f7ff',
+  },
+  infoButton: {
+    marginHorizontal: 8,
+  },
 }); 

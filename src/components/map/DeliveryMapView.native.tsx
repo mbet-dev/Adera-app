@@ -43,19 +43,22 @@ export default function DeliveryMapView({
             pinColor="blue"
           />
         )}
-        {partners.map((partner) => (
-          <Marker
-            key={partner.id}
-            coordinate={{
-              latitude: Number(partner.latitude),
-              longitude: Number(partner.longitude),
-            }}
-            title={partner.profile[0]?.full_name || 'Partner'}
-            description={partner.location}
-            pinColor={ADERA_RED}
-            onPress={() => onMarkerPress(partner)}
-          />
-        ))}
+        {partners.map((partner) => {
+          const isSelected = selectedPartner?.id === partner.id;
+          return (
+            <Marker
+              key={partner.id}
+              coordinate={{
+                latitude: Number(partner.latitude),
+                longitude: Number(partner.longitude),
+              }}
+              title={partner.profile[0]?.full_name || 'Partner'}
+              description={partner.location}
+              pinColor={isSelected ? 'green' : ADERA_RED}
+              onPress={() => onMarkerPress(partner)}
+            />
+          );
+        })}
       </MapView>
     </View>
   );
