@@ -37,15 +37,11 @@ export interface Partner {
   profile: {
     full_name: string;
   }[];
-  address?: string;
-  working_hours?: string;
-  location_pic_url?: string;
-  gallery_urls?: string[];
-  contact_person?: string;
-  contact_phone?: string;
-  accepts_cash?: boolean;
-  accepts_card?: boolean;
-  allows_payment_processing?: boolean;
-  allows_proxy_payment?: boolean;
-  payment_methods?: string[];
+  image_url?: string | null;
+  has_pos_machine?: boolean | null;
+  accepts_proxy_payment?: boolean | null;
+  payment_methods?: string[] | null;
+  working_hours?: Record<string, string> | null;
+  contact_person?: string | null;
+  contact_phone?: string | null;
 } 
