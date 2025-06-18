@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import L, { LatLngExpression, LatLng } from 'leaflet';
 import { LocationObjectCoords } from 'expo-location';
 import { Partner } from '../../types/database';
@@ -22,13 +21,6 @@ const userIcon = L.divIcon({
     className: 'custom-leaflet-icon',
     iconSize: [24, 24],
     iconAnchor: [12, 12],
-});
-
-const selectedPartnerIcon = L.divIcon({
-  html: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="#2ECC71" stroke="white" stroke-width="2"/></svg>`,
-  className: 'custom-leaflet-icon',
-  iconSize: [24, 24],
-  iconAnchor: [12, 12],
 });
 
 interface DeliveryMapViewProps {
@@ -53,13 +45,25 @@ export default function DeliveryMapView({
   partners,
   mapRegion,
   userLocation,
-  selectedPartner,
   onMarkerPress,
   mapType,
 }: DeliveryMapViewProps) {
 
   const position: LatLngExpression = [mapRegion.latitude, mapRegion.longitude];
   const [zoom, setZoom] = useState(13);
+
+  // Ensure Leaflet styles are loaded via CDN to avoid Metro bundler issues with CSS `url()` assets
+  useEffect(() => {
+    const linkId = 'leaflet-cdn-css';
+    if (!document.getElementById(linkId)) {
+      const link = document.createElement('link');
+      link.id = linkId;
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      link.crossOrigin = '';
+      document.head.appendChild(link);
+    }
+  }, []);
 
   return (
     <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, zIndex: 0 }}>
@@ -102,7 +106,7 @@ export default function DeliveryMapView({
             <Marker
             key={partner.id}
             position={[Number(partner.latitude), Number(partner.longitude)]}
-            icon={selectedPartner?.id === partner.id ? selectedPartnerIcon : partnerIcon}
+            icon={partnerIcon}
             eventHandlers={{
                 click: () => {
                 onMarkerPress(partner);

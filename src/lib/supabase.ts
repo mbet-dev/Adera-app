@@ -13,6 +13,21 @@ const extra = consts?.extra as Record<string, any> | undefined;
 const supabaseUrl = envSupabaseUrl || extra?.supabaseUrl || 'https://placeholder.supabase.co';
 const supabaseAnonKey = envSupabaseAnon || extra?.supabaseAnonKey || 'public-anon-key';
 
+// Debugging: Log the first few characters of the credentials so we can verify
+// they are loaded on both web and native without leaking the full secret.
+console.log('[supabase] Init', {
+  url: supabaseUrl,
+  anonKeyPreview: supabaseAnonKey ? supabaseAnonKey.slice(0, 6) + '...' : undefined,
+  fromEnv: {
+    url: !!envSupabaseUrl,
+    anonKey: !!envSupabaseAnon
+  },
+  fromExtra: {
+    url: !!extra?.supabaseUrl,
+    anonKey: !!extra?.supabaseAnonKey
+  },
+});
+
 if (!supabaseUrl || !supabaseAnonKey) {
   // During development we don't want the entire bundle to fail if env vars are missing. Instead, create
   // a disabled client and log a clear warning. Most Supabase calls will then fail gracefully at runtime.

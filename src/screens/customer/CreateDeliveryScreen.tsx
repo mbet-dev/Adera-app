@@ -68,6 +68,8 @@ export default function CreateDeliveryScreen() {
   }, []);
 
   const fetchPartners = async () => {
+    const startTime = Date.now();
+    console.log('[fetchPartners] Starting fetch…');
     setError(null);
     try {
       const { data, error: supabaseError } = await supabase
@@ -77,7 +79,6 @@ export default function CreateDeliveryScreen() {
           location,
           latitude,
           longitude,
-          image_url,
           has_pos_machine,
           accepts_proxy_payment,
           payment_methods,
@@ -89,11 +90,19 @@ export default function CreateDeliveryScreen() {
           )
         `);
 
+      console.log('[fetchPartners] Supabase response', {
+        durationMs: Date.now() - startTime,
+        rows: data?.length,
+        supabaseError,
+      });
+
       if (supabaseError) throw supabaseError;
       
       const formattedData = (data || []) as Partner[];
 
       setPartners(formattedData);
+      
+      console.log('[fetchPartners] Partners state updated', { partnersCount: formattedData.length });
       
       if (formattedData.length > 0 && formattedData[0]) {
         setRegion(prevRegion => ({
@@ -104,6 +113,7 @@ export default function CreateDeliveryScreen() {
       }
 
     } catch (err: unknown) {
+        console.error('[fetchPartners] Error', err);
         if (err instanceof Error) {
             setError(`Failed to fetch partners. Please check your connection and Row Level Security policies in Supabase. \n\nError: ${err.message}`);
         } else {

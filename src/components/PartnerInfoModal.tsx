@@ -40,7 +40,9 @@ const PartnerInfoModal: React.FC<PartnerInfoModalProps> = ({ visible, partner, o
             {/* Image */}
             {partner.image_url ? (
               <Image source={{ uri: partner.image_url }} style={styles.image} resizeMode="cover" />
-            ) : null}
+            ) : (
+              <Image source={require('../../assets/tentPlacesnOthersRes1x/images.jpeg')} style={styles.image} resizeMode="cover" />
+            )}
 
             {/* Name & Address */}
             <Text style={styles.name}>{partner.profile[0]?.full_name || 'Partner'}</Text>
