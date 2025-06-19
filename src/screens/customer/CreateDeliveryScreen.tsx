@@ -12,6 +12,8 @@ import { CustomerStackParamList } from '../../types/navigation';
 import DeliveryMapView from '../../components/map/DeliveryMapView';
 import MapControls, { MapType } from '../../components/map/MapControls';
 import PartnerInfoModal from '../../components/PartnerInfoModal';
+import CreateDeliveryFAB from '../../components/delivery/CreateDeliveryFAB';
+import { DeliveryCreationProvider } from '../../contexts/DeliveryCreationContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -39,7 +41,7 @@ export default function CreateDeliveryScreen() {
     longitudeDelta: LONGITUDE_DELTA,
   });
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [partnerInfoVisible, setPartnerInfoVisible] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -164,7 +166,7 @@ export default function CreateDeliveryScreen() {
     const userLng = userLocation?.coords.longitude;
 
     const scheme = Platform.select({ ios: 'maps:0,0?daddr=', android: 'geo:0,0?q=' });
-    const destination = `${latitude},${longitude}(${selectedPartner.profile[0]?.full_name})`;
+    const destination = `${latitude},${longitude}(${selectedPartner?.profile?.[0]?.full_name || ''})`;
     const userLocationQuery = userLat && userLng ? `&saddr=${userLat},${userLng}` : '';
 
     let url = '';
@@ -186,8 +188,12 @@ export default function CreateDeliveryScreen() {
 
   const handleShowPartnerInfo = (partner: Partner) => {
     setSelectedPartner(partner);
-    setModalVisible(true);
+    setPartnerInfoVisible(true);
   };
+
+  const handleModalClose = React.useCallback(() => {
+    setPartnerInfoVisible(false);
+  }, []);
 
   if (loading) {
       return (
@@ -208,88 +214,95 @@ export default function CreateDeliveryScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <DeliveryMapView 
-        partners={partners}
-        mapRegion={region}
-        userLocation={userLocation?.coords}
-        selectedPartner={selectedPartner}
-        onMarkerPress={handleMarkerPress}
-        mapType={mapType}
-      />
-      
-      {/* HUD (Heads-Up Display) Elements */}
-      <View style={[StyleSheet.absoluteFill, { zIndex: 1 }]} pointerEvents="box-none">
+    <DeliveryCreationProvider>
+      <View style={styles.container}>
+        <DeliveryMapView 
+          partners={partners}
+          mapRegion={region}
+          userLocation={userLocation?.coords}
+          selectedPartner={selectedPartner}
+          onMarkerPress={handleMarkerPress}
+          mapType={mapType}
+        />
+        
+        {/* HUD (Heads-Up Display) Elements */}
+        <View style={[StyleSheet.absoluteFill, { zIndex: 1 }]} pointerEvents="box-none">
 
-        <View style={styles.header}>
-          <Text style={[styles.headerTitle, { color: '#333' }]} numberOfLines={1}>
-            {Platform.OS === 'web' 
-                ? "ADERA partners" 
-                : (selectedPartner ? selectedPartner.profile[0]?.full_name : 'Select a Partner')
-            }
-          </Text>
-          <Text style={[styles.headerSubtitle, { color: '#666' }]} numberOfLines={1}>{selectedPartner ? selectedPartner.location : 'Choose a location from the map or list'}</Text>
-          <TouchableOpacity style={styles.closeButton}>
-              <Feather name="x" size={24} color={'#333'} />
-          </TouchableOpacity>
-        </View>
+          <View style={styles.header}>
+            <Text style={[styles.headerTitle, { color: '#333' }]} numberOfLines={1}>
+              {Platform.OS === 'web' 
+                  ? "ADERA partners" 
+                  : (selectedPartner ? selectedPartner?.profile?.[0]?.full_name : 'Select a Partner')
+              }
+            </Text>
+            <Text style={[styles.headerSubtitle, { color: '#666' }]} numberOfLines={1}>{selectedPartner ? selectedPartner.location : 'Choose a location from the map or list'}</Text>
+            <TouchableOpacity style={styles.closeButton}>
+                <Feather name="x" size={24} color={'#333'} />
+            </TouchableOpacity>
+          </View>
 
-        <View style={styles.searchContainer}>
-          <View style={styles.searchBox}>
-            <Feather name="search" size={20} color="#888" style={styles.searchIcon} />
-            <TextInput
-              placeholder="Search"
-              placeholderTextColor="#888"
-              style={styles.searchInput}
+          <View style={styles.searchContainer}>
+            <View style={styles.searchBox}>
+              <Feather name="search" size={20} color="#888" style={styles.searchIcon} />
+              <TextInput
+                placeholder="Search"
+                placeholderTextColor="#888"
+                style={styles.searchInput}
+              />
+            </View>
+            <TouchableOpacity style={styles.filterButton}>
+              <Feather name="filter" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.controlsContainer}>
+              <MapControls
+                  mapType={mapType}
+                  onRecenter={handleRecenter}
+                  onToggleMapType={handleToggleMapType}
+                  onOpenInMaps={handleOpenInMaps}
+              />
+          </View>
+
+          <View style={styles.bottomListContainer}>
+            <FlatList
+              data={partners}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item: partner }) => {
+                const partnerName = partner.profile?.[0]?.full_name || 'Partner Location';
+                return (
+                    <TouchableOpacity style={[styles.partnerItem, { backgroundColor: selectedPartner?.id === partner.id ? '#fdecec' : '#fff' }]} onPress={() => handleMarkerPress(partner)}>
+                        <View style={styles.partnerIconContainer}>
+                            <Feather name="map-pin" size={24} color={ADERA_RED} />
+                        </View>
+                        <View style={[styles.partnerInfo, selectedPartner?.id === partner.id && { opacity: 0.8 }]}>
+                            <Text style={styles.partnerName}>{partnerName}</Text>
+                            <Text style={styles.partnerAddress}>{partner.location}</Text>
+                        </View>
+                        <TouchableOpacity onPress={() => handleShowPartnerInfo(partner)} style={{ padding: 6 }}>
+                            <Feather name="info" size={22} color={ADERA_RED} />
+                        </TouchableOpacity>
+                    </TouchableOpacity>
+                )
+              }}
+              showsVerticalScrollIndicator={false}
             />
           </View>
-          <TouchableOpacity style={styles.filterButton}>
-            <Feather name="filter" size={20} color="#fff" />
-          </TouchableOpacity>
         </View>
 
-        <View style={styles.controlsContainer}>
-            <MapControls
-                mapType={mapType}
-                onRecenter={handleRecenter}
-                onToggleMapType={handleToggleMapType}
-                onOpenInMaps={handleOpenInMaps}
-            />
-        </View>
+        {/* Partner Details Modal */}
+        <PartnerInfoModal
+          visible={partnerInfoVisible}
+          partner={selectedPartner}
+          onClose={handleModalClose}
+        />
 
-        <View style={styles.bottomListContainer}>
-          <FlatList
-            data={partners}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item: partner }) => {
-              const partnerName = partner.profile[0]?.full_name || 'Partner Location';
-              return (
-                  <TouchableOpacity style={[styles.partnerItem, { backgroundColor: selectedPartner?.id === partner.id ? '#fdecec' : '#fff' }]} onPress={() => handleMarkerPress(partner)}>
-                      <View style={styles.partnerIconContainer}>
-                          <Feather name="map-pin" size={24} color={ADERA_RED} />
-                      </View>
-                      <View style={[styles.partnerInfo, selectedPartner?.id === partner.id && { opacity: 0.8 }]}>
-                          <Text style={styles.partnerName}>{partnerName}</Text>
-                          <Text style={styles.partnerAddress}>{partner.location}</Text>
-                      </View>
-                      <TouchableOpacity onPress={() => handleShowPartnerInfo(partner)} style={{ padding: 6 }}>
-                          <Feather name="info" size={22} color={ADERA_RED} />
-                      </TouchableOpacity>
-                  </TouchableOpacity>
-              )
-            }}
-            showsVerticalScrollIndicator={false}
-          />
+        {/* Delivery Creation UI */}
+        <View style={styles.deliveryCreationLayer} pointerEvents="box-none">
+          <CreateDeliveryFAB />
         </View>
       </View>
-
-      {/* Partner Details Modal */}
-      <PartnerInfoModal
-        visible={modalVisible}
-        partner={selectedPartner}
-        onClose={() => setModalVisible(false)}
-      />
-    </View>
+    </DeliveryCreationProvider>
   );
 }
 
@@ -297,6 +310,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  deliveryCreationLayer: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 2, // Higher than map and HUD elements
+    pointerEvents: 'box-none',
   },
   centerContent: {
     justifyContent: 'center',

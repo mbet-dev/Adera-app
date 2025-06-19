@@ -1,72 +1,48 @@
-# Adera Project Brief
+# Adera App Project Brief
 
-## Project Overview
-Adera is a modern parcel delivery and tracking platform designed specifically for Addis Ababa, Ethiopia. The platform aims to revolutionize urban delivery with a user-friendly, real-time tracking service that is secure, affordable, and multilingual, supporting both mobile and web platforms.
+## Overview
+Adera is a comprehensive parcel delivery management system that connects senders, receivers, partners (dropoff/pickup points), drivers, and staff through a mobile and web application.
 
 ## Core Requirements
 
-### Technical Requirements
-- React Native with Expo for mobile
-- React for web platform
-- Shared business logic and components
-- Supabase for backend services
-- Real-time tracking and notifications
-- Multilingual support (English, Amharic, Afaan Oromoo, Tigrigna, Somali)
-- QR code generation and scanning
-- Payment gateway integrations (Telebirr, Chapa, ArifPay)
-- OpenStreetMap integration
-- Push notification system
+### Delivery Creation Flow
+1. Terms & Conditions Modal
+   - Must show before parameter input
+   - Deep link in Settings page for all roles
+   - Link to eligible parcel items list
 
-### Role-Based Requirements
+2. Multi-Section Modal Flow
+   - Package Details (Document/Small/Medium/Big)
+   - Recipient Details (Member/Non-member)
+   - Dropoff Point Selection
+   - Pickup Point Selection
+   - Payment Method Selection
+   - Confirmation Page
 
-#### Customer
-- Parcel creation and tracking
-- Payment processing
-- Real-time updates
-- Chat with courier
-- Delivery history
-- Profile management
+### Tracking System
+- QR Code Structure: `TRACKING_ID + PHASE_FLAG + TIMESTAMP + HASH`
+- Client-side initial QR generation
+- Server-side hash regeneration at pickup point
+- SMS verification system for receivers
 
-#### Partner (Business)
-- Bulk parcel management
-- Business profile
-- Analytics dashboard
-- Payment history
-- Customer management
-- Delivery scheduling
+### Payment Cases
+1. Direct sender payment (wallet/bank)
+2. Dropoff point proxy payment
+3. Receiver payment (member)
+4. Receiver bank payment (non-member)
+5. Cash on delivery at pickup point
 
-#### Courier
-- Delivery assignments
-- Route optimization
-- Real-time location sharing
-- QR code scanning
-- Delivery confirmation
-- Earnings tracking
+### Partner Integration
+- Display all available partners
+- Indicate supported payment methods
+- Show POS/proxy payment capabilities
+- Working hours and contact info
 
-#### Sorting Facility Personnel
-- Parcel sorting
-- Status updates
-- Inventory management
-- Route assignment
-- Quality control
-
-#### Admin
-- User management
-- System monitoring
-- Analytics and reporting
-- Payment management
-- Support management
-- System configuration
-
-### Non-Functional Requirements
-- Cross-platform compatibility
-- Offline capabilities
-- Secure authentication
-- Real-time data synchronization
-- Scalable architecture
-- Local market adaptation
-- High performance
-- Data security
+## Technical Stack
+- React Native (Mobile)
+- React (Web)
+- Supabase (Backend)
+- Expo (Cross-platform)
 
 ## Project Goals
 1. Create a seamless parcel delivery experience in Addis Ababa

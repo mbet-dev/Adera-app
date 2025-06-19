@@ -169,3 +169,120 @@ EXPO_PUBLIC_PLATFORM=web|mobile
 - Optimized image uploads
 - Real-time updates via WebSocket
 - Progressive Web App support 
+
+## Database Schema
+
+### Core Tables
+1. `profiles`
+   - User profiles for all roles
+   - Links to auth.users
+
+2. `partners`
+   - Location data
+   - Payment capabilities
+   - Working hours
+   - Contact info
+
+3. `deliveries`
+   - Package details
+   - Tracking info
+   - Payment status
+   - Phase flags
+
+4. `delivery_tracking`
+   - QR code history
+   - Phase transitions
+   - Location stamps
+
+## Frontend Architecture
+
+### Shared Components
+1. FAB Component
+   ```typescript
+   interface FABProps {
+     onPress: () => void;
+     disabled?: boolean;
+     loading?: boolean;
+   }
+   ```
+
+2. Multi-Step Modal
+   ```typescript
+   interface DeliveryStep {
+     id: string;
+     title: string;
+     component: React.ComponentType<any>;
+     validate: () => boolean;
+   }
+   ```
+
+3. Partner Selection
+   ```typescript
+   interface Partner {
+     id: string;
+     location: string;
+     latitude: number;
+     longitude: number;
+     has_pos_machine: boolean;
+     accepts_proxy_payment: boolean;
+     payment_methods: string[];
+     working_hours: Record<string, string>;
+     contact_person: string;
+     contact_phone: string;
+   }
+   ```
+
+### State Management
+1. Delivery Creation Context
+   ```typescript
+   interface DeliveryCreationState {
+     currentStep: number;
+     packageDetails: PackageDetails;
+     recipient: RecipientInfo;
+     dropoffPoint: Partner | null;
+     pickupPoint: Partner | null;
+     paymentMethod: PaymentMethod;
+     trackingCode: string | null;
+   }
+   ```
+
+2. Partner Context
+   ```typescript
+   interface PartnerContextState {
+     partners: Partner[];
+     loading: boolean;
+     error: Error | null;
+     filterByPaymentMethod: (method: PaymentMethod) => Partner[];
+   }
+   ```
+
+## Implementation Plan
+
+### Phase 1: Foundation
+1. Database schema updates
+2. Base components creation
+3. Terms & Conditions modal
+
+### Phase 2: Core Flow
+1. FAB implementation
+2. Multi-step modal framework
+3. Package details form
+4. Recipient details form
+
+### Phase 3: Partner Integration
+1. Partner selection UI
+2. Payment method filtering
+3. Working hours display
+4. Contact info handling
+
+### Phase 4: Payment & Tracking
+1. QR code generation
+2. Payment method selection
+3. Confirmation flow
+4. SMS integration
+
+### Phase 5: Polish
+1. Error handling
+2. Loading states
+3. Validation
+4. Analytics integration 

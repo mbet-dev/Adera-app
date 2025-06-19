@@ -31,17 +31,19 @@ export type ParcelTracking = {
 
 export interface Partner {
   id: string;
-  location: string;
-  latitude: number;
-  longitude: number;
-  profile: {
-    full_name: string;
-  }[];
-  image_url?: string | null;
-  has_pos_machine?: boolean | null;
-  accepts_proxy_payment?: boolean | null;
-  payment_methods?: string[] | null;
-  working_hours?: Record<string, string> | null;
-  contact_person?: string | null;
-  contact_phone?: string | null;
+  profile_id?: string;
+  location?: string;
+  contact_person?: string;
+  contact_phone?: string;
+  payment_methods?: string[];
+  has_pos_machine?: boolean;
+  accepts_proxy_payment?: boolean;
+  working_hours?: Record<string, string>;
+  image_url?: string;
+  image_urls?: string[];
+  profile?: Profile[];
+  created_at?: string;
+  updated_at?: string;
+  latitude?: number | string;
+  longitude?: number | string;
 } 

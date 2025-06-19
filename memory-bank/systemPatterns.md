@@ -167,4 +167,127 @@
 - Edge function tests
 - Integration tests
 - Security tests
-- Payment integration tests 
+- Payment integration tests
+
+## Delivery Creation Flow
+
+```mermaid
+flowchart TD
+    Start[FAB Press] --> TC[Terms & Conditions]
+    TC -->|Accept| Step1[Package Details]
+    TC -->|Reject| End
+
+    Step1 --> Step2[Recipient Info]
+    Step2 --> Step3[Dropoff Selection]
+    Step3 --> Step4[Pickup Selection]
+    Step4 --> Step5[Payment Method]
+    Step5 --> Step6[Confirmation]
+    
+    Step6 -->|Confirm| Generate[Generate QR]
+    Generate --> Store[Store Delivery]
+    Store --> Notify[Notify Partners]
+    
+    Step6 -->|Cancel| End
+```
+
+## QR Code Lifecycle
+
+```mermaid
+flowchart TD
+    Create[Create Delivery] --> GenQR[Generate Initial QR]
+    GenQR --> Store[Store in Database]
+    
+    Store --> Track[Track Phase Changes]
+    Track --> Pickup[Reach Pickup Point]
+    
+    Pickup --> NewHash[Generate New Hash]
+    NewHash --> SendSMS[Send SMS to Receiver]
+    SendSMS --> Verify[Verify at Delivery]
+```
+
+## Payment Flow Patterns
+
+```mermaid
+flowchart TD
+    Start[Payment Selection] --> Case1[Direct Payment]
+    Start --> Case2[Partner Payment]
+    Start --> Case3[Receiver Payment]
+    Start --> Case4[Bank Payment]
+    Start --> Case5[Cash on Delivery]
+    
+    Case1 --> Wallet[Wallet]
+    Case1 --> Bank[Bank]
+    
+    Case2 --> PartnerWallet[Partner Wallet]
+    Case3 --> ReceiverWallet[Receiver Wallet]
+    Case4 --> BankTransfer[Bank Transfer]
+    Case5 --> CashAtPickup[Cash at Pickup]
+```
+
+## Component Architecture
+
+```mermaid
+flowchart TD
+    FAB[Floating Action Button] --> Modal[Multi-Step Modal]
+    
+    Modal --> TC[Terms Modal]
+    Modal --> Package[Package Form]
+    Modal --> Recipient[Recipient Form]
+    Modal --> Partners[Partner Selection]
+    Modal --> Payment[Payment Selection]
+    Modal --> Confirm[Confirmation]
+    
+    Partners --> Map[Map View]
+    Partners --> List[List View]
+    
+    Payment --> Methods[Payment Methods]
+    Payment --> Summary[Order Summary]
+```
+
+## State Management Pattern
+
+```mermaid
+flowchart LR
+    Context[Delivery Context] --> State[Current State]
+    Context --> Actions[Actions]
+    
+    State --> View[UI Components]
+    Actions --> API[API Calls]
+    
+    API --> State
+    View --> Actions
+```
+
+## Data Flow
+
+```mermaid
+flowchart TD
+    Client[Client App] --> API[Supabase API]
+    API --> DB[Database]
+    
+    DB --> Cache[Cache Layer]
+    Cache --> Client
+    
+    API --> SMS[SMS Service]
+    API --> Payment[Payment Gateway]
+    API --> Notify[Notifications]
+```
+
+## Error Handling Pattern
+
+```mermaid
+flowchart TD
+    Error[Error Occurs] --> Type[Determine Type]
+    
+    Type --> Network[Network Error]
+    Type --> Validation[Validation Error]
+    Type --> Auth[Auth Error]
+    
+    Network --> Retry[Retry Logic]
+    Validation --> Form[Form Feedback]
+    Auth --> Login[Re-auth Flow]
+    
+    Retry --> Success[Success]
+    Form --> Fix[User Fix]
+    Login --> Token[New Token]
+``` 

@@ -250,7 +250,7 @@
     "email_change_token_new": "",
     "email_change": "",
     "email_change_sent_at": null,
-    "last_sign_in_at": "2025-06-09 21:18:16.932976+00",
+    "last_sign_in_at": "2025-06-12 21:02:39.134214+00",
     "raw_app_meta_data": {
       "provider": "email",
       "providers": [
@@ -265,7 +265,7 @@
     },
     "is_super_admin": null,
     "created_at": "2025-06-09 21:08:36.730727+00",
-    "updated_at": "2025-06-09 21:18:16.935118+00",
+    "updated_at": "2025-06-12 21:02:39.135918+00",
     "phone": "251921000002",
     "phone_confirmed_at": null,
     "phone_change": "",
@@ -297,7 +297,7 @@
     "email_change_token_new": "",
     "email_change": "",
     "email_change_sent_at": null,
-    "last_sign_in_at": "2025-06-09 22:00:46.535925+00",
+    "last_sign_in_at": "2025-06-12 21:24:25.490684+00",
     "raw_app_meta_data": {
       "provider": "email",
       "providers": [
@@ -312,7 +312,7 @@
     },
     "is_super_admin": null,
     "created_at": "2025-06-09 21:08:38.239805+00",
-    "updated_at": "2025-06-10 15:28:53.521106+00",
+    "updated_at": "2025-06-19 12:36:38.756444+00",
     "phone": "251912345678",
     "phone_confirmed_at": null,
     "phone_change": "",
@@ -485,7 +485,7 @@
     "email_change_token_new": "",
     "email_change": "",
     "email_change_sent_at": null,
-    "last_sign_in_at": "2025-06-10 12:10:11.627423+00",
+    "last_sign_in_at": "2025-06-12 20:59:49.366955+00",
     "raw_app_meta_data": {
       "provider": "email",
       "providers": [
@@ -500,7 +500,7 @@
     },
     "is_super_admin": null,
     "created_at": "2025-06-09 21:08:39.507877+00",
-    "updated_at": "2025-06-10 15:33:36.108449+00",
+    "updated_at": "2025-06-19 12:45:36.225792+00",
     "phone": "251912345682",
     "phone_confirmed_at": null,
     "phone_change": "",
@@ -1660,7 +1660,7 @@
     "email_change_token_new": "",
     "email_change": "",
     "email_change_sent_at": null,
-    "last_sign_in_at": "2025-06-09 21:15:51.952123+00",
+    "last_sign_in_at": "2025-06-12 21:03:34.940163+00",
     "raw_app_meta_data": {
       "provider": "email",
       "providers": [
@@ -1675,7 +1675,7 @@
     },
     "is_super_admin": null,
     "created_at": "2025-06-09 21:08:52.596378+00",
-    "updated_at": "2025-06-10 12:09:12.362052+00",
+    "updated_at": "2025-06-12 23:00:59.624562+00",
     "phone": "251941000020",
     "phone_confirmed_at": null,
     "phone_change": "",
