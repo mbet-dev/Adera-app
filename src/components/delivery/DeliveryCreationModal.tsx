@@ -26,27 +26,19 @@ export function DeliveryCreationModal({
     reset,
   } = useDeliveryCreation();
 
-  console.log('[DeliveryCreationModal] Rendering. Visible:', visible, 'Step:', currentStep, 'Terms Accepted:', termsAccepted);
-
   // This effect ensures that if the modal is closed unexpectedly (e.g., hardware back button), the state is cleared.
   React.useEffect(() => {
     if (!visible) {
-      console.log('[DeliveryCreationModal] Modal is not visible. Resetting state in 300ms.');
       // A small delay ensures the UI has time to close before state is wiped
       setTimeout(() => {
-        console.log('[DeliveryCreationModal] State has been reset.');
         reset();
       }, 300);
-    } else {
-      console.log('[DeliveryCreationModal] Modal is visible.');
     }
   }, [visible, reset]);
 
   const handleTermsAccept = React.useCallback(() => {
-    console.log('[DeliveryCreationModal] handleTermsAccept called.');
     setTermsAccepted(true);
     setCurrentStep(1);
-    console.log('[DeliveryCreationModal] State updated: termsAccepted=true, currentStep=1.');
   }, [setTermsAccepted, setCurrentStep]);
 
   const handleTermsDecline = React.useCallback(() => {
@@ -67,7 +59,6 @@ export function DeliveryCreationModal({
 
   // Show terms modal first if not accepted
   if (!termsAccepted) {
-    console.log('[DeliveryCreationModal] Terms not accepted yet. Rendering TermsModal.');
     return (
       <TermsModal
         visible={visible}
@@ -78,7 +69,6 @@ export function DeliveryCreationModal({
   }
 
   const renderStep = () => {
-    console.log('[DeliveryCreationModal] renderStep called for step:', currentStep);
     switch (currentStep) {
       case 1:
         return <PackageDetailsForm onNext={handleNextStep} onBack={handlePrevStep} />;
@@ -91,13 +81,11 @@ export function DeliveryCreationModal({
       case 5:
         return <ConfirmationForm onConfirm={onClose} onBack={handlePrevStep} />;
       default:
-        console.log('[DeliveryCreationModal] renderStep default case. Returning null.');
         return null;
     }
   };
 
   if (currentStep === 0) {
-    console.log('[DeliveryCreationModal] currentStep is 0. Rendering null.');
     return null; // Don't render anything if we haven't started (e.g., after terms accepted but before step 1 set)
   }
 
@@ -128,6 +116,7 @@ const styles = StyleSheet.create({
       web: '80%',
       default: '90%',
     }),
+    flex: 1,
     maxWidth: 600,
     maxHeight: '90%',
     borderRadius: 12,
