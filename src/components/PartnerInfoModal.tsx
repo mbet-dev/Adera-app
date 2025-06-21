@@ -30,14 +30,37 @@ export default function PartnerInfoModal({
 
   if (!partner) return null;
 
-  const images = partner.image_urls || [partner.image_url];
+  const images = partner.images || [partner.image_url];
   
-  const formatWorkingHours = (hours: Record<string, string>) => {
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    return days.map(day => ({
-      day,
-      hours: hours[day] || 'Closed'
-    }));
+  const formatWorkingHours = (hours: Record<string, { open: string; close: string }>) => {
+    const days = [
+      { short: 'Mon', full: 'monday' },
+      { short: 'Tue', full: 'tuesday' },
+      { short: 'Wed', full: 'wednesday' },
+      { short: 'Thu', full: 'thursday' },
+      { short: 'Fri', full: 'friday' },
+      { short: 'Sat', full: 'saturday' },
+      { short: 'Sun', full: 'sunday' }
+    ];
+    
+    return days.map(({ short, full }) => {
+      const dayHours = hours[full];
+      let displayHours = 'Closed';
+      
+      if (dayHours) {
+        if (dayHours.open === 'closed' || dayHours.close === 'closed') {
+          displayHours = 'Closed';
+        } else {
+          displayHours = `${dayHours.open} - ${dayHours.close}`;
+        }
+      }
+      
+      return {
+        day: short,
+        hours: displayHours,
+        isClosed: displayHours === 'Closed'
+      };
+    });
   };
 
   const renderPaymentMethods = (methods: string[]) => {
@@ -75,7 +98,7 @@ export default function PartnerInfoModal({
           {/* Header with close button */}
           <View style={styles.header}>
             <Text style={[styles.title, { color: theme.colors.text }]}>
-              {partner.profile[0]?.full_name}
+              {partner.profile?.[0]?.full_name || 'Partner'}
             </Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Ionicons name="close" size={24} color={theme.colors.text} />
@@ -167,10 +190,19 @@ export default function PartnerInfoModal({
                 <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Working Hours</Text>
               </View>
               <View style={styles.workingHours}>
-                {formatWorkingHours(partner.working_hours || {}).map(({ day, hours }) => (
+                {formatWorkingHours(partner.working_hours || {}).map(({ day, hours, isClosed }) => (
                   <View key={day} style={styles.workingHourRow}>
                     <Text style={[styles.dayText, { color: theme.colors.text }]}>{day}</Text>
-                    <Text style={[styles.hoursText, { color: theme.colors.text }]}>{hours}</Text>
+                    <Text 
+                      style={[
+                        styles.hoursText, 
+                        { 
+                          color: isClosed ? theme.colors.error : theme.colors.text 
+                        }
+                      ]}
+                    >
+                      {hours}
+                    </Text>
                   </View>
                 ))}
               </View>

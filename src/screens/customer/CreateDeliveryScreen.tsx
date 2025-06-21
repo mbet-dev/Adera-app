@@ -227,7 +227,6 @@ export default function CreateDeliveryScreen() {
         
         {/* HUD (Heads-Up Display) Elements */}
         <View style={[StyleSheet.absoluteFill, { zIndex: 1 }]} pointerEvents="box-none">
-
           <View style={styles.header}>
             <Text style={[styles.headerTitle, { color: '#333' }]} numberOfLines={1}>
               {Platform.OS === 'web' 
@@ -288,6 +287,8 @@ export default function CreateDeliveryScreen() {
               showsVerticalScrollIndicator={false}
             />
           </View>
+
+          <CreateDeliveryFAB />
         </View>
 
         {/* Partner Details Modal */}
@@ -296,11 +297,6 @@ export default function CreateDeliveryScreen() {
           partner={selectedPartner}
           onClose={handleModalClose}
         />
-
-        {/* Delivery Creation UI */}
-        <View style={styles.deliveryCreationLayer} pointerEvents="box-none">
-          <CreateDeliveryFAB />
-        </View>
       </View>
     </DeliveryCreationProvider>
   );
@@ -495,5 +491,10 @@ const styles = StyleSheet.create({
       width: 14,
       height: 14,
       borderRadius: 7,
-  }
+  },
+  mapControls: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+  },
 }); 

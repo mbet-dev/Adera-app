@@ -2,25 +2,22 @@ import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, Platform, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
-import { TermsModal } from '../TermsModal';
 import { DeliveryCreationModal } from './DeliveryCreationModal';
+import { useDeliveryCreation } from '../../contexts/DeliveryCreationContext';
 
 export default function CreateDeliveryFAB() {
   const theme = useTheme();
-  const [showTermsModal, setShowTermsModal] = useState(false);
-  const [showDeliveryModal, setShowDeliveryModal] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const { reset } = useDeliveryCreation();
 
   const handlePress = () => {
-    setShowTermsModal(true);
+    reset(); // Reset state every time the FAB is clicked to ensure a fresh start
+    setModalVisible(true);
   };
 
-  const handleTermsAccept = () => {
-    setShowTermsModal(false);
-    setShowDeliveryModal(true);
-  };
-
-  const handleDeliveryClose = () => {
-    setShowDeliveryModal(false);
+  const handleModalClose = () => {
+    setModalVisible(false);
+    // The reset is now handled on open, so we don't need it here.
   };
 
   return (
@@ -35,15 +32,9 @@ export default function CreateDeliveryFAB() {
         <Ionicons name="add" size={24} color="white" />
       </TouchableOpacity>
 
-      <TermsModal
-        visible={showTermsModal}
-        onAccept={handleTermsAccept}
-        onClose={() => setShowTermsModal(false)}
-      />
-
       <DeliveryCreationModal
-        visible={showDeliveryModal}
-        onClose={handleDeliveryClose}
+        visible={modalVisible}
+        onClose={handleModalClose}
       />
     </View>
   );

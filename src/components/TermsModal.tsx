@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../hooks/useTheme';
@@ -15,9 +16,53 @@ interface TermsModalProps {
   visible: boolean;
   onAccept: () => void;
   onClose: () => void;
+  buttonLabel?: string;
 }
 
-export function TermsModal({ visible, onAccept, onClose }: TermsModalProps) {
+const NON_ELIGIBLE_ITEMS: string[] = [
+  'Alcohol and illicit drugs',
+  'Explosives, firearms or ammunition',
+  'Flammable liquids or gases',
+  'Perishable food without proper packaging',
+  'Animals or live plants',
+  'Cash, precious metals or stones',
+  'Counterfeit or illegal goods',
+  'Hazardous chemicals',
+  'Human remains or body parts',
+  'Any item prohibited by Ethiopian law',
+];
+
+const NON_ELIGIBLE_URL = 'https://drive.google.com/file/d/1-GnUsKkGo-Rs343UxrmNgBpnA4hRwtZc/view?usp=drive_link';
+
+const DownloadNonEligibleButton = () => {
+  const theme = useTheme();
+  
+  const handleDownload = async () => {
+    const pdfUrl = 'https://drive.google.com/uc?export=download&id=1-GnUsKkGo-Rs343UxrmNgBpnA4hRwtZc';
+    
+    if (Platform.OS === 'web') {
+      window.open(pdfUrl, '_blank');
+    } else {
+      try {
+        await Linking.openURL(pdfUrl);
+      } catch (error) {
+        console.error('Error opening PDF:', error);
+      }
+    }
+  };
+
+  return (
+    <TouchableOpacity 
+      style={[styles.downloadButton, { backgroundColor: theme.colors.primary }]}
+      onPress={handleDownload}
+    >
+      <Ionicons name="download-outline" size={20} color="white" style={styles.downloadIcon} />
+      <Text style={styles.downloadText}>Download Terms & Conditions PDF</Text>
+    </TouchableOpacity>
+  );
+};
+
+export function TermsModal({ visible, onAccept, onClose, buttonLabel = 'Accept & Continue' }: TermsModalProps) {
   const theme = useTheme();
 
   return (
@@ -80,6 +125,12 @@ export function TermsModal({ visible, onAccept, onClose }: TermsModalProps) {
             <Text style={[styles.text, { color: theme.colors.text }]}>
               3. Claims must be filed within 24 hours of delivery.
             </Text>
+
+            <Text style={[styles.sectionTitle, { color: theme.colors.text, marginTop: 20 }]}>Non-Eligible Items</Text>
+            {NON_ELIGIBLE_ITEMS.map(item => (
+              <Text key={item} style={[styles.text, { color: theme.colors.error }]}>• {item}</Text>
+            ))}
+            <DownloadNonEligibleButton />
           </ScrollView>
 
           <View style={styles.footer}>
@@ -87,7 +138,7 @@ export function TermsModal({ visible, onAccept, onClose }: TermsModalProps) {
               style={[styles.button, { backgroundColor: theme.colors.primary }]}
               onPress={onAccept}
             >
-              <Text style={styles.buttonText}>Accept & Continue</Text>
+              <Text style={styles.buttonText}>{buttonLabel}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -165,6 +216,23 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  downloadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  downloadIcon: {
+    marginRight: 8,
+  },
+  downloadText: {
+    color: 'white',
+    fontSize: 14,
     fontWeight: '600',
   },
 }); 

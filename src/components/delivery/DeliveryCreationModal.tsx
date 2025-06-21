@@ -4,6 +4,10 @@ import { useTheme } from '../../hooks/useTheme';
 import { useDeliveryCreation } from '../../contexts/DeliveryCreationContext';
 import { TermsModal } from '../TermsModal';
 import { PackageDetailsForm } from './PackageDetailsForm';
+import { RecipientForm } from './RecipientForm';
+import { LocationSelectionForm } from './LocationSelectionForm';
+import { PaymentMethodForm } from './PaymentMethodForm';
+import { ConfirmationForm } from './ConfirmationForm';
 
 interface DeliveryCreationModalProps {
   visible: boolean;
@@ -22,10 +26,13 @@ export function DeliveryCreationModal({
     reset,
   } = useDeliveryCreation();
 
-  // Reset state when modal is closed
+  // This effect ensures that if the modal is closed unexpectedly (e.g., hardware back button), the state is cleared.
   React.useEffect(() => {
     if (!visible) {
-      reset();
+      // A small delay ensures the UI has time to close before state is wiped
+      setTimeout(() => {
+        reset();
+      }, 300);
     }
   }, [visible, reset]);
 
@@ -42,6 +49,14 @@ export function DeliveryCreationModal({
     setCurrentStep(currentStep + 1);
   }, [currentStep, setCurrentStep]);
 
+  const handlePrevStep = React.useCallback(() => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    } else {
+      onClose();
+    }
+  }, [currentStep, setCurrentStep, onClose]);
+
   // Show terms modal first if not accepted
   if (!termsAccepted) {
     return (
@@ -53,6 +68,27 @@ export function DeliveryCreationModal({
     );
   }
 
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return <PackageDetailsForm onNext={handleNextStep} onBack={handlePrevStep} />;
+      case 2:
+        return <RecipientForm onNext={handleNextStep} onBack={handlePrevStep} />;
+      case 3:
+        return <LocationSelectionForm onNext={handleNextStep} onBack={handlePrevStep} />;
+      case 4:
+        return <PaymentMethodForm onNext={handleNextStep} onBack={handlePrevStep} />;
+      case 5:
+        return <ConfirmationForm onConfirm={onClose} onBack={handlePrevStep} />;
+      default:
+        return null;
+    }
+  };
+
+  if (currentStep === 0) {
+    return null; // Don't render anything if we haven't started (e.g., after terms accepted but before step 1 set)
+  }
+
   return (
     <Modal
       visible={visible}
@@ -62,10 +98,7 @@ export function DeliveryCreationModal({
     >
       <View style={[styles.container, { backgroundColor: theme.colors.modalBackground }]}>
         <View style={[styles.content, { backgroundColor: theme.colors.background }]}>
-          {currentStep === 1 && (
-            <PackageDetailsForm onNext={handleNextStep} />
-          )}
-          {/* Add more steps here */}
+          {renderStep()}
         </View>
       </View>
     </Modal>

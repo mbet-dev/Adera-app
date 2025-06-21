@@ -29,6 +29,8 @@ export type ParcelTracking = {
   created_at: string;
 };
 
+export type PaymentMethod = 'sender_wallet' | 'sender_bank' | 'dropoff_partner' | 'receiver_wallet' | 'receiver_bank' | 'cash_on_delivery';
+
 export interface Partner {
   id: string;
   profile_id?: string;
@@ -38,9 +40,9 @@ export interface Partner {
   payment_methods?: string[];
   has_pos_machine?: boolean;
   accepts_proxy_payment?: boolean;
-  working_hours?: Record<string, string>;
+  working_hours?: Record<string, { open: string; close: string }>;
   image_url?: string;
-  image_urls?: string[];
+  images?: string[];
   profile?: Profile[];
   created_at?: string;
   updated_at?: string;

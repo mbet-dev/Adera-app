@@ -1,30 +1,19 @@
 import React from 'react';
-import { Partner } from '../types/database';
+import { Partner, PaymentMethod } from '../types/database';
 
 export type PackageSize = 'document' | 'small' | 'medium' | 'big';
 
 export interface PackageDetails {
   size: PackageSize;
   weight: number;
-  specialHandling: boolean;
   description?: string;
+  specialHandling: boolean;
 }
 
 export interface RecipientInfo {
+  name: string;
   phone: string;
-  name?: string;
-  isMember: boolean;
-  address?: string;
-  notes?: string;
 }
-
-export type PaymentMethod = 
-  | 'sender_wallet'
-  | 'sender_bank'
-  | 'dropoff_partner'
-  | 'receiver_wallet'
-  | 'receiver_bank'
-  | 'cash_on_delivery';
 
 export interface DeliveryCreationState {
   currentStep: number;

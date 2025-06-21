@@ -167,7 +167,7 @@
 - Edge function tests
 - Integration tests
 - Security tests
-- Payment integration tests
+- Payment integration tests 
 
 ## Delivery Creation Flow
 

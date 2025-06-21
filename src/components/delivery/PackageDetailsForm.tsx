@@ -21,9 +21,10 @@ const PACKAGE_SIZES: { label: string; value: PackageSize }[] = [
 
 interface PackageDetailsFormProps {
   onNext: () => void;
+  onBack: () => void;
 }
 
-export function PackageDetailsForm({ onNext }: PackageDetailsFormProps) {
+export function PackageDetailsForm({ onNext, onBack }: PackageDetailsFormProps) {
   const theme = useTheme();
   const { state, setPackageDetails } = useDeliveryCreation();
   const { packageDetails } = state;
@@ -170,6 +171,12 @@ export function PackageDetailsForm({ onNext }: PackageDetailsFormProps) {
 
       <View style={styles.buttonContainer}>
         <Button
+          title="Back"
+          onPress={onBack}
+          variant="secondary"
+          style={styles.button}
+        />
+        <Button
           title="Next"
           onPress={handleNext}
           variant="primary"
@@ -205,18 +212,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+    marginBottom: 8,
   },
   sizeButton: {
-    ...Platform.select({
-      web: {
-        flex: 0,
-        minWidth: 150,
-      },
-      default: {
-        flex: 1,
-        minWidth: '45%',
-      },
-    }),
+    flex: 1,
+    minWidth: 120,
   },
   input: {
     height: 40,
@@ -228,6 +228,7 @@ const styles = StyleSheet.create({
   textArea: {
     height: 100,
     paddingTop: 8,
+    paddingBottom: 8,
     textAlignVertical: 'top',
   },
   switchContainer: {
@@ -236,21 +237,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   error: {
-    fontSize: 14,
+    fontSize: 12,
     marginTop: 4,
   },
   buttonContainer: {
-    marginTop: 16,
+    marginTop: 32,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   button: {
-    ...Platform.select({
-      web: {
-        minWidth: 200,
-      },
-      default: {
-        minWidth: '100%',
-      },
-    }),
-    alignSelf: 'center',
+    height: 48,
   },
 }); 
