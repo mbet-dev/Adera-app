@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
@@ -142,7 +143,7 @@ export function LocationSelectionForm({ onNext, onBack }: LocationSelectionFormP
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.outerContainer}>
       <PartnerSelectionModal 
         visible={!!selectionType}
         partners={partners}
@@ -150,11 +151,10 @@ export function LocationSelectionForm({ onNext, onBack }: LocationSelectionFormP
         onSelect={handleSelect}
         loading={loading}
       />
-      <View style={styles.content}>
-        <Text style={[styles.title, { color: theme.colors.text }]}>
-          Select Locations
-        </Text>
-
+      <Text style={[styles.title, { color: theme.colors.text }]}>
+        Select Locations
+      </Text>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
             Dropoff Point
@@ -178,7 +178,9 @@ export function LocationSelectionForm({ onNext, onBack }: LocationSelectionFormP
             </Text>
           )}
         </View>
+      </ScrollView>
 
+      <View style={styles.footer}>
         <View style={styles.buttonContainer}>
           <Button
             title="Back"
@@ -194,16 +196,22 @@ export function LocationSelectionForm({ onNext, onBack }: LocationSelectionFormP
           />
         </View>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    height: '100%',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
   container: {
     flex: 1,
   },
   content: {
-    padding: 16,
+    // No padding here, handled by outer container
   },
   title: {
     fontSize: 24,
@@ -254,11 +262,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
   },
+  footer: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+    paddingTop: 16,
+    paddingBottom: Platform.OS === 'ios' ? 16 : 0,
+  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 12,
-    marginTop: 32,
   },
   button: {
     flex: 1,

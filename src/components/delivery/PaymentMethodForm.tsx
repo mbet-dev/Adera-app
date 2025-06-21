@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
@@ -66,13 +67,15 @@ export function PaymentMethodForm({ onNext, onBack }: PaymentMethodFormProps) {
   }, [dropoffPoint]);
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={[styles.title, { color: theme.colors.text }]}>
-          Payment Method
-        </Text>
-
-        <View style={styles.methodsGrid}>
+    <View style={styles.outerContainer}>
+      <Text style={[styles.title, { color: theme.colors.text }]}>
+        Select Payment Method
+      </Text>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+      >
+        <View style={styles.section}>
           {PAYMENT_METHODS.map(method => {
             const isAvailable = isMethodAvailable(method.value);
             const isSelected = paymentMethod === method.value;
@@ -113,14 +116,14 @@ export function PaymentMethodForm({ onNext, onBack }: PaymentMethodFormProps) {
               </TouchableOpacity>
             );
           })}
+          {error && (
+            <Text style={[styles.error, { color: theme.colors.error }]}>
+              {error}
+            </Text>
+          )}
         </View>
-
-        {error && (
-          <Text style={[styles.error, { color: theme.colors.error }]}>
-            {error}
-          </Text>
-        )}
-
+      </ScrollView>
+      <View style={styles.footer}>
         <View style={styles.buttonContainer}>
           <Button
             title="Back"
@@ -136,22 +139,32 @@ export function PaymentMethodForm({ onNext, onBack }: PaymentMethodFormProps) {
           />
         </View>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    height: '100%',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
   container: {
     flex: 1,
   },
   content: {
-    padding: 16,
+    // No padding here, handled by outer container
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 24,
     textAlign: 'center',
+    marginTop: 4,
+  },
+  section: {
+    // This style was missing
   },
   methodsGrid: {
     flexDirection: 'row',
@@ -184,13 +197,21 @@ const styles = StyleSheet.create({
     marginTop: 4,
     textAlign: 'center',
   },
+  footer: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+    paddingTop: 16,
+    paddingBottom: Platform.OS === 'ios' ? 16 : 0,
+  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 12,
-    marginTop: 32,
   },
   button: {
     flex: 1,
+  },
+  paymentMethod: {
+    borderWidth: 1,
   },
 }); 

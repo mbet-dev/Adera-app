@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
+  ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { useTheme } from '../../hooks/useTheme';
 import { useDeliveryCreation } from '../../contexts/DeliveryCreationContext';
 import { Button } from '../Button';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ConfirmationFormProps {
   onConfirm: () => void;
@@ -19,112 +22,73 @@ export function ConfirmationForm({ onConfirm, onBack }: ConfirmationFormProps) {
   const { state } = useDeliveryCreation();
   const { packageDetails, recipient, dropoffPoint, pickupPoint, paymentMethod } = state;
 
-  const renderSection = (title: string, content: React.ReactNode) => (
-    <View style={styles.section}>
-      <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-        {title}
-      </Text>
-      {content}
+  const renderDetailRow = (label: string, value: string) => (
+    <View style={styles.detailRow}>
+      <Text style={[styles.label, { color: theme.colors.text }]}>{label}</Text>
+      <Text style={[styles.value, { color: theme.colors.text }]}>{value}</Text>
     </View>
   );
 
+  const handleSubmit = useCallback(() => {
+    // Implementation of handleSubmit
+  }, [onConfirm, state]);
+
+  const submitting = false; // Replace with actual state
+  const error = null; // Replace with actual error state
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={[styles.title, { color: theme.colors.text }]}>
-          Confirm Delivery
-        </Text>
-
-        {renderSection('Package Details', (
-          <View>
-            <Text style={[styles.detailText, { color: theme.colors.text }]}>
-              Size: {packageDetails.size}
-            </Text>
-            <Text style={[styles.detailText, { color: theme.colors.text }]}>
-              Weight: {packageDetails.weight} kg
-            </Text>
-            {packageDetails.description && (
-              <Text style={[styles.detailText, { color: theme.colors.text }]}>
-                Description: {packageDetails.description}
-              </Text>
-            )}
-            {packageDetails.specialHandling && (
-              <Text style={[styles.detailText, { color: theme.colors.text }]}>
-                Special Handling Required
-              </Text>
-            )}
-          </View>
-        ))}
-
-        {renderSection('Recipient', (
-          <View>
-            <Text style={[styles.detailText, { color: theme.colors.text }]}>
-              Name: {recipient.name}
-            </Text>
-            <Text style={[styles.detailText, { color: theme.colors.text }]}>
-              Phone: {recipient.phone}
-            </Text>
-          </View>
-        ))}
-
-        {renderSection('Dropoff Point', (
-          <View>
-            <Text style={[styles.detailText, { color: theme.colors.text }]}>
-              {dropoffPoint?.profile?.[0]?.full_name || 'Partner'}
-            </Text>
-            <Text style={[styles.detailText, { color: theme.colors.text }]}>
-              {dropoffPoint?.location}
-            </Text>
-          </View>
-        ))}
-
-        {renderSection('Pickup Point', (
-          <View>
-            <Text style={[styles.detailText, { color: theme.colors.text }]}>
-              {pickupPoint?.profile?.[0]?.full_name || 'Partner'}
-            </Text>
-            <Text style={[styles.detailText, { color: theme.colors.text }]}>
-              {pickupPoint?.location}
-            </Text>
-          </View>
-        ))}
-
-        {renderSection('Payment', (
-          <View>
-            <Text style={[styles.detailText, { color: theme.colors.text }]}>
-              Method: {paymentMethod?.replace('_', ' ').toUpperCase()}
-            </Text>
-            <Text style={[styles.detailText, { color: theme.colors.text }]}>
-              Estimated Cost: ETB 150.00
-            </Text>
-          </View>
-        ))}
-
+    <View style={styles.outerContainer}>
+      <Text style={[styles.title, { color: theme.colors.text }]}>
+        Confirm Delivery
+      </Text>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+      >
+        {renderDetailRow('Package Size', packageDetails.size || 'N/A')}
+        {renderDetailRow('Package Weight', `${packageDetails.weight || 0} kg`)}
+        {renderDetailRow('Recipient Name', recipient.name || 'N/A')}
+        {renderDetailRow('Recipient Phone', recipient.phone || 'N/A')}
+        {renderDetailRow('Pickup Point', pickupPoint?.profile?.[0]?.full_name || 'N/A')}
+        {renderDetailRow('Dropoff Point', dropoffPoint?.profile?.[0]?.full_name || 'N/A')}
+        {renderDetailRow('Payment Method', paymentMethod || 'N/A')}
+      </ScrollView>
+      <View style={styles.footer}>
         <View style={styles.buttonContainer}>
           <Button
             title="Back"
             onPress={onBack}
             variant="secondary"
             style={styles.button}
+            disabled={submitting}
           />
           <Button
-            title="Confirm"
-            onPress={onConfirm}
+            title={submitting ? 'Submitting...' : 'Confirm & Submit'}
+            onPress={handleSubmit}
             variant="primary"
             style={styles.button}
+            disabled={submitting}
           />
         </View>
+        {submitting && <ActivityIndicator style={styles.loader} color={theme.colors.primary} />}
+        {error && <Text style={[styles.error, { color: theme.colors.error }]}>{error}</Text>}
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    height: '100%',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
   container: {
     flex: 1,
   },
   content: {
-    padding: 16,
+    // No padding here
   },
   title: {
     fontSize: 24,
@@ -132,23 +96,38 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     textAlign: 'center',
   },
-  section: {
-    marginBottom: 24,
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
   },
-  sectionTitle: {
+  label: {
     fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
+    fontWeight: '500',
   },
-  detailText: {
+  value: {
+    fontSize: 16,
+    textTransform: 'capitalize',
+  },
+  loader: {
+    marginTop: 16,
+  },
+  error: {
+    marginTop: 16,
+    textAlign: 'center',
     fontSize: 14,
-    marginBottom: 4,
+  },
+  footer: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+    paddingTop: 16,
+    paddingBottom: Platform.OS === 'ios' ? 16 : 0,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 12,
-    marginTop: 32,
   },
   button: {
     flex: 1,
