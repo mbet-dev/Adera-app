@@ -14,6 +14,7 @@
     "serve:web": "npx serve web-build"
   },
   "dependencies": {
+    "@expo/webpack-config": "^18",
     "@hookform/resolvers": "^5.0.1",
     "@react-native-async-storage/async-storage": "^2.1.2",
     "@react-native-community/netinfo": "^11.4.1",
@@ -21,7 +22,7 @@
     "@react-navigation/native": "^7.1.10",
     "@react-navigation/native-stack": "^7.3.14",
     "@react-navigation/stack": "^7.3.3",
-    "@supabase/supabase-js": "^2.50.0",
+    "@supabase/supabase-js": "^2.50.5",
     "@tanstack/react-query": "^5.79.2",
     "axios": "^1.9.0",
     "date-fns": "^4.1.0",
@@ -54,8 +55,7 @@
     "react-native-web": "~0.20",
     "react-native-webview": "^13.14.1",
     "yup": "^1.6.1",
-    "zustand": "^5.0.5",
-    "@expo/webpack-config": "^18"
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -64,7 +64,7 @@
     "@types/react-native": "^0.73.0",
     "@types/react-native-vector-icons": "^6.4.18",
     "@types/react-navigation": "^3.4.0",
-    "dotenv": "^16.5.0",
+    "dotenv": "^16.6.1",
     "ts-node": "^10.9.2",
     "typescript": "~5.8.3"
   },

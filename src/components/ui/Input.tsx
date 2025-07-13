@@ -1,72 +1,103 @@
-import React from 'react';
-import { View, TextInput, StyleSheet, Platform } from 'react-native';
-import { Text } from './Text';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import React, { useState } from 'react';
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  ViewStyle,
+  TextStyle,
+  TextInputProps,
+} from 'react-native';
 
-export interface InputProps {
-  value: string;
-  onChangeText: (text: string) => void;
-  placeholder?: string;
+export interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
-  secureTextEntry?: boolean;
-  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
-  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
-  rightIcon?: string;
-  onRightIconPress?: () => void;
-  style?: any;
-  inputStyle?: any;
-  labelStyle?: any;
-  errorStyle?: any;
+  helperText?: string;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  containerStyle?: ViewStyle;
+  inputStyle?: TextStyle;
+  labelStyle?: TextStyle;
+  errorStyle?: TextStyle;
+  helperStyle?: TextStyle;
 }
 
 export const Input: React.FC<InputProps> = ({
-  value,
-  onChangeText,
-  placeholder,
   label,
   error,
-  secureTextEntry,
-  keyboardType = 'default',
-  autoCapitalize = 'none',
+  helperText,
+  leftIcon,
   rightIcon,
-  onRightIconPress,
-  style,
+  containerStyle,
   inputStyle,
   labelStyle,
   errorStyle,
+  helperStyle,
+  style,
+  ...props
 }) => {
+  const [isFocused, setIsFocused] = useState(false);
+
+  const handleFocus = (e: any) => {
+    setIsFocused(true);
+    props.onFocus?.(e);
+  };
+
+  const handleBlur = (e: any) => {
+    setIsFocused(false);
+    props.onBlur?.(e);
+  };
+
   return (
-    <View style={[styles.container, style]}>
+    <View style={[styles.container, containerStyle]}>
       {label && (
-        <Text style={[styles.label, labelStyle]}>{label}</Text>
+        <Text style={[styles.label, labelStyle]}>
+          {label}
+        </Text>
       )}
-      <View style={styles.inputContainer}>
+      
+      <View style={[
+        styles.inputContainer,
+        isFocused && styles.focused,
+        error && styles.error,
+        style,
+      ]}>
+        {leftIcon && (
+          <View style={styles.leftIcon}>
+            {leftIcon}
+          </View>
+        )}
+        
         <TextInput
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          secureTextEntry={secureTextEntry}
-          keyboardType={keyboardType}
-          autoCapitalize={autoCapitalize}
           style={[
             styles.input,
-            Platform.OS === 'web' && styles.webInput,
+            leftIcon ? styles.inputWithLeftIcon : null,
+            rightIcon ? styles.inputWithRightIcon : null,
             inputStyle,
           ]}
+          placeholderTextColor="#9CA3AF"
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          {...props}
         />
+        
         {rightIcon && (
-          <Icon
-            name={rightIcon}
-            size={24}
-            color="#666"
-            onPress={onRightIconPress}
-            style={styles.icon}
-          />
+          <View style={styles.rightIcon}>
+            {rightIcon}
+          </View>
         )}
       </View>
+      
       {error && (
-        <Text style={[styles.error, errorStyle]}>{error}</Text>
+        <Text style={[styles.errorText, errorStyle]}>
+          {error}
+        </Text>
+      )}
+      
+      {helperText && !error && (
+        <Text style={[styles.helperText, helperStyle]}>
+          {helperText}
+        </Text>
       )}
     </View>
   );
@@ -76,33 +107,69 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
   },
+  
   label: {
-    marginBottom: 8,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '500',
+    color: '#374151',
+    marginBottom: 6,
   },
+  
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#D1D5DB',
     borderRadius: 8,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
+    minHeight: 48,
   },
+  
+  focused: {
+    borderColor: '#3B82F6',
+    borderWidth: 2,
+  },
+  
+  error: {
+    borderColor: '#EF4444',
+    borderWidth: 2,
+  },
+  
+  leftIcon: {
+    paddingLeft: 12,
+    paddingRight: 8,
+  },
+  
+  rightIcon: {
+    paddingLeft: 8,
+    paddingRight: 12,
+  },
+  
   input: {
     flex: 1,
-    padding: 12,
     fontSize: 16,
+    color: '#111827',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
   },
-  webInput: {
-    outlineStyle: 'none' as const,
+  
+  inputWithLeftIcon: {
+    paddingLeft: 8,
   },
-  icon: {
-    padding: 12,
+  
+  inputWithRightIcon: {
+    paddingRight: 8,
   },
-  error: {
-    color: '#ff3b30',
-    fontSize: 14,
+  
+  errorText: {
+    fontSize: 12,
+    color: '#EF4444',
+    marginTop: 4,
+  },
+  
+  helperText: {
+    fontSize: 12,
+    color: '#6B7280',
     marginTop: 4,
   },
 }); 

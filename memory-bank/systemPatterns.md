@@ -1,293 +1,284 @@
-# System Patterns
+# Adera App - System Patterns
 
 ## Architecture Overview
 
-### Cross-Platform Architecture
-- Shared business logic
-- Platform-specific UI components
-- Unified state management
-- Common API layer
-- Shared type definitions
-- Platform detection utilities
-
-### Mobile App Architecture
-- Expo-based React Native
-- Component-based architecture
-- Navigation stack management
-- State management with Zustand
-- Custom hooks for shared logic
-- Service layer for API communication
-
-### Web App Architecture
-- React with TypeScript
-- Component-based architecture
-- React Router for navigation
-- State management with Zustand
-- Custom hooks for shared logic
-- Service layer for API communication
-
-### Backend Architecture (Supabase)
-- PostgreSQL database
-- Row Level Security (RLS)
-- Real-time subscriptions
-- Edge Functions
-- Storage buckets
-- Authentication system
+### High-Level Architecture
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Mobile App    │    │   Web App       │    │   Admin Panel   │
+│   (React Native)│    │   (React)       │    │   (React)       │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+                    ┌─────────────────┐
+                    │   Supabase      │
+                    │   (Backend)     │
+                    └─────────────────┘
+                                 │
+         ┌───────────────────────┼───────────────────────┐
+         │                       │                       │
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Payment APIs  │    │   SMS Service   │    │   Map Services  │
+│   (Telebirr,    │    │   (Twilio)      │    │   (OpenStreet)  │
+│    Chapa)       │    │                 │    │                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
 
 ## Design Patterns
 
-### Frontend Patterns
-- Platform-specific components
-- Shared business logic
-- Custom hooks for platform detection
-- Service layer pattern
-- Repository pattern for data access
-- Factory pattern for QR codes
-- Strategy pattern for platform-specific features
+### 1. Role-Based Access Control (RBAC)
+```typescript
+enum UserRole {
+  CUSTOMER = 'customer',
+  PARTNER = 'partner',
+  DRIVER = 'driver',
+  STAFF = 'staff',
+  ADMIN = 'admin'
+}
 
-### Backend Patterns
-- Row Level Security policies
-- Real-time subscription patterns
-- Event-driven architecture
-- Repository pattern
-- Factory pattern for QR codes
-- Strategy pattern for payment processing
-
-### QR Code System
-- **Structure Format**:
-  ```
-  QR_CODE = TRACKING_ID + PHASE_FLAG + TIMESTAMP + HASH
-  Example: ADE20231001-2-1672531005-7c6d3a
-  ```
-- **Phase Flags**:
-  - 0: Created
-  - 1: At Dropoff Partner
-  - 2: Courier Picked Up (to Hub)/in_transit_to_hub
-  - 3: At Sorting Hub
-  - 4: Courier Picked Up (to Recipient)/dispatched
-  - 5: At Pickup Partner
-  - 6: Delivered
-- **Validation Logic**:
-  - Partners/Couriers scan QR → Backend verifies phase progression
-  - Each scan tied to timestamp, location, and user role
-  - Phase transitions must follow valid sequence
-
-## Component Structure
-
-### Shared Components
-- Authentication forms
-- QR code scanner/generator
-- Map components
-- Chat interface
-- Payment forms
-- Loading states
-- Error boundaries
-
-### Mobile-Specific Components
-- Native navigation
-- Camera integration
-- Push notifications
-- Location services
-- Biometric authentication
-
-### Web-Specific Components
-- Browser notifications
-- File upload
-- Progressive Web App
-- Browser storage
-- Service workers
-
-## State Management
-
-### Global State
-- User authentication
-- Language preferences
-- Theme settings
-- Navigation state
-- Error handling
-- Platform detection
-
-### Local State
-- Form state
-- Parcel tracking
-- Map state
-- Chat state
-- Payment state
-- Platform-specific features
-
-## Data Flow
-
-### Frontend Data Flow
-- Supabase queries
-- Real-time subscriptions
-- State updates
-- Cache management
-- Error handling
-- Platform-specific data handling
-
-### Backend Data Flow
-- RLS policies
-- Real-time events
-- Database triggers
-- Edge functions
-- Storage operations
-- Payment processing
-
-## Security Patterns
-
-### Authentication
-- Supabase Auth
-- JWT tokens
-- Biometric authentication
-- Session management
-- Role-based access
-- Platform-specific security
-
-### Authorization
-- Row Level Security
-- Role-based permissions
-- Resource protection
-- API security
-- Data encryption
-- Platform-specific security
-
-## Testing Strategy
-
-### Frontend Testing
-- Unit tests
-- Integration tests
-- E2E tests with Detox
-- Performance tests
-- Accessibility tests
-- Cross-platform tests
-
-### Backend Testing
-- Database tests
-- RLS policy tests
-- Edge function tests
-- Integration tests
-- Security tests
-- Payment integration tests 
-
-## Delivery Creation Flow
-
-```mermaid
-flowchart TD
-    Start[FAB Press] --> TC[Terms & Conditions]
-    TC -->|Accept| Step1[Package Details]
-    TC -->|Reject| End
-
-    Step1 --> Step2[Recipient Info]
-    Step2 --> Step3[Dropoff Selection]
-    Step3 --> Step4[Pickup Selection]
-    Step4 --> Step5[Payment Method]
-    Step5 --> Step6[Confirmation]
-    
-    Step6 -->|Confirm| Generate[Generate QR]
-    Generate --> Store[Store Delivery]
-    Store --> Notify[Notify Partners]
-    
-    Step6 -->|Cancel| End
+interface User {
+  id: string;
+  role: UserRole;
+  permissions: Permission[];
+}
 ```
 
-## QR Code Lifecycle
-
-```mermaid
-flowchart TD
-    Create[Create Delivery] --> GenQR[Generate Initial QR]
-    GenQR --> Store[Store in Database]
-    
-    Store --> Track[Track Phase Changes]
-    Track --> Pickup[Reach Pickup Point]
-    
-    Pickup --> NewHash[Generate New Hash]
-    NewHash --> SendSMS[Send SMS to Receiver]
-    SendSMS --> Verify[Verify at Delivery]
+### 2. State Management Pattern
+```typescript
+// Zustand Store Structure
+interface AppState {
+  // User state
+  user: User | null;
+  isAuthenticated: boolean;
+  
+  // Parcel state
+  parcels: Parcel[];
+  activeParcel: Parcel | null;
+  
+  // UI state
+  loading: boolean;
+  error: string | null;
+  
+  // Actions
+  setUser: (user: User) => void;
+  setParcels: (parcels: Parcel[]) => void;
+  // ... other actions
+}
 ```
 
-## Payment Flow Patterns
+### 3. Service Layer Pattern
+```typescript
+// Service interfaces
+interface ParcelService {
+  createParcel(data: CreateParcelData): Promise<Parcel>;
+  trackParcel(trackingId: string): Promise<ParcelStatus>;
+  updateStatus(parcelId: string, status: ParcelStatus): Promise<void>;
+}
 
-```mermaid
-flowchart TD
-    Start[Payment Selection] --> Case1[Direct Payment]
-    Start --> Case2[Partner Payment]
-    Start --> Case3[Receiver Payment]
-    Start --> Case4[Bank Payment]
-    Start --> Case5[Cash on Delivery]
-    
-    Case1 --> Wallet[Wallet]
-    Case1 --> Bank[Bank]
-    
-    Case2 --> PartnerWallet[Partner Wallet]
-    Case3 --> ReceiverWallet[Receiver Wallet]
-    Case4 --> BankTransfer[Bank Transfer]
-    Case5 --> CashAtPickup[Cash at Pickup]
+interface PaymentService {
+  processPayment(data: PaymentData): Promise<PaymentResult>;
+  verifyPayment(paymentId: string): Promise<PaymentStatus>;
+}
+```
+
+### 4. Repository Pattern
+```typescript
+// Data access layer
+interface ParcelRepository {
+  findById(id: string): Promise<Parcel | null>;
+  findByTrackingId(trackingId: string): Promise<Parcel | null>;
+  create(data: CreateParcelData): Promise<Parcel>;
+  update(id: string, data: Partial<Parcel>): Promise<Parcel>;
+}
 ```
 
 ## Component Architecture
 
-```mermaid
-flowchart TD
-    FAB[Floating Action Button] --> Modal[Multi-Step Modal]
-    
-    Modal --> TC[Terms Modal]
-    Modal --> Package[Package Form]
-    Modal --> Recipient[Recipient Form]
-    Modal --> Partners[Partner Selection]
-    Modal --> Payment[Payment Selection]
-    Modal --> Confirm[Confirmation]
-    
-    Partners --> Map[Map View]
-    Partners --> List[List View]
-    
-    Payment --> Methods[Payment Methods]
-    Payment --> Summary[Order Summary]
+### 1. Screen Components
+```
+screens/
+├── auth/
+│   ├── LoginScreen.tsx
+│   ├── RegisterScreen.tsx
+│   └── ForgotPasswordScreen.tsx
+├── customer/
+│   ├── DashboardScreen.tsx
+│   ├── CreateParcelScreen.tsx
+│   ├── TrackParcelScreen.tsx
+│   └── ProfileScreen.tsx
+├── partner/
+│   ├── PartnerDashboardScreen.tsx
+│   ├── ScanParcelScreen.tsx
+│   ├── InventoryScreen.tsx
+│   └── EarningsScreen.tsx
+├── driver/
+│   ├── DriverDashboardScreen.tsx
+│   ├── RouteScreen.tsx
+│   └── ScanParcelScreen.tsx
+└── admin/
+    ├── AdminDashboardScreen.tsx
+    ├── UserManagementScreen.tsx
+    └── AnalyticsScreen.tsx
 ```
 
-## State Management Pattern
-
-```mermaid
-flowchart LR
-    Context[Delivery Context] --> State[Current State]
-    Context --> Actions[Actions]
-    
-    State --> View[UI Components]
-    Actions --> API[API Calls]
-    
-    API --> State
-    View --> Actions
+### 2. Reusable Components
+```
+components/
+├── ui/
+│   ├── Button.tsx
+│   ├── Input.tsx
+│   ├── Card.tsx
+│   └── Modal.tsx
+├── forms/
+│   ├── ParcelForm.tsx
+│   ├── PaymentForm.tsx
+│   └── PartnerRegistrationForm.tsx
+├── maps/
+│   ├── MapView.tsx
+│   ├── LocationPicker.tsx
+│   └── RouteDisplay.tsx
+└── business/
+    ├── ParcelCard.tsx
+    ├── StatusTimeline.tsx
+    ├── QRScanner.tsx
+    └── PaymentMethods.tsx
 ```
 
-## Data Flow
+## Data Flow Patterns
 
-```mermaid
-flowchart TD
-    Client[Client App] --> API[Supabase API]
-    API --> DB[Database]
-    
-    DB --> Cache[Cache Layer]
-    Cache --> Client
-    
-    API --> SMS[SMS Service]
-    API --> Payment[Payment Gateway]
-    API --> Notify[Notifications]
+### 1. Parcel Creation Flow
+```
+User Input → Form Validation → API Call → Database → Real-time Update → UI Update
 ```
 
-## Error Handling Pattern
+### 2. Real-time Tracking Flow
+```
+Database Change → Supabase Realtime → Client Subscription → State Update → UI Re-render
+```
 
-```mermaid
-flowchart TD
-    Error[Error Occurs] --> Type[Determine Type]
-    
-    Type --> Network[Network Error]
-    Type --> Validation[Validation Error]
-    Type --> Auth[Auth Error]
-    
-    Network --> Retry[Retry Logic]
-    Validation --> Form[Form Feedback]
-    Auth --> Login[Re-auth Flow]
-    
-    Retry --> Success[Success]
-    Form --> Fix[User Fix]
-    Login --> Token[New Token]
+### 3. Payment Processing Flow
+```
+Payment Request → Payment Gateway → Webhook → Database Update → Notification → UI Update
+```
+
+## Security Patterns
+
+### 1. Row Level Security (RLS)
+```sql
+-- Example RLS policy for parcels
+CREATE POLICY "Users can view their own parcels" ON parcels
+FOR SELECT USING (auth.uid() = sender_id OR auth.uid() = recipient_id);
+```
+
+### 2. Authentication Flow
+```
+Login → JWT Token → Secure Storage → API Calls → Token Refresh → Logout
+```
+
+### 3. Data Validation
+```typescript
+// Input validation schema
+const parcelSchema = yup.object({
+  recipientName: yup.string().required(),
+  recipientPhone: yup.string().matches(/^\+251\d{9}$/),
+  packageType: yup.string().oneOf(['document', 'small', 'medium', 'large']),
+  pickupLocation: yup.object({
+    latitude: yup.number().required(),
+    longitude: yup.number().required()
+  })
+});
+```
+
+## Error Handling Patterns
+
+### 1. Global Error Boundary
+```typescript
+class ErrorBoundary extends React.Component {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Log error to monitoring service
+    // Show user-friendly error message
+  }
+}
+```
+
+### 2. API Error Handling
+```typescript
+const handleApiError = (error: ApiError) => {
+  switch (error.code) {
+    case 'NETWORK_ERROR':
+      return 'Please check your internet connection';
+    case 'UNAUTHORIZED':
+      return 'Please log in again';
+    default:
+      return 'Something went wrong. Please try again.';
+  }
+};
+```
+
+## Performance Patterns
+
+### 1. Lazy Loading
+```typescript
+// Lazy load screens
+const CreateParcelScreen = lazy(() => import('./CreateParcelScreen'));
+const TrackParcelScreen = lazy(() => import('./TrackParcelScreen'));
+```
+
+### 2. Caching Strategy
+```typescript
+// React Query caching
+const { data: parcels } = useQuery({
+  queryKey: ['parcels', userId],
+  queryFn: () => parcelService.getUserParcels(userId),
+  staleTime: 5 * 60 * 1000, // 5 minutes
+  cacheTime: 10 * 60 * 1000, // 10 minutes
+});
+```
+
+### 3. Image Optimization
+```typescript
+// Progressive image loading
+const OptimizedImage = ({ uri, ...props }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  
+  return (
+    <Image
+      source={{ uri }}
+      onLoad={() => setIsLoaded(true)}
+      style={[props.style, { opacity: isLoaded ? 1 : 0.3 }]}
+      {...props}
+    />
+  );
+};
+```
+
+## Testing Patterns
+
+### 1. Component Testing
+```typescript
+describe('ParcelCard', () => {
+  it('should display parcel information correctly', () => {
+    render(<ParcelCard parcel={mockParcel} />);
+    expect(screen.getByText(mockParcel.trackingId)).toBeInTheDocument();
+  });
+});
+```
+
+### 2. Integration Testing
+```typescript
+describe('Parcel Creation Flow', () => {
+  it('should create parcel successfully', async () => {
+    // Test complete flow from form to database
+  });
+});
+```
+
+### 3. E2E Testing
+```typescript
+describe('Customer Journey', () => {
+  it('should complete parcel delivery process', async () => {
+    // Test complete user journey
+  });
+});
 ``` 

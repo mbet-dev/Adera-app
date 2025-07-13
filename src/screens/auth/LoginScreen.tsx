@@ -1,296 +1,220 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Platform } from 'react-native';
-import { useTheme } from '../../contexts/ThemeContext';
-import { useAuth } from '../../contexts/AuthContext';
-import { useBiometric } from '../../hooks/useBiometric';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../types/navigation';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Alert,
+} from 'react-native';
+import { useAuthStore } from '../../store/useAuthStore';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Card } from '../../components/ui/Card';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Auth'>;
-
-export default function LoginScreen({ navigation }: Props) {
-  const { colors } = useTheme();
-  const { login } = useAuth();
-  const { isAvailable, authenticate, hasBiometricCredentials } = useBiometric();
+export const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showManualLogin, setShowManualLogin] = useState(Platform.OS === 'web');
-  const [biometricsEnabled, setBiometricsEnabled] = useState(false);
-  const [initialCheckDone, setInitialCheckDone] = useState(Platform.OS === 'web');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
-  // Check biometric status immediately on mount for native
-  useEffect(() => {
-    if (Platform.OS === 'web') return;
+  const { signIn, isLoading, error, clearError } = useAuthStore();
 
-    const initBiometrics = async () => {
-      try {
-        if (isAvailable) {
-          const hasCredentials = await hasBiometricCredentials();
-          setBiometricsEnabled(hasCredentials);
-          if (hasCredentials) {
-            handleBiometricLogin();
-          } else {
-            setShowManualLogin(true);
-          }
-        } else {
-          setShowManualLogin(true);
-        }
-      } catch (error) {
-        console.error('Biometric initialization error:', error);
-        setShowManualLogin(true);
-      } finally {
-        setInitialCheckDone(true);
-      }
-    };
+  const validateForm = () => {
+    let isValid = true;
+    
+    // Reset errors
+    setEmailError('');
+    setPasswordError('');
+    clearError();
 
-    initBiometrics();
-  }, [isAvailable]);
-
-  const handleBiometricLogin = async () => {
-    try {
-      setLoading(true);
-      const credentials = await authenticate();
-      if (credentials) {
-        await login(credentials.email, credentials.password);
-      } else {
-        setShowManualLogin(true);
-      }
-    } catch (error: any) {
-      Alert.alert('Error', 'Biometric authentication failed. Please log in manually.');
-      setShowManualLogin(true);
-    } finally {
-      setLoading(false);
+    // Validate email
+    if (!email) {
+      setEmailError('Email is required');
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError('Please enter a valid email');
+      isValid = false;
     }
+
+    // Validate password
+    if (!password) {
+      setPasswordError('Password is required');
+      isValid = false;
+    } else if (password.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      isValid = false;
+    }
+
+    return isValid;
   };
 
-  const handleManualLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+  const handleLogin = async () => {
+    if (!validateForm()) {
       return;
     }
+
     try {
-      setLoading(true);
-      await login(email, password);
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to sign in');
-      setLoading(false); // Ensure loading is stopped on error
+      await signIn(email, password);
+    } catch (error) {
+      Alert.alert('Login Error', 'Failed to sign in. Please try again.');
     }
-    // No need to set loading false here, as onAuthStateChange will trigger re-render
   };
 
-  // Show loading state while initial check is in progress
-  if (!initialCheckDone) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.biometricPrompt}>
-          <Icon name="fingerprint" size={64} color={colors.primary} />
-          <Text style={[styles.subtitle, { color: colors.text }]}>
-            Checking login options...
-          </Text>
-        </View>
-      </View>
-    );
-  }
-
-  // Show biometric prompt screen
-  if (!showManualLogin && biometricsEnabled) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.biometricPrompt}>
-          <Icon name="fingerprint" size={64} color={colors.primary} />
-          <Text style={[styles.title, { color: colors.text }]}>
-            Login with Biometrics
-          </Text>
-          {loading && (
-            <Text style={[styles.subtitle, { color: colors.text }]}>
-              Authenticating...
-            </Text>
-          )}
-          <TouchableOpacity
-            style={styles.switchToManual}
-            onPress={() => setShowManualLogin(true)}
-          >
-            <Text style={[styles.switchToManualText, { color: colors.primary }]}>
-              Use email and password instead
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
-  // Show traditional login screen
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>
-          Welcome Back
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.text }]}>
-          Sign in to continue
-        </Text>
-      </View>
-
-      <View style={styles.form}>
-        <TextInput
-          style={[styles.input, { 
-            backgroundColor: colors.card,
-            color: colors.text,
-            borderColor: colors.border
-          }]}
-          placeholder="Email"
-          placeholderTextColor={colors.placeholder}
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
-
-        <TextInput
-          style={[styles.input, { 
-            backgroundColor: colors.card,
-            color: colors.text,
-            borderColor: colors.border
-          }]}
-          placeholder="Password"
-          placeholderTextColor={colors.placeholder}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        {biometricsEnabled && (
-          <TouchableOpacity
-            style={[styles.biometricButton, { borderColor: colors.border }]}
-            onPress={handleBiometricLogin}
-            disabled={loading}
-          >
-            <Icon name="fingerprint" size={24} color={colors.primary} />
-            <Text style={[styles.biometricText, { color: colors.text }]}>
-              Use biometric login
-            </Text>
-          </TouchableOpacity>
-        )}
-
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: colors.primary }]}
-          onPress={handleManualLogin}
-          disabled={loading}
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoidingView}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.buttonText}>
-            {loading ? 'Signing in...' : 'Sign In'}
-          </Text>
-        </TouchableOpacity>
+          <View style={styles.content}>
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={styles.title}>Welcome to Adera</Text>
+              <Text style={styles.subtitle}>
+                Sign in to your account to continue
+              </Text>
+            </View>
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate('ForgotPassword')}
-          style={styles.forgotPassword}
-        >
-          <Text style={[styles.forgotPasswordText, { color: colors.primary }]}>
-            Forgot Password?
-          </Text>
-        </TouchableOpacity>
-      </View>
+            {/* Login Form */}
+            <Card style={styles.formCard}>
+              <Input
+                label="Email"
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Enter your email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                error={emailError}
+              />
 
-      <View style={styles.footer}>
-        <Text style={[styles.footerText, { color: colors.text }]}>
-          Don't have an account?{' '}
-        </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-          <Text style={[styles.footerLink, { color: colors.primary }]}>
-            Sign Up
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+              <Input
+                label="Password"
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Enter your password"
+                secureTextEntry
+                error={passwordError}
+              />
+
+              {error && (
+                <Text style={styles.errorText}>
+                  {error}
+                </Text>
+              )}
+
+              <Button
+                title="Sign In"
+                onPress={handleLogin}
+                loading={isLoading}
+                fullWidth
+                style={styles.loginButton}
+              />
+
+              <View style={styles.forgotPassword}>
+                <Text style={styles.forgotPasswordText}>
+                  Forgot your password?
+                </Text>
+              </View>
+            </Card>
+
+            {/* Sign Up Link */}
+            <View style={styles.signUpContainer}>
+              <Text style={styles.signUpText}>
+                Don't have an account?{' '}
+                <Text style={styles.signUpLink}>
+                  Sign up
+                </Text>
+              </Text>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20
+    backgroundColor: '#F9FAFB',
   },
-  biometricPrompt: {
+  
+  keyboardAvoidingView: {
     flex: 1,
+  },
+  
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    gap: 20
   },
-  switchToManual: {
-    marginTop: 20
+  
+  content: {
+    padding: 24,
   },
-  switchToManualText: {
-    fontSize: 16
-  },
+  
   header: {
-    marginTop: 60,
-    marginBottom: 40
+    alignItems: 'center',
+    marginBottom: 32,
   },
+  
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 8
+    color: '#111827',
+    marginBottom: 8,
   },
+  
   subtitle: {
     fontSize: 16,
-    opacity: 0.7
+    color: '#6B7280',
+    textAlign: 'center',
   },
-  form: {
-    gap: 16
+  
+  formCard: {
+    marginBottom: 24,
   },
-  input: {
-    height: 50,
-    borderRadius: 12,
-    borderWidth: 1,
-    paddingHorizontal: 16,
-    fontSize: 16
+  
+  loginButton: {
+    marginTop: 8,
   },
-  button: {
-    height: 50,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 8
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600'
-  },
-  biometricButton: {
-    height: 50,
-    borderRadius: 12,
-    borderWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8
-  },
-  biometricText: {
-    fontSize: 16,
-    fontWeight: '500'
-  },
+  
   forgotPassword: {
     alignItems: 'center',
-    marginTop: 16
+    marginTop: 16,
   },
+  
   forgotPasswordText: {
-    fontSize: 16
+    fontSize: 14,
+    color: '#3B82F6',
+    textDecorationLine: 'underline',
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 'auto',
-    marginBottom: 20
+  
+  signUpContainer: {
+    alignItems: 'center',
   },
-  footerText: {
-    fontSize: 16
+  
+  signUpText: {
+    fontSize: 14,
+    color: '#6B7280',
   },
-  footerLink: {
-    fontSize: 16,
-    fontWeight: '600'
-  }
+  
+  signUpLink: {
+    color: '#3B82F6',
+    fontWeight: '600',
+  },
+  
+  errorText: {
+    fontSize: 14,
+    color: '#EF4444',
+    textAlign: 'center',
+    marginTop: 8,
+  },
 }); 

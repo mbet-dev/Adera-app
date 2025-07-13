@@ -1,154 +1,53 @@
-# Product Context
+# Adera App - Product Context
 
-## Problem Statement
-Urban delivery in Addis Ababa faces challenges with tracking, reliability, and communication. Adera aims to solve these issues by providing a comprehensive parcel delivery and tracking platform that connects customers, partners, and couriers in real-time, accessible through both mobile and web platforms.
+## Why This Project Exists
 
-## User Experience Goals
+### Problem Statement
+Addis Ababa faces significant challenges in urban logistics and e-commerce:
+- **Fragmented Delivery Services**: No unified platform for reliable parcel delivery
+- **Limited E-commerce Infrastructure**: Small businesses struggle to establish online presence
+- **Payment Barriers**: Cash-based culture with limited digital payment adoption
+- **Language Barriers**: Diverse linguistic communities need localized solutions
+- **Trust Issues**: Lack of secure, verifiable delivery tracking
+
+### Market Opportunity
+- **Growing Urban Population**: Addis Ababa's expanding middle class
+- **Mobile-First Users**: High smartphone penetration with limited desktop usage
+- **Small Business Growth**: Increasing demand for digital commerce solutions
+- **Delivery Gap**: Underserved last-mile delivery market
+
+## How It Should Work
 
 ### Core User Experience
-- Intuitive cross-platform interface
-- Real-time parcel tracking
-- Seamless payment processing
-- Multilingual support
-- Offline capabilities
-- Push notifications
-- Role-specific dashboards
+1. **Seamless Parcel Creation**: Simple, guided process for sending packages
+2. **Real-Time Tracking**: Live updates with map visualization
+3. **Secure Verification**: QR codes and pickup codes for parcel security
+4. **Flexible Payments**: Multiple payment options including COD
+5. **Partner Integration**: Easy onboarding for pickup/drop-off points
 
-### User Interface
-- Clean and modern design
-- Role-specific layouts
-- Map-based interactions
-- QR code scanning
-- Chat interface
-- Status updates
-- Platform-specific optimizations
+### E-Commerce Subsystem
+- **Partner Storefronts**: Pre-designed templates for quick setup
+- **Inventory Management**: Integrated with delivery logistics
+- **Commission Structure**: Transparent revenue sharing
+- **Local Promotion**: In-app advertising and promotions
 
-### User Interaction
-- Smooth parcel creation flow
-- Real-time tracking updates
-- In-app chat system
-- Payment processing
-- Photo upload for verification
-- Status confirmation
-- Platform-specific gestures
+### User Experience Goals
+- **Intuitive Navigation**: Role-based interfaces optimized for each user type
+- **Offline Functionality**: Critical features work without internet
+- **Multilingual Support**: Full localization in 5 languages
+- **Performance**: Fast loading and smooth interactions
+- **Accessibility**: Usable by people with varying technical skills
 
-## Key Features
+## Key Differentiators
+1. **Hybrid Model**: Combines logistics with e-commerce
+2. **Local Focus**: Designed specifically for Ethiopian market
+3. **Partner Ecosystem**: Enables small businesses to grow
+4. **Trust Building**: Transparent tracking and verification
+5. **Scalable Architecture**: Ready for regional expansion
 
-### Role-Based Features
-
-#### Customer
-- Parcel creation and tracking
-- Payment processing
-- Real-time updates
-- Chat with courier
-- Delivery history
-- Profile management
-
-#### Partner (Business)
-- Bulk parcel management
-- Business profile
-- Analytics dashboard
-- Payment history
-- Customer management
-- Delivery scheduling
-
-#### Courier
-- Delivery assignments
-- Route optimization
-- Real-time location sharing
-- QR code scanning
-- Delivery confirmation
-- Earnings tracking
-
-#### Sorting Facility Personnel
-- Parcel sorting
-- Status updates
-- Inventory management
-- Route assignment
-- Quality control
-
-#### Admin
-- User management
-- System monitoring
-- Analytics and reporting
-- Payment management
-- Support management
-- System configuration
-
-### Platform-Specific Features
-
-#### Mobile
-- Push notifications
-- Camera integration
-- GPS tracking
-- Biometric authentication
-- Offline mode
-- Background sync
-
-#### Web
-- Browser notifications
-- File upload
-- Progressive Web App
-- Browser storage
-- Service workers
-- Responsive design
-
-## Integration Capabilities
-- Telebirr payment
-- Chapa payment
-- ArifPay payment
-- OpenStreetMap
-- Push notifications
-- SMS notifications
-- Email notifications
-
-## Payment Flows
-
-### Cash on Delivery (COD)
-- **Workflow**:
-  1. Sender selects COD option
-  2. Recipient receives confirmation request
-  3. 24-hour expiry for recipient confirmation
-  4. If declined → Parcel auto-canceled, Partner notified
-  5. If accepted → Proceeds with delivery
-- **Security**:
-  - Recipient verification required
-  - Digital signature capture
-  - Photo evidence of delivery
-  - Transaction logging
-
-### Digital Payments
-- **Telebirr Integration**:
-  - Mobile PIN-based OTP flow
-  - Real-time transaction verification
-  - Automatic receipt generation
-  - Transaction history tracking
-
-- **Chapa Integration**:
-  - Embedded Webview flow
-  - Transaction receipt generation
-  - Payment status tracking
-  - Refund processing capability
-
-- **ArifPay Integration**:
-  - SDK-based integration
-  - Real-time payment verification
-  - Transaction logging
-  - Refund handling
-
-### Payment Security
-- Encrypted payment data
-- Secure API communication
-- Transaction logging
-- Audit trail maintenance
-- Refund processing
-- Dispute resolution
-
-## Performance Goals
-- Sub-second QR scanning
-- Real-time location updates
-- Fast map loading
-- Quick payment processing
-- Efficient photo upload
-- Smooth offline operation
-- Cross-platform consistency 
+## Success Indicators
+- **User Engagement**: Daily active users and session duration
+- **Delivery Success**: Completion rates and customer satisfaction
+- **Partner Growth**: Number of active partners and their earnings
+- **Payment Adoption**: Digital payment usage rates
+- **Market Penetration**: Coverage across Addis Ababa neighborhoods 

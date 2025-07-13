@@ -1,62 +1,45 @@
-# Adera App Project Brief
+# Adera App - Project Brief
 
-## Overview
-Adera is a comprehensive parcel delivery management system that connects senders, receivers, partners (dropoff/pickup points), drivers, and staff through a mobile and web application.
+## Project Overview
+**Adera** is a dual-purpose platform combining PTP (Peer-to-Peer) Parcel Delivery and Tracking System with an E-Commerce Subsystem for Partner Shops, specifically designed for Addis Ababa, Ethiopia.
 
-## Core Requirements
+## Core Mission
+Revolutionize urban delivery in Addis Ababa with a user-friendly, real-time parcel tracking and delivery service that is secure, affordable, multilingual, and mobile-first, with role-based access and strong local integrations.
 
-### Delivery Creation Flow
-1. Terms & Conditions Modal
-   - Must show before parameter input
-   - Deep link in Settings page for all roles
-   - Link to eligible parcel items list
+## Key Objectives
+1. **Logistics Excellence**: Provide reliable, trackable parcel delivery with real-time updates
+2. **E-Commerce Integration**: Enable partners to operate mini e-shops within the platform
+3. **Local Market Adaptation**: Optimize for Ethiopian payment methods and business practices
+4. **Multilingual Support**: Serve diverse linguistic communities in Addis Ababa
+5. **Role-Based System**: Support multiple user types with specialized interfaces
 
-2. Multi-Section Modal Flow
-   - Package Details (Document/Small/Medium/Big)
-   - Recipient Details (Member/Non-member)
-   - Dropoff Point Selection
-   - Pickup Point Selection
-   - Payment Method Selection
-   - Confirmation Page
+## Target Market
+- **Primary**: Urban dwellers in Addis Ababa (age 18-35)
+- **Secondary**: Small to medium merchants seeking digital presence
+- **Tertiary**: Online sellers using social media who need fulfillment
 
-### Tracking System
-- QR Code Structure: `TRACKING_ID + PHASE_FLAG + TIMESTAMP + HASH`
-- Client-side initial QR generation
-- Server-side hash regeneration at pickup point
-- SMS verification system for receivers
+## Success Metrics
+- User adoption and retention rates
+- Delivery completion rates
+- Partner satisfaction and earnings
+- Payment processing efficiency
+- Customer satisfaction scores
 
-### Payment Cases
-1. Direct sender payment (wallet/bank)
-2. Dropoff point proxy payment
-3. Receiver payment (member)
-4. Receiver bank payment (non-member)
-5. Cash on delivery at pickup point
+## Technical Requirements
+- Cross-platform mobile app (iOS/Android) with web support
+- Real-time tracking and notifications
+- Secure payment processing
+- Offline capability for critical functions
+- Scalable architecture for growth
 
-### Partner Integration
-- Display all available partners
-- Indicate supported payment methods
-- Show POS/proxy payment capabilities
-- Working hours and contact info
+## Business Model
+- Commission-based delivery fees
+- Partner subscription fees for e-shop features
+- Premium store templates
+- Transaction fees on marketplace sales
 
-## Technical Stack
-- React Native (Mobile)
-- React (Web)
-- Supabase (Backend)
-- Expo (Cross-platform)
-
-## Project Goals
-1. Create a seamless parcel delivery experience in Addis Ababa
-2. Provide real-time tracking and updates
-3. Support multiple payment methods
-4. Enable multilingual communication
-5. Ensure secure and reliable delivery operations
-6. Maintain consistent experience across platforms
-
-## Success Criteria
-- Successful delivery tracking system
-- Efficient partner and courier management
-- Reliable payment processing
-- Positive user feedback
-- High delivery success rate
-- Low parcel loss/damage rate
-- Consistent cross-platform experience 
+## Timeline
+- **Phase 1**: MVP with core delivery functionality
+- **Phase 2**: E-commerce subsystem
+- **Phase 3**: Advanced features and optimizations
+- **Phase 4**: Market expansion and scaling 

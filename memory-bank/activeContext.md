@@ -1,86 +1,123 @@
-# Active Context
+# Adera App - Active Context
 
-## Current Focus
-Implementing the delivery creation flow with a new FAB-triggered multi-step modal system.
+## Current Work Focus
+**Phase**: Initial Setup and Foundation Building
+**Date**: Current session
+**Priority**: Establishing memory bank and project structure
 
 ## Recent Changes
-- Added partner schema support columns
-- Implemented fallback images for partners
-- Created memory bank documentation
+- ✅ Created memory bank structure with core documentation
+- ✅ Established project brief and product context
+- ✅ Documented technical stack and system patterns
+- ✅ Analyzed existing project structure and dependencies
+- ✅ Created comprehensive database schema SQL script (updated with card_payment support)
+- ✅ Implemented TypeScript type definitions (updated with card_payment support)
+- ✅ Set up Supabase client configuration
+- ✅ Created Zustand authentication store
+- ✅ Built reusable UI components (Button, Input, Card)
+- ✅ Implemented basic login screen
+- ✅ Updated main App component
+- ✅ Created setup documentation
+- ✅ Added card payment method support for partners
 
-## Next Steps
+## Current State Analysis
 
-### Immediate Tasks
-1. Create Terms & Conditions Modal
-   - Fetch content from backend
-   - Add deep link in Settings
-   - Link to eligible items list
+### What's Already in Place
+- **Project Structure**: Basic React Native + Expo setup
+- **Dependencies**: Core packages installed (Supabase, React Navigation, etc.)
+- **File Organization**: Well-structured src/ directory with components, screens, services
+- **Configuration**: TypeScript, Expo config, package.json with scripts
 
-2. Implement FAB Component
-   - Cross-platform styling
-   - Animation support
-   - Loading state
+### What Needs to Be Built
+1. **Database Schema**: Complete Supabase table structure
+2. **Authentication System**: Role-based auth with Supabase
+3. **Core Screens**: Role-specific interfaces for all user types
+4. **Navigation**: Role-based navigation structure
+5. **State Management**: Zustand store setup
+6. **API Services**: Supabase client integration
+7. **UI Components**: Reusable component library
+8. **Internationalization**: i18n setup for 5 languages
 
-3. Build Multi-Step Modal Framework
-   - Step navigation
-   - Form state management
-   - Validation system
+## Next Steps (Immediate Priority)
 
-### Package Details Form
-- Package size selection
-   - Document
-   - Small
-   - Medium
-   - Big
-- Weight input
-- Special handling flags
+### 1. Database Schema Setup
+- [ ] Create comprehensive SQL script for Supabase
+- [ ] Define all tables with proper relationships
+- [ ] Set up Row Level Security (RLS) policies
+- [ ] Create database triggers and functions
 
-### Recipient Form
-- Phone number validation
-- Member status check
-- Address input
-- Notes field
+### 2. Authentication & Authorization
+- [ ] Set up Supabase Auth configuration
+- [ ] Create role-based authentication flow
+- [ ] Implement user registration with role selection
+- [ ] Set up secure token management
 
-### Partner Selection
-- Map integration
-- List view
-- Filter by capabilities
-- Working hours display
+### 3. Core Type Definitions
+- [ ] Define TypeScript interfaces for all entities
+- [ ] Create API response types
+- [ ] Set up form validation schemas
+- [ ] Define state management types
 
-### Payment Method Selection
-- Dynamic options based on:
-   - Package details
-   - Partner capabilities
-   - Recipient status
+### 4. Basic UI Foundation
+- [ ] Create reusable UI components
+- [ ] Set up theme and styling system
+- [ ] Implement responsive design patterns
+- [ ] Create loading and error states
 
 ## Active Decisions
 
-### Modal Navigation
-- Bottom sheet on mobile
-- Centered modal on web
-- Persistent form state
-- Back button handling
+### Database Design Decisions
+- **User Roles**: customer, partner, driver, staff, admin
+- **Parcel Status Flow**: created → dropoff → facility_received → in_transit → pickup_ready → delivered
+- **QR Code Structure**: TRACKING_ID + PHASE_FLAG + TIMESTAMP + HASH
+- **Payment Methods**: Telebirr, Chapa, ArifPay, Cash on Delivery, Card Payment
 
-### State Management
-- Context-based approach
-- Form validation
-- Error handling
-- Loading states
+### Technical Decisions
+- **State Management**: Zustand for global state, React Query for server state
+- **Navigation**: React Navigation with role-based routing
+- **Forms**: React Hook Form with Yup validation
+- **Maps**: React Native Maps with OpenStreetMap integration
 
-### Data Flow
-- Client-side validation
-- Progressive form filling
-- Optimistic updates
-- Error recovery
+### UI/UX Decisions
+- **Design System**: Custom components with consistent styling
+- **Multilingual**: i18next with 5 language support
+- **Accessibility**: WCAG 2.1 AA compliance
+- **Performance**: Lazy loading and optimization strategies
 
 ## Current Challenges
-1. Cross-platform modal behavior
-2. Form state persistence
-3. Payment method filtering
-4. Partner capability indicators
 
-## Testing Strategy
-1. Component unit tests
-2. Integration tests
-3. E2E flow testing
-4. Payment simulation 
+### Technical Challenges
+1. **Payment Integration**: Multiple Ethiopian payment gateways
+2. **Offline Support**: Critical functions without internet
+3. **Real-time Updates**: Efficient Supabase Realtime usage
+4. **Map Performance**: Optimizing map rendering and interactions
+
+### Business Challenges
+1. **User Onboarding**: Simplifying registration for different roles
+2. **Payment Flow**: Handling various payment scenarios
+3. **Partner Management**: Streamlining partner onboarding
+4. **Dispute Resolution**: Handling delivery issues and complaints
+
+## Immediate Action Items
+
+### This Session
+1. ✅ Create memory bank documentation
+2. ✅ Generate comprehensive database schema SQL
+3. ✅ Set up basic authentication flow
+4. ✅ Create core type definitions
+5. ✅ Build reusable UI components
+6. ✅ Implement login screen
+7. ✅ Create setup documentation
+
+### Next Session
+1. [ ] Implement basic UI components
+2. [ ] Set up navigation structure
+3. [ ] Create first screen implementations
+4. [ ] Set up state management
+
+## Notes and Considerations
+- **Local Market Focus**: All features must work well in Addis Ababa context
+- **Network Conditions**: App must handle poor connectivity gracefully
+- **Device Diversity**: Support for various Android and iOS devices
+- **Language Support**: Full localization for Ethiopian languages
+- **Payment Flexibility**: Multiple payment options including cash 
