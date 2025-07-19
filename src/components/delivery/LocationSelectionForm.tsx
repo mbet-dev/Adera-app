@@ -36,8 +36,9 @@ export function LocationSelectionForm({ onNext, onBack }: LocationSelectionFormP
           location,
           latitude,
           longitude,
-          profile:profiles (
-            full_name
+          user:users (
+            first_name,
+            last_name
           )
         `);
         if (error) throw error;
@@ -124,7 +125,7 @@ export function LocationSelectionForm({ onNext, onBack }: LocationSelectionFormP
       <View style={[styles.partnerCard, { borderColor: theme.colors.border }]}>
         <View style={styles.partnerInfo}>
           <Text style={[styles.partnerName, { color: theme.colors.text }]}>
-            {partner.profile?.[0]?.full_name || 'Partner'}
+            {partner.user?.[0] ? `${partner.user[0].first_name} ${partner.user[0].last_name}` : 'Partner'}
           </Text>
           <Text style={[styles.partnerAddress, { color: theme.colors.text + '80' }]}>
             {partner.location}

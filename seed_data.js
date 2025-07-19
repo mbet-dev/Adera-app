@@ -96,7 +96,7 @@ async function seedData() {
     await supabase.from('categories').delete().neq('id', '00000000-0000-0000-0000-000000000000');
     await supabase.from('shops').delete().neq('id', '00000000-0000-0000-0000-000000000000');
     await supabase.from('partners').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('profiles').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    await supabase.from('users').delete().neq('id', '00000000-0000-0000-0000-000000000000');
 
     // Fetch all existing auth.users and delete them if they are part of our seed list
     const { data: existingUsers, error: fetchError } = await supabase.auth.admin.listUsers();
@@ -121,8 +121,8 @@ async function seedData() {
     }
 
 
-    // 2. Create users in auth.users via Admin API and populate public.profiles
-    console.log('Creating auth.users and public.profiles...');
+    // 2. Create users in auth.users via Admin API and populate public.users
+    console.log('Creating auth.users and public.users...');
     const createdUserIds = {}; // To store user_id mapped to email
 
     for (const userData of usersToCreate) {
@@ -160,17 +160,21 @@ async function seedData() {
       const userId = userResponse.user.id;
       createdUserIds[email] = userId;
 
-      // Insert into public.profiles
-      const { error: profileError } = await supabase.from('profiles').upsert({ // Using upsert for idempotency
+      // Insert into public.users
+      const [firstName, ...lastNameParts] = fullName.split(' ');
+      const lastName = lastNameParts.join(' ') || 'User';
+      
+      const { error: userInsertError } = await supabase.from('users').upsert({ // Using upsert for idempotency
         id: userId,
-        full_name: fullName,
         email: email,
-        phone_number: phoneNumber,
+        first_name: firstName,
+        last_name: lastName,
         role: role,
+        phone: phoneNumber,
       }, { onConflict: 'id' });
 
-      if (profileError) {
-        console.error(`Error upserting profile for ${email}:`, profileError.message);
+      if (userInsertError) {
+        console.error(`Error upserting user for ${email}:`, userInsertError.message);
       } else {
         console.log(`Created/Upserted user and profile for: ${email} (${role})`);
       }
@@ -403,7 +407,7 @@ async function seedData() {
     }
 
     // Sample Orders
-    const { data: customers, error: fetchCustomersError } = await supabase.from('profiles').select('id, email').eq('role', 'customer');
+    const { data: customers, error: fetchCustomersError } = await supabase.from('users').select('id, email').eq('role', 'customer');
     if (fetchCustomersError) throw fetchCustomersError;
 
     if (customers && customers.length > 0) {
@@ -434,7 +438,7 @@ async function seedData() {
     }
 
     // Sample Parcels
-    const { data: profiles, error: fetchProfilesError } = await supabase.from('profiles').select('id, role, phone_number');
+    const { data: profiles, error: fetchProfilesError } = await supabase.from('users').select('id, role, phone');
     if (fetchProfilesError) throw fetchProfilesError;
 
     const customerProfile = profiles.find(p => p.role === 'customer');

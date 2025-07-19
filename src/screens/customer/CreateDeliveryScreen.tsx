@@ -87,8 +87,9 @@ export default function CreateDeliveryScreen() {
           working_hours,
           contact_person,
           contact_phone,
-          profile:profiles (
-            full_name
+          user:users (
+            first_name,
+            last_name
           )
         `);
 
@@ -166,7 +167,7 @@ export default function CreateDeliveryScreen() {
     const userLng = userLocation?.coords.longitude;
 
     const scheme = Platform.select({ ios: 'maps:0,0?daddr=', android: 'geo:0,0?q=' });
-    const destination = `${latitude},${longitude}(${selectedPartner?.profile?.[0]?.full_name || ''})`;
+    const destination = `${latitude},${longitude}(${selectedPartner?.user?.[0] ? `${selectedPartner.user[0].first_name} ${selectedPartner.user[0].last_name}` : ''})`;
     const userLocationQuery = userLat && userLng ? `&saddr=${userLat},${userLng}` : '';
 
     let url = '';
@@ -231,7 +232,7 @@ export default function CreateDeliveryScreen() {
             <Text style={[styles.headerTitle, { color: '#333' }]} numberOfLines={1}>
               {Platform.OS === 'web' 
                   ? "ADERA partners" 
-                  : (selectedPartner ? selectedPartner?.profile?.[0]?.full_name : 'Select a Partner')
+                  : (selectedPartner ? (selectedPartner?.user?.[0] ? `${selectedPartner.user[0].first_name} ${selectedPartner.user[0].last_name}` : 'Partner') : 'Select a Partner')
               }
             </Text>
             <Text style={[styles.headerSubtitle, { color: '#666' }]} numberOfLines={1}>{selectedPartner ? selectedPartner.location : 'Choose a location from the map or list'}</Text>

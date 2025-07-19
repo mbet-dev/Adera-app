@@ -88,7 +88,7 @@ export const Input: React.FC<InputProps> = ({
         )}
       </View>
       
-      {error && (
+      {error && error.length > 0 && (
         <Text style={[styles.errorText, errorStyle]}>
           {error}
         </Text>

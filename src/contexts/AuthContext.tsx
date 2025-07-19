@@ -69,28 +69,98 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('full_name, role, phone_number')
+      // First, try to get existing user profile from the users table
+      const { data: userProfile, error } = await supabase
+        .from('users')
+        .select('first_name, last_name, role, phone')
         .eq('id', supabaseUser.id)
         .single();
       
-      if (error) throw error;
-
-      if (profile) {
+      if (error && error.code === 'PGRST116') {
+        // User profile doesn't exist, create a default one
+        console.log('[AuthContext] User profile not found, creating default profile for user:', supabaseUser.id);
+        
+        const fullName = supabaseUser.user_metadata?.full_name || 'Unknown User';
+        const [firstName, ...lastNameParts] = fullName.split(' ');
+        const lastName = lastNameParts.join(' ') || 'User';
+        
+        const defaultProfile = {
+          id: supabaseUser.id,
+          email: supabaseUser.email || '',
+          first_name: firstName,
+          last_name: lastName,
+          role: supabaseUser.user_metadata?.role || 'customer',
+          phone: supabaseUser.user_metadata?.phone_number || '',
+        };
+        
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert(defaultProfile);
+        
+        if (insertError) {
+          console.error('Error creating default user profile:', insertError);
+          // Still create user object with default values
+          const fullUser: User = {
+            id: supabaseUser.id,
+            email: supabaseUser.email || '',
+            fullName: fullName,
+            role: (supabaseUser.user_metadata?.role || 'customer').toUpperCase() as UserRole,
+            phoneNumber: supabaseUser.user_metadata?.phone_number || '',
+          };
+          setUser(fullUser);
+          return;
+        }
+        
+        // Use the default profile we just created
         const fullUser: User = {
           id: supabaseUser.id,
           email: supabaseUser.email || '',
-          fullName: profile.full_name,
-          role: profile.role.toUpperCase() as UserRole,
-          phoneNumber: profile.phone_number,
+          fullName: fullName,
+          role: (supabaseUser.user_metadata?.role || 'customer').toUpperCase() as UserRole,
+          phoneNumber: supabaseUser.user_metadata?.phone_number || '',
+        };
+        console.log('[AuthContext] Default user profile created and loaded:', fullUser);
+        setUser(fullUser);
+        return;
+      }
+      
+      if (error) {
+        console.error('Error loading user profile:', error);
+        // Create user with fallback values
+        const fullUser: User = {
+          id: supabaseUser.id,
+          email: supabaseUser.email || '',
+          fullName: supabaseUser.user_metadata?.full_name || 'Unknown User',
+          role: (supabaseUser.user_metadata?.role || 'customer').toUpperCase() as UserRole,
+          phoneNumber: supabaseUser.user_metadata?.phone_number || '',
+        };
+        setUser(fullUser);
+        return;
+      }
+
+      if (userProfile) {
+        const fullName = `${userProfile.first_name} ${userProfile.last_name}`.trim();
+        const fullUser: User = {
+          id: supabaseUser.id,
+          email: supabaseUser.email || '',
+          fullName: fullName,
+          role: userProfile.role.toUpperCase() as UserRole,
+          phoneNumber: userProfile.phone || '',
         };
         console.log('[AuthContext] User profile loaded:', fullUser);
         setUser(fullUser);
       }
     } catch (error) {
       console.error('Error loading user profile:', error);
-      setUser(null); // Clear user data on profile load failure
+      // Create user with fallback values on any error
+      const fullUser: User = {
+        id: supabaseUser.id,
+        email: supabaseUser.email || '',
+        fullName: supabaseUser.user_metadata?.full_name || 'Unknown User',
+        role: (supabaseUser.user_metadata?.role || 'customer').toUpperCase() as UserRole,
+        phoneNumber: supabaseUser.user_metadata?.phone_number || '',
+      };
+      setUser(fullUser);
     }
   };
 
@@ -120,18 +190,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) throw error;
 
-    // Create a matching profile row immediately so that first login can succeed
+    // Create a matching user profile row immediately so that first login can succeed
     const userId = data?.user?.id;
     if (userId) {
-      const { error: profileError } = await supabase.from('profiles').insert({
+      const [firstName, ...lastNameParts] = userData.fullName.split(' ');
+      const lastName = lastNameParts.join(' ') || 'User';
+      
+      const { error: userError } = await supabase.from('users').insert({
         id: userId,
-        full_name: userData.fullName,
+        email: userData.email,
+        first_name: firstName,
+        last_name: lastName,
         role: userData.role.toLowerCase(),
-        phone_number: userData.phoneNumber,
+        phone: userData.phoneNumber,
       });
 
-      if (profileError && profileError.code !== '23505') { // Ignore duplicate inserts
-        throw profileError;
+      if (userError && userError.code !== '23505') { // Ignore duplicate inserts
+        throw userError;
       }
     }
     // The onAuthStateChange listener will handle setting the session

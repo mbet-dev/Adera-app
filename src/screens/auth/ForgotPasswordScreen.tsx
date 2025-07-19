@@ -1,138 +1,166 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { useTheme } from '../../contexts/ThemeContext';
-import { useAuth } from '../../hooks/useAuth';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AuthStackParamList } from '../../types/navigation';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+  Platform,
+  KeyboardAvoidingView,
+  ScrollView,
+} from 'react-native';
+import { useAuthStore } from '../../store/useAuthStore';
+import { Input } from '../../components/ui/Input';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
+import { Colors } from '../../constants/Colors';
+import { MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'ForgotPassword'>;
+interface ForgotPasswordScreenProps {
+  onLoginPress: () => void;
+}
 
-export default function ForgotPasswordScreen({ navigation }: Props) {
-  const { colors } = useTheme();
-  const { resetPassword } = useAuth();
+export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onLoginPress }) => {
   const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const { sendPasswordResetEmail, isLoading, error: authError, message: authMessage } = useAuthStore();
 
-  const handleResetPassword = async () => {
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
-      Alert.alert('Error', 'Please enter your email');
+      return 'Email is required.';
+    } else if (!emailRegex.test(email)) {
+      return 'Please enter a valid email address.';
+    }
+    return '';
+  };
+
+  const handleSendResetEmail = async () => {
+    const emailValidation = validateEmail(email);
+    if (emailValidation) {
+      setEmailError(emailValidation);
       return;
     }
+    setEmailError('');
 
-    try {
-      setLoading(true);
-      await resetPassword(email);
-      Alert.alert(
-        'Success',
-        'Password reset instructions have been sent to your email',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('Login')
-          }
-        ]
-      );
-    } catch (error: any) {
-      Alert.alert('Error', error.message);
-    } finally {
-      setLoading(false);
-    }
+    await sendPasswordResetEmail(email);
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>
-          Forgot Password
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.text }]}>
-          Enter your email to reset your password
+    <LinearGradient
+      colors={[Colors.primaryGradientStart, Colors.primaryGradientEnd]}
+      style={styles.gradientBackground}
+    >
+      <SafeAreaView style={styles.safeArea}>
+        <KeyboardAvoidingView
+          style={styles.keyboardAvoidingView}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <ScrollView contentContainerStyle={styles.scrollViewContent}>
+            <View style={styles.headerContainer}>
+              <MaterialIcons name="lock-open" size={60} color={Colors.white} />
+              <Text style={styles.headerTitle}>Forgot Password?</Text>
+              <Text style={styles.headerSubtitle}>
+                Enter your email address to receive a password reset link.
         </Text>
       </View>
 
-      <View style={styles.form}>
-        <TextInput
-          style={[styles.input, { 
-            backgroundColor: colors.card,
-            color: colors.text,
-            borderColor: colors.border
-          }]}
-          placeholder="Email"
-          placeholderTextColor={colors.placeholder}
+            <Card style={styles.card}>
+              <Input
+                label="Email"
           value={email}
-          onChangeText={setEmail}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  setEmailError('');
+                }}
+                placeholder="you@example.com"
+                keyboardType="email-address"
           autoCapitalize="none"
-          keyboardType="email-address"
-        />
+                error={emailError}
+              />
 
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: colors.primary }]}
-          onPress={handleResetPassword}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>
-            {loading ? 'Sending...' : 'Reset Password'}
-          </Text>
-        </TouchableOpacity>
+              {authError && <Text style={styles.authErrorText}>{authError}</Text>}
+              {authMessage && <Text style={styles.authMessageText}>{authMessage}</Text>}
 
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={[styles.backButtonText, { color: colors.primary }]}>
-            Back to Login
-          </Text>
+              <Button
+                title={isLoading ? 'Sending...' : 'Send Reset Email'}
+                onPress={handleSendResetEmail}
+                disabled={isLoading}
+              />
+
+              <TouchableOpacity onPress={onLoginPress} style={styles.backToLoginButton}>
+                <Text style={styles.backToLoginText}>Back to Login</Text>
         </TouchableOpacity>
-      </View>
-    </View>
+            </Card>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </LinearGradient>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
+  gradientBackground: {
     flex: 1,
-    padding: 20
   },
-  header: {
-    marginTop: 60,
-    marginBottom: 40
+  safeArea: {
+    flex: 1,
+    backgroundColor: 'transparent',
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 8
+  keyboardAvoidingView: {
+    flex: 1,
   },
-  subtitle: {
-    fontSize: 16,
-    opacity: 0.7
-  },
-  form: {
-    gap: 16
-  },
-  input: {
-    height: 50,
-    borderRadius: 12,
-    borderWidth: 1,
-    paddingHorizontal: 16,
-    fontSize: 16
-  },
-  button: {
-    height: 50,
-    borderRadius: 12,
+  scrollViewContent: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 8
+    paddingVertical: 20,
+    paddingHorizontal: 20,
   },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600'
-  },
-  backButton: {
+  headerContainer: {
     alignItems: 'center',
-    marginTop: 16
+    marginBottom: 30,
   },
-  backButtonText: {
-    fontSize: 16
-  }
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: Colors.white,
+    marginTop: 15,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: Colors.white,
+    textAlign: 'center',
+    marginTop: 10,
+    maxWidth: 300,
+  },
+  card: {
+    width: '100%',
+    maxWidth: 350, // Adjusted from 400
+    padding: 20,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  authErrorText: {
+    color: Colors.errorRed,
+    marginBottom: 10,
+    textAlign: 'center',
+    fontSize: 14,
+  },
+  authMessageText: {
+    color: Colors.successGreen,
+    marginBottom: 10,
+    textAlign: 'center',
+    fontSize: 14,
+  },
+  backToLoginButton: {
+    marginTop: 20,
+  },
+  backToLoginText: {
+    color: Colors.primaryBlue,
+    fontSize: 16,
+    fontWeight: '600',
+  },
 }); 

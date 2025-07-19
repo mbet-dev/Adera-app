@@ -8,13 +8,23 @@ import {
   Platform,
   ScrollView,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
+import { Colors } from '../../constants/Colors';
 
-export const LoginScreen: React.FC = () => {
+interface LoginScreenProps {
+  onSignupPress: () => void;
+  onForgotPasswordPress: () => void; // New prop
+}
+
+export const LoginScreen: React.FC<LoginScreenProps> = ({
+  onSignupPress,
+  onForgotPasswordPress, // Destructure new prop
+}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -118,20 +128,20 @@ export const LoginScreen: React.FC = () => {
                 style={styles.loginButton}
               />
 
-              <View style={styles.forgotPassword}>
-                <Text style={styles.forgotPasswordText}>
-                  Forgot your password?
-                </Text>
-              </View>
+              <TouchableOpacity onPress={onForgotPasswordPress} style={styles.forgotPasswordButton}>
+                <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
+              </TouchableOpacity>
             </Card>
 
             {/* Sign Up Link */}
             <View style={styles.signUpContainer}>
               <Text style={styles.signUpText}>
                 Don't have an account?{' '}
-                <Text style={styles.signUpLink}>
-                  Sign up
-                </Text>
+                <TouchableOpacity onPress={onSignupPress}>
+                  <Text style={styles.signUpLink}>
+                    Sign up
+                  </Text>
+                </TouchableOpacity>
               </Text>
             </View>
           </View>
@@ -186,15 +196,16 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   
-  forgotPassword: {
-    alignItems: 'center',
-    marginTop: 16,
+  forgotPasswordButton: {
+    marginTop: 15,
+    alignSelf: 'center',
   },
   
   forgotPasswordText: {
-    fontSize: 14,
-    color: '#3B82F6',
-    textDecorationLine: 'underline',
+    color: Colors.primaryBlue,
+    fontSize: 15,
+    fontWeight: '600',
+    textDecorationLine: 'none',
   },
   
   signUpContainer: {

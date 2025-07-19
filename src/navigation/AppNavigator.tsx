@@ -3,9 +3,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../contexts/AuthContext';
 import { CustomerNavigator, PartnerNavigator, DriverNavigator, AdminNavigator } from './RoleNavigators';
-import LoginScreen from '../screens/auth/LoginScreen';
+import { LoginScreen } from '../screens/auth/LoginScreen';
+import { ForgotPasswordScreen } from '../screens/auth/ForgotPasswordScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
-import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 import OTPScreen from '../screens/auth/OTPScreen';
 import { RootStackParamList } from '../types/navigation';
 import { LoadingIndicator } from '../components/ui/LoadingIndicator';
@@ -46,9 +46,26 @@ export default function AppNavigator() {
         {!isAuthenticated ? (
           // Auth Stack
           <Stack.Group>
-            <Stack.Screen name="Auth" component={LoginScreen} />
+            <Stack.Screen 
+              name="Auth" 
+              children={(props) => (
+                <LoginScreen
+                  {...props}
+                  onSignupPress={() => props.navigation.navigate('Register')}
+                  onForgotPasswordPress={() => props.navigation.navigate('ForgotPassword')}
+                />
+              )}
+            />
             <Stack.Screen name="Register" component={RegisterScreen} />
-            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+            <Stack.Screen 
+              name="ForgotPassword" 
+              children={(props) => (
+                <ForgotPasswordScreen
+                  {...props}
+                  onLoginPress={() => props.navigation.navigate('Auth')}
+                />
+              )}
+            />
             <Stack.Screen name="OTP" component={OTPScreen} />
           </Stack.Group>
         ) : (

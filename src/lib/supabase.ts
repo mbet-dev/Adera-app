@@ -64,9 +64,9 @@ export const auth = {
   },
 
   // Reset password
-  resetPassword: async (email: string) => {
+  resetPassword: async (email: string, options?: { redirectTo?: string }) => {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'adera://reset-password',
+      redirectTo: options?.redirectTo || 'adera://reset-password',
     });
     return { data, error };
   },

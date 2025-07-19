@@ -58,7 +58,7 @@ export function RecipientForm({ onNext, onBack }: RecipientFormProps) {
     setPhoneCheck({ checking: true, isNewUser: false, message: undefined, checkedPhone: recipient.phone });
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('users')
         .select('id')
         .eq('phone', recipient.phone)
         .maybeSingle();

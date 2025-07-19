@@ -33,7 +33,7 @@ export type PaymentMethod = 'sender_wallet' | 'sender_bank' | 'dropoff_partner' 
 
 export interface Partner {
   id: string;
-  profile_id?: string;
+  user_id?: string;
   location?: string;
   contact_person?: string;
   contact_phone?: string;
@@ -43,7 +43,10 @@ export interface Partner {
   working_hours?: Record<string, { open: string; close: string }>;
   image_url?: string;
   images?: string[];
-  profile?: Profile[];
+  user?: Array<{
+    first_name: string;
+    last_name: string;
+  }>;
   created_at?: string;
   updated_at?: string;
   latitude?: number | string;
