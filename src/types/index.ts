@@ -84,23 +84,22 @@ export interface User {
 
 export interface Partner {
   id: string;
-  user_id: string;
   business_name: string;
-  business_license?: string;
-  business_category?: string;
   address: string;
   latitude: number;
   longitude: number;
-  phone: string;
-  email?: string;
-  operating_hours?: OperatingHours;
   accepted_payment_methods: PaymentMethod[];
-  is_approved: boolean;
-  is_active: boolean;
-  commission_rate: number;
-  total_earnings: number;
-  created_at: string;
-  updated_at: string;
+  operating_hours?: OperatingHours;
+  phone: string;
+  // URL for the main photo of the business location
+  photo_url?: string;
+  // Array of additional photo URLs for the business location
+  photos?: string[];
+  // Array of users associated with the partner (from Supabase join)
+  users: {
+    first_name: string;
+    last_name: string;
+  }[];
 }
 
 export interface Driver {

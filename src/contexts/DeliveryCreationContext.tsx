@@ -1,5 +1,6 @@
 import React from 'react';
-import { Partner, PaymentMethod } from '../types/database';
+import { Partner } from '../types/index';
+import { PaymentMethod } from '../types/database';
 
 export type PackageSize = 'document' | 'small' | 'medium' | 'big';
 

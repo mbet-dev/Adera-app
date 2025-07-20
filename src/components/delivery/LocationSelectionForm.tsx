@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
 import { useDeliveryCreation } from '../../contexts/DeliveryCreationContext';
 import { Button } from '../Button';
-import { Partner } from '../../types/database';
+import { Partner } from '../../types';
 import { supabase } from '../../lib/supabase';
 import { PartnerSelectionModal } from './PartnerSelectionModal';
 
@@ -33,10 +33,16 @@ export function LocationSelectionForm({ onNext, onBack }: LocationSelectionFormP
       try {
         const { data, error } = await supabase.from('partners').select(`
           id,
-          location,
+          business_name,
+          address,
           latitude,
           longitude,
-          user:users (
+          accepted_payment_methods,
+          operating_hours,
+          phone,
+          photo_url,
+          photos,
+          users:users (
             first_name,
             last_name
           )
@@ -125,10 +131,10 @@ export function LocationSelectionForm({ onNext, onBack }: LocationSelectionFormP
       <View style={[styles.partnerCard, { borderColor: theme.colors.border }]}>
         <View style={styles.partnerInfo}>
           <Text style={[styles.partnerName, { color: theme.colors.text }]}>
-            {partner.user?.[0] ? `${partner.user[0].first_name} ${partner.user[0].last_name}` : 'Partner'}
+            {partner.users?.[0] ? `${partner.users[0].first_name} ${partner.users[0].last_name}` : 'Partner'}
           </Text>
           <Text style={[styles.partnerAddress, { color: theme.colors.text + '80' }]}>
-            {partner.location}
+            {partner.address}
           </Text>
         </View>
         <TouchableOpacity 

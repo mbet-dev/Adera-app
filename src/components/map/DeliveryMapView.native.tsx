@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView, { Marker, Region, LatLng } from 'react-native-maps';
-import { Partner } from '../../types/database';
+import { Partner } from '../../types/index';
 import { MapType } from '../../components/map/MapControls/index.native';
 
 const ADERA_RED = '#E63946';
@@ -25,6 +25,14 @@ export default function DeliveryMapView({
 }: DeliveryMapViewProps) {
   const mapRef = useRef<MapView>(null);
 
+  // Guard: If mapRegion is undefined/null, render nothing (or a fallback UI)
+  if (!mapRegion || typeof mapRegion.latitude !== 'number' || typeof mapRegion.longitude !== 'number') {
+    return null;
+  }
+
+  // Guard: If partners is not an array, default to empty array
+  const safePartners = Array.isArray(partners) ? partners : [];
+
   return (
     <View style={styles.container}>
       <MapView
@@ -43,15 +51,15 @@ export default function DeliveryMapView({
             pinColor="blue"
           />
         )}
-        {partners.map((partner) => (
+        {safePartners.map((partner) => (
           <Marker
             key={partner.id}
             coordinate={{
               latitude: Number(partner.latitude),
               longitude: Number(partner.longitude),
             }}
-            title={partner.profile[0]?.full_name || 'Partner'}
-            description={partner.location}
+            title={partner.business_name || 'Partner'}
+            description={partner.address || ''}
             pinColor={ADERA_RED}
             onPress={() => onMarkerPress(partner)}
           />

@@ -12,7 +12,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
-import { Partner } from '../../types/database';
+import { Partner } from '../../types';
+import { Image } from 'react-native';
 
 interface PartnerSelectionModalProps {
   visible: boolean;
@@ -37,8 +38,8 @@ export function PartnerSelectionModal({
       return partners;
     }
     return partners.filter(p =>
-      p.profile?.[0]?.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-      p.location?.toLowerCase().includes(search.toLowerCase())
+      p.business_name.toLowerCase().includes(search.toLowerCase()) ||
+      p.address.toLowerCase().includes(search.toLowerCase())
     );
   }, [partners, search]);
 
@@ -48,15 +49,16 @@ export function PartnerSelectionModal({
 
   const renderItem = ({ item }: { item: Partner }) => (
     <TouchableOpacity style={styles.itemContainer} onPress={() => handleSelect(item)}>
-      <View style={styles.itemIcon}>
-        <Ionicons name="business-outline" size={24} color={theme.colors.primary} />
-      </View>
+      <Image
+        source={item.photo_url ? { uri: item.photo_url } : require('../../../assets/icon.png')}
+        style={styles.itemImage}
+      />
       <View style={styles.itemTextContainer}>
         <Text style={[styles.itemName, { color: theme.colors.text }]}>
-          {item.profile?.[0]?.full_name || 'N/A'}
+          {item.business_name}
         </Text>
         <Text style={[styles.itemLocation, { color: theme.colors.text + '90' }]}>
-          {item.location}
+          {item.address}
         </Text>
       </View>
     </TouchableOpacity>
@@ -166,7 +168,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(0,0,0,0.05)',
   },
-  itemIcon: {
+  itemImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     marginRight: 16,
   },
   itemTextContainer: {
