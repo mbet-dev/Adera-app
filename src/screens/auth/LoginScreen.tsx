@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,26 +11,48 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useBiometric } from '../../hooks/useBiometric';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
 import { Colors } from '../../constants/Colors';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface LoginScreenProps {
   onSignupPress: () => void;
-  onForgotPasswordPress: () => void; // New prop
+  onForgotPasswordPress: () => void;
 }
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({
   onSignupPress,
-  onForgotPasswordPress, // Destructure new prop
+  onForgotPasswordPress,
 }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [showBiometricOption, setShowBiometricOption] = useState(false);
 
   const { signIn, isLoading, error, clearError } = useAuthStore();
+  const { 
+    isAvailable, 
+    isEnrolled, 
+    authenticate, 
+    hasBiometricCredentials,
+    loading: biometricLoading 
+  } = useBiometric();
+
+  // Check for biometric availability and stored credentials on mount
+  useEffect(() => {
+    const checkBiometricSetup = async () => {
+      if (isAvailable && isEnrolled) {
+        const hasCredentials = await hasBiometricCredentials();
+        setShowBiometricOption(hasCredentials);
+      }
+    };
+    
+    checkBiometricSetup();
+  }, [isAvailable, isEnrolled, hasBiometricCredentials]);
 
   const validateForm = () => {
     let isValid = true;
@@ -73,6 +95,20 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     }
   };
 
+  const handleBiometricLogin = async () => {
+    try {
+      const credentials = await authenticate();
+      
+      if (credentials) {
+        await signIn(credentials.email, credentials.password);
+      } else {
+        Alert.alert('Biometric Login Failed', 'Please try again or use your password.');
+      }
+    } catch (error) {
+      Alert.alert('Biometric Error', 'Biometric authentication failed. Please use your password.');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -91,6 +127,32 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 Sign in to your account to continue
               </Text>
             </View>
+
+            {/* Biometric Login Option */}
+            {showBiometricOption && Platform.OS !== 'web' && (
+              <Card style={styles.biometricCard}>
+                <TouchableOpacity
+                  style={styles.biometricButton}
+                  onPress={handleBiometricLogin}
+                  disabled={biometricLoading || isLoading}
+                >
+                  <Icon 
+                    name="fingerprint" 
+                    size={24} 
+                    color={Colors.primaryBlue} 
+                  />
+                  <Text style={styles.biometricButtonText}>
+                    {biometricLoading ? 'Authenticating...' : 'Login with Biometrics'}
+                  </Text>
+                </TouchableOpacity>
+                
+                <View style={styles.dividerContainer}>
+                  <View style={styles.divider} />
+                  <Text style={styles.dividerText}>or</Text>
+                  <View style={styles.divider} />
+                </View>
+              </Card>
+            )}
 
             {/* Login Form */}
             <Card style={styles.formCard}>
@@ -186,6 +248,48 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6B7280',
     textAlign: 'center',
+  },
+  
+  biometricCard: {
+    marginBottom: 16,
+  },
+  
+  biometricButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  
+  biometricButtonText: {
+    marginLeft: 12,
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.primaryBlue,
+  },
+  
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E5E7EB',
+  },
+  
+  dividerText: {
+    marginHorizontal: 16,
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '500',
   },
   
   formCard: {

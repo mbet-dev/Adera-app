@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import type { FlatList as FlatListType } from 'react-native';
 import { View, Text, StyleSheet, TextInput, Dimensions, TouchableOpacity, Platform, ActivityIndicator, Linking, Alert, FlatList } from 'react-native';
 import { Region } from 'react-native-maps';
 import { Feather } from '@expo/vector-icons';
@@ -7,9 +8,11 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import * as Location from 'expo-location';
 import { supabase } from '../../lib/supabase';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Partner } from '../../types/database';
+import { Partner } from '../../types/index';
 import { CustomerStackParamList } from '../../types/navigation';
 import DeliveryMapView from '../../components/map/DeliveryMapView';
+// For web, import useState for zoom management
+import { Platform as RNPlatform } from 'react-native';
 import MapControls, { MapType } from '../../components/map/MapControls';
 import PartnerInfoModal from '../../components/PartnerInfoModal';
 import CreateDeliveryFAB from '../../components/delivery/CreateDeliveryFAB';
@@ -34,14 +37,20 @@ export default function CreateDeliveryScreen() {
   const [error, setError] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
   const [mapType, setMapType] = useState<MapType>('standard');
+  // For native, use 'hybrid' when 'satellite' is selected
+  const effectiveMapType = Platform.OS !== 'web' && mapType === 'satellite' ? 'hybrid' : mapType;
   const [region, setRegion] = useState<Region>({
     latitude: 9.005401, // Default to Addis Ababa
     longitude: 38.763611,
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });
+  // For web, manage zoom state
+  const [zoom, setZoom] = useState(13);
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const [partnerInfoVisible, setPartnerInfoVisible] = useState(false);
+  // Ref for FlatList to enable programmatic scrolling
+  const flatListRef = useRef<FlatListType<Partner>>(null);
 
   useEffect(() => {
     (async () => {
@@ -78,16 +87,15 @@ export default function CreateDeliveryScreen() {
         .from('partners')
         .select(`
           id,
-          location,
+          business_name,
+          address,
           latitude,
           longitude,
-          has_pos_machine,
-          accepts_proxy_payment,
-          payment_methods,
-          working_hours,
-          contact_person,
-          contact_phone,
-          user:users (
+          accepted_payment_methods,
+          operating_hours,
+          phone,
+          photos,
+          users (
             first_name,
             last_name
           )
@@ -133,11 +141,16 @@ export default function CreateDeliveryScreen() {
     setSelectedPartner(partner);
     // Also move the map view to the selected partner
     setRegion({
-        latitude: Number(partner.latitude),
-        longitude: Number(partner.longitude),
-        latitudeDelta: 0.04, // Zoom in closer
-        longitudeDelta: 0.04 * ASPECT_RATIO,
+      latitude: Number(partner.latitude),
+      longitude: Number(partner.longitude),
+      latitudeDelta: 0.04, // Zoom in closer
+      longitudeDelta: 0.04 * ASPECT_RATIO,
     });
+    // Scroll the FlatList to the selected partner
+    const index = partners.findIndex((p) => p.id === partner.id);
+    if (flatListRef.current && index !== -1) {
+      (flatListRef.current as any).scrollToIndex({ index, animated: true });
+    }
     // navigation.navigate('DeliveryParameters', { partner }); // We can re-enable this later
   };
 
@@ -149,6 +162,9 @@ export default function CreateDeliveryScreen() {
         latitudeDelta: LATITUDE_DELTA,
         longitudeDelta: LONGITUDE_DELTA,
       });
+      if (RNPlatform.OS === 'web') {
+        setZoom(13); // Reset zoom to default on recenter
+      }
     }
   };
   
@@ -167,7 +183,7 @@ export default function CreateDeliveryScreen() {
     const userLng = userLocation?.coords.longitude;
 
     const scheme = Platform.select({ ios: 'maps:0,0?daddr=', android: 'geo:0,0?q=' });
-    const destination = `${latitude},${longitude}(${selectedPartner?.user?.[0] ? `${selectedPartner.user[0].first_name} ${selectedPartner.user[0].last_name}` : ''})`;
+    const destination = `${latitude},${longitude}(${selectedPartner?.users && selectedPartner.users.length > 0 ? `${selectedPartner.users[0].first_name} ${selectedPartner.users[0].last_name}` : ''})`;
     const userLocationQuery = userLat && userLng ? `&saddr=${userLat},${userLng}` : '';
 
     let url = '';
@@ -223,7 +239,9 @@ export default function CreateDeliveryScreen() {
           userLocation={userLocation?.coords}
           selectedPartner={selectedPartner}
           onMarkerPress={handleMarkerPress}
-          mapType={mapType}
+          mapType={effectiveMapType}
+          zoom={zoom}
+          setZoom={setZoom}
         />
         
         {/* HUD (Heads-Up Display) Elements */}
@@ -232,10 +250,10 @@ export default function CreateDeliveryScreen() {
             <Text style={[styles.headerTitle, { color: '#333' }]} numberOfLines={1}>
               {Platform.OS === 'web' 
                   ? "ADERA partners" 
-                  : (selectedPartner ? (selectedPartner?.user?.[0] ? `${selectedPartner.user[0].first_name} ${selectedPartner.user[0].last_name}` : 'Partner') : 'Select a Partner')
+                  : (selectedPartner ? selectedPartner.business_name : 'Select a Partner')
               }
             </Text>
-            <Text style={[styles.headerSubtitle, { color: '#666' }]} numberOfLines={1}>{selectedPartner ? selectedPartner.location : 'Choose a location from the map or list'}</Text>
+            <Text style={[styles.headerSubtitle, { color: '#666' }]} numberOfLines={1}>{selectedPartner ? selectedPartner.address : 'Choose a location from the map or list'}</Text>
             <TouchableOpacity style={styles.closeButton}>
                 <Feather name="x" size={24} color={'#333'} />
             </TouchableOpacity>
@@ -266,23 +284,24 @@ export default function CreateDeliveryScreen() {
 
           <View style={styles.bottomListContainer}>
             <FlatList
+              ref={flatListRef}
               data={partners}
               keyExtractor={(item) => item.id}
               renderItem={({ item: partner }) => {
-                const partnerName = partner.profile?.[0]?.full_name || 'Partner Location';
+                const partnerName = partner.business_name || 'Partner Location';
                 return (
-                    <TouchableOpacity style={[styles.partnerItem, { backgroundColor: selectedPartner?.id === partner.id ? '#fdecec' : '#fff' }]} onPress={() => handleMarkerPress(partner)}>
-                        <View style={styles.partnerIconContainer}>
-                            <Feather name="map-pin" size={24} color={ADERA_RED} />
-                        </View>
-                        <View style={[styles.partnerInfo, selectedPartner?.id === partner.id && { opacity: 0.8 }]}>
-                            <Text style={styles.partnerName}>{partnerName}</Text>
-                            <Text style={styles.partnerAddress}>{partner.location}</Text>
-                        </View>
-                        <TouchableOpacity onPress={() => handleShowPartnerInfo(partner)} style={{ padding: 6 }}>
-                            <Feather name="info" size={22} color={ADERA_RED} />
-                        </TouchableOpacity>
+                  <TouchableOpacity style={[styles.partnerItem, { backgroundColor: selectedPartner?.id === partner.id ? '#fdecec' : '#fff' }]} onPress={() => handleMarkerPress(partner)}>
+                    <View style={styles.partnerIconContainer}>
+                      <Feather name="map-pin" size={24} color={ADERA_RED} />
+                    </View>
+                    <View style={[styles.partnerInfo, selectedPartner?.id === partner.id && { opacity: 0.8 }]}>
+                      <Text style={styles.partnerName}>{partnerName}</Text>
+                      <Text style={styles.partnerAddress}>{partner.address}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => handleShowPartnerInfo(partner)} style={{ padding: 6 }}>
+                      <Feather name="info" size={22} color={ADERA_RED} />
                     </TouchableOpacity>
+                  </TouchableOpacity>
                 )
               }}
               showsVerticalScrollIndicator={false}

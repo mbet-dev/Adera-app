@@ -12,7 +12,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../hooks/useTheme';
-import { Partner } from '../types/database';
+import { Partner } from '../types/index';
+import { PARTNER_PHOTO_PLACEHOLDER } from '../constants/images';
 
 interface PartnerInfoModalProps {
   visible: boolean;
@@ -27,10 +28,11 @@ export default function PartnerInfoModal({
 }: PartnerInfoModalProps) {
   const theme = useTheme();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageError, setImageError] = useState(false);
 
   if (!partner) return null;
 
-  const images = partner.images || [partner.image_url];
+  const images = partner.photos && partner.photos.length > 0 ? partner.photos : [PARTNER_PHOTO_PLACEHOLDER];
   
   const formatWorkingHours = (hours: Record<string, { open: string; close: string }>) => {
     const days = [
@@ -79,11 +81,15 @@ export default function PartnerInfoModal({
   };
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    if (images.length > 0) {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    if (images.length > 0) {
+      setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    }
   };
 
   return (
@@ -98,7 +104,7 @@ export default function PartnerInfoModal({
           {/* Header with close button */}
           <View style={styles.header}>
             <Text style={[styles.title, { color: theme.colors.text }]}>
-              {partner.profile?.[0]?.full_name || 'Partner'}
+              {partner.business_name}
             </Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Ionicons name="close" size={24} color={theme.colors.text} />
@@ -108,14 +114,18 @@ export default function PartnerInfoModal({
           <ScrollView style={styles.scrollView}>
             {/* Image Gallery */}
             <View style={styles.imageContainer}>
-              <Image
-                source={typeof images[currentImageIndex] === 'string' 
-                  ? { uri: images[currentImageIndex] }
-                  : images[currentImageIndex]
-                }
-                style={styles.image}
-                resizeMode="cover"
-              />
+              {images.length > 0 && (
+                <Image
+                  source={
+                    imageError
+                      ? { uri: PARTNER_PHOTO_PLACEHOLDER }
+                      : { uri: images[currentImageIndex] }
+                  }
+                  style={styles.image}
+                  resizeMode="cover"
+                  onError={() => setImageError(true)}
+                />
+              )}
               {images.length > 1 && (
                 <>
                   <TouchableOpacity style={[styles.imageButton, styles.prevButton]} onPress={prevImage}>
@@ -146,7 +156,7 @@ export default function PartnerInfoModal({
                 <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Location</Text>
               </View>
               <Text style={[styles.sectionContent, { color: theme.colors.text }]}>
-                {partner.location}
+                {partner.address}
               </Text>
             </View>
 
@@ -157,30 +167,9 @@ export default function PartnerInfoModal({
                 <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Payment Options</Text>
               </View>
               <View style={styles.paymentMethodsContainer}>
-                {renderPaymentMethods(partner.payment_methods || [])}
+                {renderPaymentMethods(partner.accepted_payment_methods || [])}
               </View>
-              <View style={styles.paymentFeatures}>
-                <View style={styles.feature}>
-                  <Ionicons 
-                    name={partner.has_pos_machine ? "checkmark-circle" : "close-circle"} 
-                    size={20} 
-                    color={partner.has_pos_machine ? theme.colors.primary : theme.colors.error} 
-                  />
-                  <Text style={[styles.featureText, { color: theme.colors.text }]}>
-                    POS Machine
-                  </Text>
-                </View>
-                <View style={styles.feature}>
-                  <Ionicons 
-                    name={partner.accepts_proxy_payment ? "checkmark-circle" : "close-circle"} 
-                    size={20} 
-                    color={partner.accepts_proxy_payment ? theme.colors.primary : theme.colors.error} 
-                  />
-                  <Text style={[styles.featureText, { color: theme.colors.text }]}>
-                    Proxy Payment
-                  </Text>
-                </View>
-              </View>
+              {/* Features like POS Machine and Proxy Payment are not present in the new Partner type. */}
             </View>
 
             {/* Working Hours */}
@@ -190,7 +179,7 @@ export default function PartnerInfoModal({
                 <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Working Hours</Text>
               </View>
               <View style={styles.workingHours}>
-                {formatWorkingHours(partner.working_hours || {}).map(({ day, hours, isClosed }) => (
+                {formatWorkingHours(partner.operating_hours || {}).map(({ day, hours, isClosed }) => (
                   <View key={day} style={styles.workingHourRow}>
                     <Text style={[styles.dayText, { color: theme.colors.text }]}>{day}</Text>
                     <Text 
@@ -215,10 +204,10 @@ export default function PartnerInfoModal({
                 <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Contact</Text>
               </View>
               <Text style={[styles.sectionContent, { color: theme.colors.text }]}>
-                {partner.contact_person}
+                {partner.users && partner.users.length > 0 ? `${partner.users[0].first_name} ${partner.users[0].last_name}`: ''}
               </Text>
               <Text style={[styles.sectionContent, { color: theme.colors.text }]}>
-                {partner.contact_phone}
+                {partner.phone}
               </Text>
             </View>
           </ScrollView>

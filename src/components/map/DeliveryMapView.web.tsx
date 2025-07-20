@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from 'react-leaflet';
 import L, { LatLngExpression, LatLng } from 'leaflet';
 import { LocationObjectCoords } from 'expo-location';
-import { Partner } from '../../types/database';
+import { Partner } from '../../types/index';
 import { Region } from 'react-native-maps';
 import MapControls, { MapType } from './MapControls/index.web';
 
@@ -30,6 +30,8 @@ interface DeliveryMapViewProps {
   selectedPartner: Partner | null;
   onMarkerPress: (partner: Partner) => void;
   mapType: MapType;
+  zoom: number;
+  setZoom: (zoom: number) => void;
 }
 
 // A component to sync the map's view with our state
@@ -47,10 +49,19 @@ export default function DeliveryMapView({
   userLocation,
   onMarkerPress,
   mapType,
+  zoom,
+  setZoom,
 }: DeliveryMapViewProps) {
 
+  // Guard: If mapRegion is undefined/null, render nothing (or a fallback UI)
+  if (!mapRegion || typeof mapRegion.latitude !== 'number' || typeof mapRegion.longitude !== 'number') {
+    return null;
+  }
+
+  // Guard: If partners is not an array, default to empty array
+  const safePartners = Array.isArray(partners) ? partners : [];
+
   const position: LatLngExpression = [mapRegion.latitude, mapRegion.longitude];
-  const [zoom, setZoom] = useState(13);
 
   // Ensure Leaflet styles are loaded via CDN to avoid Metro bundler issues with CSS `url()` assets
   useEffect(() => {
@@ -86,12 +97,20 @@ export default function DeliveryMapView({
           />
         )}
         {mapType === 'satellite' && (
-          <TileLayer
+          <>
+            <TileLayer
               url='https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
               maxZoom={20}
               subdomains={['mt0','mt1','mt2','mt3']}
               attribution='&copy; Google'
-          />
+            />
+            {/* Overlay transparent street map for street names */}
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              opacity={0.4}
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+          </>
         )}
         
         {userLocation && (
@@ -102,21 +121,21 @@ export default function DeliveryMapView({
                 <Popup>Your Location</Popup>
             </Marker>
         )}
-        {partners.map((partner) => (
+        {safePartners.map((partner) => (
             <Marker
-            key={partner.id}
-            position={[Number(partner.latitude), Number(partner.longitude)]}
-            icon={partnerIcon}
-            eventHandlers={{
+              key={partner.id}
+              position={[Number(partner.latitude), Number(partner.longitude)]}
+              icon={partnerIcon}
+              eventHandlers={{
                 click: () => {
-                onMarkerPress(partner);
+                  onMarkerPress(partner);
                 },
-            }}
+              }}
             >
-            <Popup>
-                {partner.profile[0]?.full_name || 'Partner'} <br />
-                {partner.location}
-            </Popup>
+              <Popup>
+                {partner.business_name || 'Partner'} <br />
+                {partner.address || ''}
+              </Popup>
             </Marker>
         ))}
     </MapContainer>
