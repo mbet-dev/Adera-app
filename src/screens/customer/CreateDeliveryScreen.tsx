@@ -95,6 +95,7 @@ export default function CreateDeliveryScreen() {
           operating_hours,
           phone,
           photos,
+          photo_url,
           users (
             first_name,
             last_name
@@ -233,15 +234,14 @@ export default function CreateDeliveryScreen() {
   return (
     <DeliveryCreationProvider>
       <View style={styles.container}>
-        <DeliveryMapView 
+        <DeliveryMapView
           partners={partners}
           mapRegion={region}
           userLocation={userLocation?.coords}
           selectedPartner={selectedPartner}
           onMarkerPress={handleMarkerPress}
           mapType={effectiveMapType}
-          zoom={zoom}
-          setZoom={setZoom}
+          {...(Platform.OS === 'web' && { zoom, setZoom })}
         />
         
         {/* HUD (Heads-Up Display) Elements */}

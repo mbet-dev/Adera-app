@@ -32,7 +32,16 @@ export default function PartnerInfoModal({
 
   if (!partner) return null;
 
-  const images = partner.photos && partner.photos.length > 0 ? partner.photos : [PARTNER_PHOTO_PLACEHOLDER];
+  const validPhotos = Array.isArray(partner.photos)
+    ? partner.photos.filter((url) => typeof url === 'string' && url.trim() !== '')
+    : [];
+
+  const images =
+    validPhotos.length > 0
+      ? validPhotos
+      : (partner.photo_url && typeof partner.photo_url === 'string' && partner.photo_url.trim() !== ''
+          ? [partner.photo_url]
+          : [PARTNER_PHOTO_PLACEHOLDER]);
   
   const formatWorkingHours = (hours: Record<string, { open: string; close: string }>) => {
     const days = [
@@ -267,8 +276,11 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: '100%',
-    height: 200,
+    height: 220,
     position: 'relative',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 12,
+    overflow: 'hidden',
   },
   image: {
     width: '100%',
@@ -277,10 +289,15 @@ const styles = StyleSheet.create({
   imageButton: {
     position: 'absolute',
     top: '50%',
-    transform: [{ translateY: -20 }],
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 20,
-    padding: 8,
+    transform: [{ translateY: -22 }],
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    borderRadius: 22,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
   },
   prevButton: {
     left: 8,
@@ -298,10 +315,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    margin: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginHorizontal: 5,
   },
   section: {
     padding: 16,
