@@ -98,12 +98,12 @@ export default function DeliveryMapView({
         )}
         {mapType === 'satellite' && (
           <>
-            <TileLayer
+          <TileLayer
               url='https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
               maxZoom={20}
               subdomains={['mt0','mt1','mt2','mt3']}
               attribution='&copy; Google'
-            />
+          />
             {/* Overlay transparent street map for street names */}
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -123,19 +123,19 @@ export default function DeliveryMapView({
         )}
         {safePartners.map((partner) => (
             <Marker
-              key={partner.id}
-              position={[Number(partner.latitude), Number(partner.longitude)]}
-              icon={partnerIcon}
-              eventHandlers={{
+            key={partner.id}
+            position={[Number(partner.latitude), Number(partner.longitude)]}
+            icon={partnerIcon}
+            eventHandlers={{
                 click: () => {
-                  onMarkerPress(partner);
+                onMarkerPress(partner);
                 },
-              }}
+            }}
             >
-              <Popup>
+            <Popup>
                 {partner.business_name || 'Partner'} <br />
                 {partner.address || ''}
-              </Popup>
+            </Popup>
             </Marker>
         ))}
     </MapContainer>
