@@ -28,6 +28,20 @@
     "column_default": null
   },
   {
+    "table_name": "categories",
+    "column_name": "sort_order",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "1"
+  },
+  {
+    "table_name": "categories",
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "YES",
+    "column_default": "now()"
+  },
+  {
     "table_name": "disputes",
     "column_name": "id",
     "data_type": "uuid",
@@ -296,6 +310,55 @@
   {
     "table_name": "items",
     "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "is_nullable": "YES",
+    "column_default": "now()"
+  },
+  {
+    "table_name": "items",
+    "column_name": "delivery_fee",
+    "data_type": "numeric",
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "items",
+    "column_name": "is_active",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "true"
+  },
+  {
+    "table_name": "items",
+    "column_name": "is_featured",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "true"
+  },
+  {
+    "table_name": "items",
+    "column_name": "views_count",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "items",
+    "column_name": "sales_count",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "items",
+    "column_name": "rating",
+    "data_type": "numeric",
+    "is_nullable": "YES",
+    "column_default": "5.0"
+  },
+  {
+    "table_name": "items",
+    "column_name": "updated_at",
     "data_type": "timestamp with time zone",
     "is_nullable": "YES",
     "column_default": "now()"
@@ -635,68 +698,5 @@
     "data_type": "USER-DEFINED",
     "is_nullable": "YES",
     "column_default": "'created'::parcel_status"
-  },
-  {
-    "table_name": "parcels",
-    "column_name": "dropoff_partner_id",
-    "data_type": "uuid",
-    "is_nullable": "YES",
-    "column_default": null
-  },
-  {
-    "table_name": "parcels",
-    "column_name": "pickup_partner_id",
-    "data_type": "uuid",
-    "is_nullable": "YES",
-    "column_default": null
-  },
-  {
-    "table_name": "parcels",
-    "column_name": "assigned_driver_id",
-    "data_type": "uuid",
-    "is_nullable": "YES",
-    "column_default": null
-  },
-  {
-    "table_name": "parcels",
-    "column_name": "estimated_delivery_time",
-    "data_type": "timestamp with time zone",
-    "is_nullable": "YES",
-    "column_default": null
-  },
-  {
-    "table_name": "parcels",
-    "column_name": "actual_delivery_time",
-    "data_type": "timestamp with time zone",
-    "is_nullable": "YES",
-    "column_default": null
-  },
-  {
-    "table_name": "parcels",
-    "column_name": "created_at",
-    "data_type": "timestamp with time zone",
-    "is_nullable": "YES",
-    "column_default": "now()"
-  },
-  {
-    "table_name": "parcels",
-    "column_name": "updated_at",
-    "data_type": "timestamp with time zone",
-    "is_nullable": "YES",
-    "column_default": "now()"
-  },
-  {
-    "table_name": "parcels",
-    "column_name": "damage_photos",
-    "data_type": "ARRAY",
-    "is_nullable": "YES",
-    "column_default": null
-  },
-  {
-    "table_name": "partners",
-    "column_name": "id",
-    "data_type": "uuid",
-    "is_nullable": "NO",
-    "column_default": "uuid_generate_v4()"
   }
 ]

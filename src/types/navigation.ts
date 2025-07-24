@@ -1,5 +1,5 @@
 import type { NavigatorScreenParams } from '@react-navigation/native';
-import { Partner } from './database';
+import { Partner } from './index';
 
 export type AuthStackParamList = {
   Auth: undefined;
@@ -9,6 +9,7 @@ export type AuthStackParamList = {
 };
 
 export type CustomerStackParamList = {
+  HomeTabs: undefined; // For the nested tab navigator
   Home: undefined;
   CreateDelivery: undefined;
   DeliveryParameters: { partner: Partner };
@@ -17,6 +18,11 @@ export type CustomerStackParamList = {
   Settings: undefined;
   Wallet: undefined;
   DeliveryHistory: undefined;
+  ShopDetail: { shopId: string };
+  ProductDetail: { productId: string };
+  Cart: undefined;
+  Wishlist: undefined;
+  OrderHistory: undefined;
 };
 
 export type PartnerStackParamList = {

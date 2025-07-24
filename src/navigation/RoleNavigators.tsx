@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../contexts/ThemeContext';
 
 // Customer Screens
-import HomeScreen from '../screens/main/HomeScreen';
+import EShopHomeScreen from '../screens/HomeScreen'; // Use the new E-Shop Home
 import CreateDeliveryScreen from '../screens/customer/CreateDeliveryScreen';
 import DeliveryParametersScreen from '../screens/customer/DeliveryParametersScreen';
 import TrackParcelScreen from '../screens/customer/TrackParcelScreen';
@@ -13,6 +13,11 @@ import ProfileScreen from '../screens/main/ProfileScreen';
 import SettingsScreen from '../screens/main/SettingsScreen';
 import WalletScreen from '../screens/customer/WalletScreen';
 import DeliveryHistoryScreen from '../screens/customer/DeliveryHistoryScreen';
+import ShopDetailScreen from '../screens/shop/ShopDetailScreen';
+import ProductDetailScreen from '../screens/shop/ProductDetailScreen';
+import CartScreen from '../screens/shop/CartScreen';
+import WishlistScreen from '../screens/shop/WishlistScreen';
+import OrderHistoryScreen from '../screens/shop/OrderHistoryScreen';
 
 // Partner Screens
 import PartnerHomeScreen from '../screens/partner/HomeScreen';
@@ -44,33 +49,34 @@ import {
   DriverStackParamList,
   AdminStackParamList,
 } from '../types/navigation';
-import { Partner } from '../types/database';
+import { Partner } from '../types/index';
+
+import AppHeader from '../components/ui/AppHeader';
 
 // New Stack for Delivery Flow
-type DeliveryStackParamList = {
-    CreateDeliveryHome: undefined;
-    DeliveryParameters: { partner: Partner };
-};
-const DeliveryStack = createStackNavigator<DeliveryStackParamList>();
+const DeliveryStack = createStackNavigator();
 
-const DeliveryStackNavigator = () => (
+function DeliveryStackNavigator() {
+  return (
     <DeliveryStack.Navigator screenOptions={{ headerShown: false }}>
         <DeliveryStack.Screen name="CreateDeliveryHome" component={CreateDeliveryScreen} />
         <DeliveryStack.Screen name="DeliveryParameters" component={DeliveryParametersScreen} />
     </DeliveryStack.Navigator>
 );
+}
 
 type TabIconProps = {
   color: string;
   size: number;
 };
 
+const CustomerStack = createStackNavigator<CustomerStackParamList>();
 const CustomerTab = createBottomTabNavigator<CustomerStackParamList>();
 const PartnerTab = createBottomTabNavigator<PartnerStackParamList>();
 const DriverTab = createBottomTabNavigator<DriverStackParamList>();
 const AdminTab = createBottomTabNavigator<AdminStackParamList>();
 
-export const CustomerNavigator = () => {
+const CustomerTabs = () => {
   const { colors } = useTheme();
 
   return (
@@ -87,10 +93,10 @@ export const CustomerNavigator = () => {
     >
       <CustomerTab.Screen
         name="Home"
-        component={HomeScreen}
+        component={EShopHomeScreen}
         options={{
           tabBarIcon: ({ color, size }: TabIconProps) => (
-            <Icon name="home" size={size} color={color} />
+            <Icon name="store" size={size} color={color} />
           ),
         }}
       />
@@ -140,6 +146,25 @@ export const CustomerNavigator = () => {
         }}
       />
     </CustomerTab.Navigator>
+  );
+};
+
+export const CustomerNavigator = () => {
+  return (
+    <CustomerStack.Navigator 
+      screenOptions={{
+        header: ({ navigation, route, options, back }) => (
+          <AppHeader navigation={navigation} route={route} options={options} back={back} />
+        ),
+      }}
+    >
+      <CustomerStack.Screen name="HomeTabs" component={CustomerTabs} options={{ headerShown: false }} />
+      <CustomerStack.Screen name="ShopDetail" component={ShopDetailScreen} />
+      <CustomerStack.Screen name="ProductDetail" component={ProductDetailScreen} />
+      <CustomerStack.Screen name="Cart" component={CartScreen} />
+      <CustomerStack.Screen name="Wishlist" component={WishlistScreen} />
+      <CustomerStack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+    </CustomerStack.Navigator>
   );
 };
 

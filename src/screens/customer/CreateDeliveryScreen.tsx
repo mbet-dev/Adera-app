@@ -99,7 +99,8 @@ export default function CreateDeliveryScreen() {
           users (
             first_name,
             last_name
-          )
+          ),
+          is_facility
         `);
 
       console.log('[fetchPartners] Supabase response', {
@@ -112,15 +113,17 @@ export default function CreateDeliveryScreen() {
       
       const formattedData = (data || []) as Partner[];
 
-      setPartners(formattedData);
+      // Filter out facility/sorting hubs
+      const filteredPartners = formattedData.filter(p => !p.is_facility);
+      setPartners(filteredPartners);
       
-      console.log('[fetchPartners] Partners state updated', { partnersCount: formattedData.length });
+      console.log('[fetchPartners] Partners state updated', { partnersCount: filteredPartners.length });
       
-      if (formattedData.length > 0 && formattedData[0]) {
+      if (filteredPartners.length > 0 && filteredPartners[0]) {
         setRegion(prevRegion => ({
           ...prevRegion,
-          latitude: Number(formattedData[0].latitude),
-          longitude: Number(formattedData[0].longitude),
+          latitude: Number(filteredPartners[0].latitude),
+          longitude: Number(filteredPartners[0].longitude),
         }));
       }
 

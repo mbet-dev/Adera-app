@@ -29,4 +29,4 @@ export type ParcelTracking = {
   created_at: string;
 };
 
-export type PaymentMethod = 'sender_wallet' | 'sender_bank' | 'dropoff_partner' | 'receiver_wallet' | 'receiver_bank' | 'cash_on_delivery'; 
+export type PaymentMethod = 'sender_wallet' | 'sender_bank' | 'dropoff_partner' | 'receiver_wallet' | 'receiver_bank' | 'cash_on_delivery';

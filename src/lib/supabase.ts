@@ -1,5 +1,24 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '../types/supabase';
+import { Platform } from 'react-native';
+let SupabaseStorage: any = undefined;
+
+if (Platform.OS !== 'web') {
+  // Only import expo-secure-store on native
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const SecureStore = require('expo-secure-store');
+  SupabaseStorage = {
+    async getItem(key: string) {
+      return await SecureStore.getItemAsync(key);
+    },
+    async setItem(key: string, value: string) {
+      await SecureStore.setItemAsync(key, value);
+    },
+    async removeItem(key: string) {
+      await SecureStore.deleteItemAsync(key);
+    },
+  };
+}
 
 // Supabase configuration
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
@@ -11,6 +30,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+    ...(SupabaseStorage ? { storage: SupabaseStorage } : {}),
   },
   realtime: {
     params: {

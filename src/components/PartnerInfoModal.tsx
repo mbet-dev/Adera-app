@@ -91,13 +91,13 @@ export default function PartnerInfoModal({
 
   const nextImage = () => {
     if (images.length > 0) {
-      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
     }
   };
 
   const prevImage = () => {
     if (images.length > 0) {
-      setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
     }
   };
 
@@ -124,16 +124,16 @@ export default function PartnerInfoModal({
             {/* Image Gallery */}
             <View style={styles.imageContainer}>
               {images.length > 0 && (
-                <Image
+              <Image
                   source={
                     imageError
                       ? { uri: PARTNER_PHOTO_PLACEHOLDER }
                       : { uri: images[currentImageIndex] }
-                  }
-                  style={styles.image}
-                  resizeMode="cover"
+                }
+                style={styles.image}
+                resizeMode="cover"
                   onError={() => setImageError(true)}
-                />
+              />
               )}
               {images.length > 1 && (
                 <>

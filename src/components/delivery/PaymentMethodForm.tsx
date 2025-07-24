@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
 import { useDeliveryCreation } from '../../contexts/DeliveryCreationContext';
 import { Button } from '../Button';
-import { PaymentMethod } from '../../types/database';
+import type { PaymentMethod } from '../../types/index';
 
 interface PaymentMethodFormProps {
   onNext: () => void;
@@ -19,12 +19,10 @@ interface PaymentMethodFormProps {
 }
 
 const PAYMENT_METHODS: { label: string; value: PaymentMethod; icon: string }[] = [
-  { label: 'Sender Wallet', value: 'sender_wallet', icon: 'wallet' },
-  { label: 'Sender Bank', value: 'sender_bank', icon: 'card' },
-  { label: 'Dropoff Partner', value: 'dropoff_partner', icon: 'business' },
-  { label: 'Receiver Wallet', value: 'receiver_wallet', icon: 'wallet' },
-  { label: 'Receiver Bank', value: 'receiver_bank', icon: 'card' },
-  { label: 'Cash on Delivery', value: 'cash_on_delivery', icon: 'cash' },
+  { label: 'Cash at DropOff', value: 'cash_at_dropoff', icon: 'cash' },
+  { label: 'Adera Wallet', value: 'wallet', icon: 'wallet' },
+  { label: 'Mobile Banking', value: 'mobile_banking', icon: 'phone-portrait' },
+  { label: 'POS (Card Payment)', value: 'pos', icon: 'card' },
 ];
 
 export function PaymentMethodForm({ onNext, onBack }: PaymentMethodFormProps) {
@@ -35,7 +33,7 @@ export function PaymentMethodForm({ onNext, onBack }: PaymentMethodFormProps) {
   const [error, setError] = React.useState<string>();
 
   const handleMethodSelect = React.useCallback((method: PaymentMethod) => {
-    setPaymentMethod(method);
+    setPaymentMethod(method as any); // Accepts PaymentMethod | null, but we only pass valid PaymentMethod
     setError(undefined);
   }, [setPaymentMethod]);
 
@@ -44,14 +42,8 @@ export function PaymentMethodForm({ onNext, onBack }: PaymentMethodFormProps) {
       setError('Please select a payment method');
       return false;
     }
-
-    if (paymentMethod === 'dropoff_partner' && !dropoffPoint?.accepts_proxy_payment) {
-      setError('Selected dropoff point does not accept proxy payments');
-      return false;
-    }
-
     return true;
-  }, [paymentMethod, dropoffPoint]);
+  }, [paymentMethod]);
 
   const handleNext = React.useCallback(() => {
     if (validate()) {
@@ -60,10 +52,8 @@ export function PaymentMethodForm({ onNext, onBack }: PaymentMethodFormProps) {
   }, [validate, onNext]);
 
   const isMethodAvailable = React.useCallback((method: PaymentMethod) => {
-    if (method === 'dropoff_partner') {
-      return dropoffPoint?.accepts_proxy_payment;
-    }
-    return true;
+    if (!dropoffPoint || !dropoffPoint.accepted_payment_methods) return false;
+    return (dropoffPoint.accepted_payment_methods as PaymentMethod[]).includes(method);
   }, [dropoffPoint]);
 
   return (
@@ -78,7 +68,7 @@ export function PaymentMethodForm({ onNext, onBack }: PaymentMethodFormProps) {
         <View style={styles.section}>
           {PAYMENT_METHODS.map(method => {
             const isAvailable = isMethodAvailable(method.value);
-            const isSelected = paymentMethod === method.value;
+            const isSelected = paymentMethod !== null && (paymentMethod as PaymentMethod) === method.value;
 
             return (
               <TouchableOpacity

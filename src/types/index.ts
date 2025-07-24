@@ -36,15 +36,7 @@ export enum PaymentStatus {
   CANCELLED = 'cancelled'
 }
 
-export enum PaymentMethod {
-  TELEBIRR = 'telebirr',
-  CHAPA = 'chapa',
-  ARIFPAY = 'arifpay',
-  CASH_ON_DELIVERY = 'cash_on_delivery',
-  WALLET = 'wallet',
-  RECIPIENT_PAYS = 'recipient_pays',
-  CARD_PAYMENT = 'card_payment'
-}
+export type PaymentMethod = 'cash_at_dropoff' | 'wallet' | 'mobile_banking' | 'pos';
 
 export enum PackageType {
   DOCUMENT = 'document',
@@ -100,6 +92,7 @@ export interface Partner {
     first_name: string;
     last_name: string;
   }[];
+  is_facility?: boolean;
 }
 
 export interface Driver {

@@ -869,3 +869,90 @@ Here, Alex enters the information required by the form and waives the payment to
 case-5:      Alex waived the payment to be done by Beza upon delivery where Beza is a walking customer who has Cash on Hand for this fee and requires the selection of Pickup-point partners with such an option - for them to pay from their wallet while receiving the cash from Beza.
 
 In this case, what seems different from the above is, a P2 who is open for this payment service has to be selected. Then when the recepient delivers the cash payment to P2, then the hashed string will be sent to the receiver as an SMS and only then can the parcel be dispatched. 
+
+
+*************************************************************************************************************************************
+
+#### Added Concepts and Clarifications on Adera app (for both the PTP Delivery & Tracking Service and the ecommerce platform) :
+
+
+---
+
+### **Partner Selection & Payment Methods (Clarified)**
+
+- **For Delivery Orders (DropOff Partners):**
+  - Partners may offer only the following payment acceptance options for delivery fees:
+    - **Cash (COD):** Partner accepts cash from the customer for the delivery and pays Adera on the customer's behalf (using any method they choose). Once payment is confirmed, the customer can leave the parcel at the DropOff partner for Adera driver pickup.
+    - **POS (Bank Card):** Partner accepts payment via bank card (POS terminal) and pays Adera on the customer's behalf. Only partners with POS capability can be selected for this option.
+  - These are the only payment acceptance options for delivery orders at the DropOff partner stage.
+
+- **For E-Commerce (Shop Purchases):**
+  - Partners/shops may offer a wider range of payment acceptance options for purchased goods:
+    - **Cash on Delivery (COD)**
+    - **POS (Bank Card)**
+    - **Wallet (Adera in-app wallet transfer)**
+    - **Mobile Banking (Telebirr, Chapa, ArifPay, etc.)**
+  - The available payment options for each shop are shown in the shop/partner information modal during checkout.
+
+- During delivery order creation, the customer chooses a payment method. If the selected partner does not accept the chosen method, the order cannot proceed unless another method/partner is selected.
+- Partners' payment acceptance options are shown in the Partner Information modal.
+- By default, partners are assumed to accept cash on behalf of the customer unless they explicitly reject the order.
+
+---
+
+I will now ensure this update is applied to the context file.
+It seems the context file is not being updated as expected, possibly due to its large size or formatting. To ensure your requirements are not lost, here’s what you should do:
+
+**Manual Update Instructions:**
+
+Please copy and paste the following section into your `Adera-App-Context.md` file, ideally in the section about payment methods and partner selection:
+
+---
+
+#### **Partner Selection & Payment Methods (Clarified)**
+
+- **For Delivery Orders (DropOff Partners):**
+  - Partners may offer only the following payment acceptance options for delivery fees:
+    - **Cash (COD):** Partner accepts cash from the customer for the delivery and pays Adera on the customer's behalf (using any method they choose). Once payment is confirmed, the customer can leave the parcel at the DropOff partner for Adera driver pickup.
+    - **POS (Bank Card):** Partner accepts payment via bank card (POS terminal) and pays Adera on the customer's behalf. Only partners with POS capability can be selected for this option.
+  - These are the only payment acceptance options for delivery orders at the DropOff partner stage.
+
+- **For E-Commerce (Shop Purchases):**
+  - Partners/shops may offer a wider range of payment acceptance options for purchased goods:
+    - **Cash on Delivery (COD)**
+    - **POS (Bank Card)**
+    - **Wallet (Adera in-app wallet transfer)**
+    - **Mobile Banking (Telebirr, Chapa, ArifPay, etc.)**
+  - The available payment options for each shop are shown in the shop/partner information modal during checkout.
+
+- During delivery order creation, the customer chooses a payment method. If the selected partner does not accept the chosen method, the order cannot proceed unless another method/partner is selected.
+- Partners' payment acceptance options are shown in the Partner Information modal.
+- By default, partners are assumed to accept cash on behalf of the customer unless they explicitly reject the order.
+
+---
+
+
+********************************************************************************************************
+
+### Payment Method Logic for Delivery Orders (Adera App)
+
+- **Acceptable payment methods:**
+  - 'cash_at_dropoff' (customer pays cash to dropoff partner, who pays Adera on their behalf)
+  - 'wallet' (customer pays from their in-app wallet)
+  - 'mobile_banking' (customer pays via payment gateway: TeleBirr, Chapa, ArifPay, etc.)
+  - 'pos' (customer pays with bank card at dropoff partner, who pays Adera on their behalf)
+
+- **During delivery order creation:**
+  - Customer is offered all four options.
+  - If the customer selects 'wallet' or 'mobile_banking', payment is made directly to Adera.
+  - If the customer selects 'cash_at_dropoff' or 'pos', only partners who accept that method are shown as available dropoff points.
+
+- **Partner Info Modal:**
+  - Shows 'cash_at_dropoff' and/or 'pos' if the partner can accept payment on behalf of the customer for delivery order creation.
+  - If neither is shown, the partner does not handle payments for delivery order creation (but can still be a dropoff point for finalized orders).
+
+- **Ecommerce platform:**
+  - No need to specify acceptable payment methods for shops/partners in the app UI or logic.
+
+********************************************************************************************************
+
