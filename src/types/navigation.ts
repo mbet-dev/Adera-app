@@ -19,7 +19,7 @@ export type CustomerStackParamList = {
   Wallet: undefined;
   DeliveryHistory: undefined;
   ShopDetail: { shopId: string };
-  ProductDetail: { productId: string };
+  ProductDetail: { itemId: string };
   Cart: undefined;
   Wishlist: undefined;
   OrderHistory: undefined;

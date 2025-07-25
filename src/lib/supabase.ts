@@ -618,4 +618,67 @@ export const storage = {
   },
 };
 
+// =====================================================
+// E-COMMERCE PRODUCT DETAIL, BIDS, WISHLIST, REVIEWS
+// =====================================================
+
+export const getProductDetail = async (itemId: string) => {
+  return supabase
+    .from('shop_items')
+    .select('*')
+    .eq('id', itemId)
+    .single();
+};
+
+export const getProductBids = async (itemId: string) => {
+  return supabase
+    .from('item_bids')
+    .select('*')
+    .eq('item_id', itemId)
+    .order('bid_time', { ascending: false });
+};
+
+export const placeBid = async (itemId: string, userId: string, bidAmount: number) => {
+  return supabase
+    .from('item_bids')
+    .insert([{ item_id: itemId, user_id: userId, bid_amount: bidAmount }]);
+};
+
+export const getWishlistStatus = async (userId: string, itemId: string) => {
+  return supabase
+    .from('wishlists')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('item_id', itemId)
+    .maybeSingle();
+};
+
+export const addToWishlist = async (userId: string, itemId: string) => {
+  return supabase
+    .from('wishlists')
+    .insert([{ user_id: userId, item_id: itemId }]);
+};
+
+export const removeFromWishlist = async (userId: string, itemId: string) => {
+  return supabase
+    .from('wishlists')
+    .delete()
+    .eq('user_id', userId)
+    .eq('item_id', itemId);
+};
+
+export const getProductReviews = async (itemId: string) => {
+  return supabase
+    .from('product_reviews')
+    .select('*, user_id')
+    .eq('item_id', itemId)
+    .order('created_at', { ascending: false });
+};
+
+export const addProductReview = async (itemId: string, userId: string, rating: number, review: string) => {
+  return supabase
+    .from('product_reviews')
+    .upsert([{ item_id: itemId, user_id: userId, rating, review, updated_at: new Date().toISOString() }], { onConflict: ['item_id', 'user_id'] });
+};
+
 export default supabase; 

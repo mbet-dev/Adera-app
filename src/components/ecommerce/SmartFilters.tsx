@@ -10,14 +10,21 @@ const FilterContainer = styled.View`
 
 const FilterChip = styled.TouchableOpacity<{ selected: boolean; theme: any }>`
   padding: 8px 16px;
-  background-color: ${(props: { selected: boolean; theme: any }) => (props.selected ? '#E63946' : '#eee')};
+  background-color: ${(props: { selected: boolean; theme: any }) => 
+    props.selected ? '#E63946' : (props.theme.colors.mode === 'dark' ? '#333' : '#eee')};
   border-radius: 20px;
   margin-right: 12px;
+  border-width: 1px;
+  border-color: ${(props: { selected: boolean; theme: any }) => 
+    props.selected ? '#E63946' : (props.theme.colors.mode === 'dark' ? '#555' : '#ddd')};
 `;
 
 const FilterText = styled.Text<{ selected: boolean; theme: any }>`
   font-size: 14px;
-  color: ${(props: { selected: boolean; theme: any }) => (props.selected ? '#fff' : props.theme.colors.text)};
+  font-weight: ${(props: { selected: boolean }) => props.selected ? 'bold' : '600'};
+  color: ${(props: { selected: boolean; theme: any }) => 
+    props.selected ? '#fff' : 
+    (props.theme.colors.mode === 'dark' ? '#ffffff' : '#333333')};
 `;
 
 const PriceRangeContainer = styled.View`
@@ -32,6 +39,8 @@ const PriceLabelRow = styled.View`
 
 const PriceLabel = styled.Text<{ theme: any }>`
   color: ${(props: { theme: any }) => props.theme.colors.text};
+  font-weight: 600;
+  font-size: 14px;
 `;
 
 interface SmartFiltersProps {
@@ -45,9 +54,23 @@ interface SmartFiltersProps {
   maxAllowed?: number;
 }
 
-export default function SmartFilters({ selectedFilter, onSelectFilter, minPrice, maxPrice, onMinPriceChange, onMaxPriceChange, minAllowed = 0, maxAllowed = 10000 }: SmartFiltersProps) {
+export default function SmartFilters({ 
+  selectedFilter, 
+  onSelectFilter, 
+  minPrice, 
+  maxPrice, 
+  onMinPriceChange, 
+  onMaxPriceChange, 
+  minAllowed = 0, 
+  maxAllowed = 200000 
+}: SmartFiltersProps) {
   const { colors } = useTheme();
   const filters = ['All', 'Featured', 'On Sale', 'Top Rated'];
+
+  // Format price with comma separators
+  const formatPrice = (price: number) => {
+    return price.toLocaleString('en-ET');
+  };
 
   return (
     <FilterContainer>
@@ -65,15 +88,15 @@ export default function SmartFilters({ selectedFilter, onSelectFilter, minPrice,
       </ScrollView>
       <PriceRangeContainer>
         <PriceLabelRow>
-          <PriceLabel theme={{ colors }}>Min: ETB {minPrice}</PriceLabel>
-          <PriceLabel theme={{ colors }}>Max: ETB {maxPrice}</PriceLabel>
+          <PriceLabel theme={{ colors }}>Min: ETB {formatPrice(minPrice)}</PriceLabel>
+          <PriceLabel theme={{ colors }}>Max: ETB {formatPrice(maxPrice)}</PriceLabel>
         </PriceLabelRow>
         <Slider
           minimumValue={minAllowed}
           maximumValue={maxAllowed}
           value={minPrice}
           onValueChange={onMinPriceChange}
-          step={10}
+          step={1000}
           minimumTrackTintColor="#E63946"
           maximumTrackTintColor="#ccc"
           style={{ width: '100%', height: 32 }}
@@ -83,7 +106,7 @@ export default function SmartFilters({ selectedFilter, onSelectFilter, minPrice,
           maximumValue={maxAllowed}
           value={maxPrice}
           onValueChange={onMaxPriceChange}
-          step={10}
+          step={1000}
           minimumTrackTintColor="#E63946"
           maximumTrackTintColor="#ccc"
           style={{ width: '100%', height: 32, marginTop: 4 }}

@@ -11,7 +11,7 @@ export function useCategories() {
     const fetchCategories = async () => {
       try {
         const { data, error } = await supabase
-          .from('categories')
+          .from('shop_categories')
           .select('*')
           .order('sort_order', { ascending: true })
           .limit(5); // Limit to the top 5 categories for the home screen
@@ -19,7 +19,8 @@ export function useCategories() {
         if (error) throw error;
         setCategories(data || []);
       } catch (err: any) {
-        setError(err.message);
+        console.error('Error fetching categories:', err);
+        setError(err.message || 'Error loading categories');
       } finally {
         setLoading(false);
       }

@@ -14,24 +14,32 @@ import TrackParcelButton from '../components/ecommerce/TrackParcelButton';
 import SmartFilters from '../components/ecommerce/SmartFilters';
 import { useTheme } from '../contexts/ThemeContext';
 
-const Container = styled.View`
+interface ThemeType {
+  colors: {
+    background: string;
+    text: string;
+    border: string;
+  };
+}
+
+const Container = styled.View<{ theme: ThemeType }>`
   flex: 1;
-  background-color: ${(props) => props.theme.colors.background};
+  background-color: ${(props: { theme: ThemeType }) => props.theme.colors.background};
 `;
 
-const SectionTitle = styled.Text`
+const SectionTitle = styled.Text<{ theme: ThemeType }>`
   font-size: 22px;
   font-weight: 700;
   margin: 20px 16px 10px;
-  color: ${(props) => props.theme.colors.text};
+  color: ${(props: { theme: ThemeType }) => props.theme.colors.text};
 `;
 
-const SecondaryActionsContainer = styled.View`
+const SecondaryActionsContainer = styled.View<{ theme: ThemeType }>`
   flex-direction: row;
   padding: 16px;
   gap: 16px;
   border-top-width: 1px;
-  border-top-color: ${(props) => props.theme.colors.border};
+  border-top-color: ${(props: { theme: ThemeType }) => props.theme.colors.border};
 `;
 
 const PartnerDashboardLink = () => <SendParcelButton />; // Placeholder
@@ -44,7 +52,7 @@ export default function HomeScreen() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(100000);
+  const [maxPrice, setMaxPrice] = useState(200000);
 
   // Ensure minPrice does not exceed maxPrice and vice versa
   const handleMinPriceChange = (value: number) => {
@@ -71,7 +79,7 @@ export default function HomeScreen() {
                   onMinPriceChange={handleMinPriceChange}
                   onMaxPriceChange={handleMaxPriceChange}
                   minAllowed={0}
-                  maxAllowed={10000}
+                  maxAllowed={200000}
                 />
                 <PersonalizedRecommendations />
                 <SectionTitle theme={{ colors }}>Products For You</SectionTitle>

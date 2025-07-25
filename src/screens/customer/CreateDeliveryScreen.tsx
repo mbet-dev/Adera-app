@@ -145,10 +145,10 @@ export default function CreateDeliveryScreen() {
     setSelectedPartner(partner);
     // Also move the map view to the selected partner
     setRegion({
-      latitude: Number(partner.latitude),
-      longitude: Number(partner.longitude),
-      latitudeDelta: 0.04, // Zoom in closer
-      longitudeDelta: 0.04 * ASPECT_RATIO,
+        latitude: Number(partner.latitude),
+        longitude: Number(partner.longitude),
+        latitudeDelta: 0.04, // Zoom in closer
+        longitudeDelta: 0.04 * ASPECT_RATIO,
     });
     // Scroll the FlatList to the selected partner
     const index = partners.findIndex((p) => p.id === partner.id);
@@ -237,7 +237,7 @@ export default function CreateDeliveryScreen() {
   return (
     <DeliveryCreationProvider>
       <View style={styles.container}>
-        <DeliveryMapView
+        <DeliveryMapView 
           partners={partners}
           mapRegion={region}
           userLocation={userLocation?.coords}
@@ -293,18 +293,18 @@ export default function CreateDeliveryScreen() {
               renderItem={({ item: partner }) => {
                 const partnerName = partner.business_name || 'Partner Location';
                 return (
-                  <TouchableOpacity style={[styles.partnerItem, { backgroundColor: selectedPartner?.id === partner.id ? '#fdecec' : '#fff' }]} onPress={() => handleMarkerPress(partner)}>
-                    <View style={styles.partnerIconContainer}>
-                      <Feather name="map-pin" size={24} color={ADERA_RED} />
-                    </View>
-                    <View style={[styles.partnerInfo, selectedPartner?.id === partner.id && { opacity: 0.8 }]}>
-                      <Text style={styles.partnerName}>{partnerName}</Text>
-                      <Text style={styles.partnerAddress}>{partner.address}</Text>
-                    </View>
-                    <TouchableOpacity onPress={() => handleShowPartnerInfo(partner)} style={{ padding: 6 }}>
-                      <Feather name="info" size={22} color={ADERA_RED} />
+                    <TouchableOpacity style={[styles.partnerItem, { backgroundColor: selectedPartner?.id === partner.id ? '#fdecec' : '#fff' }]} onPress={() => handleMarkerPress(partner)}>
+                        <View style={styles.partnerIconContainer}>
+                            <Feather name="map-pin" size={24} color={ADERA_RED} />
+                        </View>
+                        <View style={[styles.partnerInfo, selectedPartner?.id === partner.id && { opacity: 0.8 }]}>
+                            <Text style={styles.partnerName}>{partnerName}</Text>
+                            <Text style={styles.partnerAddress}>{partner.address}</Text>
+                        </View>
+                        <TouchableOpacity onPress={() => handleShowPartnerInfo(partner)} style={{ padding: 6 }}>
+                            <Feather name="info" size={22} color={ADERA_RED} />
+                        </TouchableOpacity>
                     </TouchableOpacity>
-                  </TouchableOpacity>
                 )
               }}
               showsVerticalScrollIndicator={false}

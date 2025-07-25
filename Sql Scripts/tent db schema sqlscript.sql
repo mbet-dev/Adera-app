@@ -1,45 +1,35 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
-CREATE TABLE public.categories (
-  shop_id uuid,
-  name text NOT NULL,
-  icon_url text,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  sort_order integer DEFAULT 1,
-  created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT categories_pkey PRIMARY KEY (id),
-  CONSTRAINT categories_shop_id_fkey FOREIGN KEY (shop_id) REFERENCES public.shops(id)
-);
 CREATE TABLE public.disputes (
-  evidence_videos ARRAY,
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   parcel_id uuid,
   reporter_id uuid,
   dispute_type text NOT NULL,
   description text NOT NULL,
   evidence_images ARRAY,
+  status text DEFAULT 'open'::text,
   resolution text,
   resolved_by uuid,
   resolved_at timestamp with time zone,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  status text DEFAULT 'open'::text,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  evidence_videos ARRAY,
   CONSTRAINT disputes_pkey PRIMARY KEY (id),
+  CONSTRAINT disputes_resolved_by_fkey FOREIGN KEY (resolved_by) REFERENCES public.users(id),
   CONSTRAINT disputes_parcel_id_fkey FOREIGN KEY (parcel_id) REFERENCES public.parcels(id),
-  CONSTRAINT disputes_reporter_id_fkey FOREIGN KEY (reporter_id) REFERENCES public.users(id),
-  CONSTRAINT disputes_resolved_by_fkey FOREIGN KEY (resolved_by) REFERENCES public.users(id)
+  CONSTRAINT disputes_reporter_id_fkey FOREIGN KEY (reporter_id) REFERENCES public.users(id)
 );
 CREATE TABLE public.drivers (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   user_id uuid,
   vehicle_type text,
   vehicle_number text,
   license_number text,
+  is_available boolean DEFAULT true,
   current_latitude numeric,
   current_longitude numeric,
   last_location_update timestamp with time zone,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  is_available boolean DEFAULT true,
   total_deliveries integer DEFAULT 0,
   total_earnings numeric DEFAULT 0.00,
   rating numeric DEFAULT 0.00,
@@ -50,58 +40,50 @@ CREATE TABLE public.drivers (
   CONSTRAINT drivers_pkey PRIMARY KEY (id),
   CONSTRAINT drivers_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
-CREATE TABLE public.items (
-  delivery_fee numeric DEFAULT 0,
-  shop_id uuid,
-  category_id uuid,
-  name text NOT NULL,
-  description text,
-  price numeric,
-  quantity integer,
-  image_urls ARRAY,
+CREATE TABLE public.item_bids (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  delivery_supported boolean DEFAULT true,
-  created_at timestamp with time zone DEFAULT now(),
-  is_active boolean DEFAULT true,
-  is_featured boolean DEFAULT true,
-  views_count integer DEFAULT 0,
-  sales_count integer DEFAULT 0,
-  rating numeric DEFAULT 5.0,
-  updated_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT items_pkey PRIMARY KEY (id),
-  CONSTRAINT items_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.categories(id),
-  CONSTRAINT items_shop_id_fkey FOREIGN KEY (shop_id) REFERENCES public.shops(id)
+  item_id uuid,
+  user_id uuid,
+  bid_amount numeric NOT NULL,
+  bid_time timestamp with time zone DEFAULT now(),
+  bid_status USER-DEFINED DEFAULT 'pending'::negotiation_status,
+  accepted_by_shop boolean DEFAULT false,
+  accepted_at timestamp with time zone,
+  CONSTRAINT item_bids_pkey PRIMARY KEY (id),
+  CONSTRAINT item_bids_item_id_fkey FOREIGN KEY (item_id) REFERENCES public.shop_items(id),
+  CONSTRAINT item_bids_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
 CREATE TABLE public.messages (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   sender_id uuid,
   receiver_id uuid,
   parcel_id uuid,
   message text NOT NULL,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   message_type text DEFAULT 'text'::text,
   is_read boolean DEFAULT false,
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT messages_pkey PRIMARY KEY (id),
+  CONSTRAINT messages_receiver_id_fkey FOREIGN KEY (receiver_id) REFERENCES public.users(id),
   CONSTRAINT messages_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.users(id),
-  CONSTRAINT messages_parcel_id_fkey FOREIGN KEY (parcel_id) REFERENCES public.parcels(id),
-  CONSTRAINT messages_receiver_id_fkey FOREIGN KEY (receiver_id) REFERENCES public.users(id)
+  CONSTRAINT messages_parcel_id_fkey FOREIGN KEY (parcel_id) REFERENCES public.parcels(id)
 );
 CREATE TABLE public.notifications (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   user_id uuid,
   title text NOT NULL,
   message text NOT NULL,
   notification_type USER-DEFINED NOT NULL,
   related_id uuid,
   related_type text,
-  sent_at timestamp with time zone,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   is_read boolean DEFAULT false,
   is_sent boolean DEFAULT false,
+  sent_at timestamp with time zone,
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT notifications_pkey PRIMARY KEY (id),
   CONSTRAINT notifications_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
 CREATE TABLE public.parcel_events (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   parcel_id uuid,
   event_type USER-DEFINED NOT NULL,
   actor_id uuid,
@@ -111,14 +93,13 @@ CREATE TABLE public.parcel_events (
   location_address text,
   notes text,
   images ARRAY,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT parcel_events_pkey PRIMARY KEY (id),
-  CONSTRAINT parcel_events_parcel_id_fkey FOREIGN KEY (parcel_id) REFERENCES public.parcels(id),
-  CONSTRAINT parcel_events_actor_id_fkey FOREIGN KEY (actor_id) REFERENCES public.users(id)
+  CONSTRAINT parcel_events_actor_id_fkey FOREIGN KEY (actor_id) REFERENCES public.users(id),
+  CONSTRAINT parcel_events_parcel_id_fkey FOREIGN KEY (parcel_id) REFERENCES public.parcels(id)
 );
 CREATE TABLE public.parcels (
-  damage_photos ARRAY,
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   tracking_id text NOT NULL UNIQUE,
   sender_id uuid,
   recipient_name text NOT NULL,
@@ -131,32 +112,27 @@ CREATE TABLE public.parcels (
   package_images ARRAY,
   pickup_code text,
   delivery_fee numeric NOT NULL,
+  insurance_fee numeric DEFAULT 0.00,
   total_amount numeric NOT NULL,
   payment_method USER-DEFINED NOT NULL,
+  payment_status USER-DEFINED DEFAULT 'pending'::payment_status,
+  status USER-DEFINED DEFAULT 'created'::parcel_status,
   dropoff_partner_id uuid,
   pickup_partner_id uuid,
   assigned_driver_id uuid,
   estimated_delivery_time timestamp with time zone,
   actual_delivery_time timestamp with time zone,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  insurance_fee numeric DEFAULT 0.00,
-  payment_status USER-DEFINED DEFAULT 'pending'::payment_status,
-  status USER-DEFINED DEFAULT 'created'::parcel_status,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  damage_photos ARRAY,
   CONSTRAINT parcels_pkey PRIMARY KEY (id),
   CONSTRAINT parcels_assigned_driver_id_fkey FOREIGN KEY (assigned_driver_id) REFERENCES public.drivers(id),
+  CONSTRAINT parcels_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.users(id),
   CONSTRAINT parcels_dropoff_partner_id_fkey FOREIGN KEY (dropoff_partner_id) REFERENCES public.partners(id),
-  CONSTRAINT parcels_pickup_partner_id_fkey FOREIGN KEY (pickup_partner_id) REFERENCES public.partners(id),
-  CONSTRAINT parcels_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.users(id)
+  CONSTRAINT parcels_pickup_partner_id_fkey FOREIGN KEY (pickup_partner_id) REFERENCES public.partners(id)
 );
 CREATE TABLE public.partners (
-  business_logo_url text,
-  business_images ARRAY,
-  store_front_image text,
-  interior_images ARRAY,
-  photo_url text,
-  photos ARRAY NOT NULL DEFAULT ARRAY[]::text[],
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   user_id uuid,
   business_name text NOT NULL,
   business_license text,
@@ -167,7 +143,6 @@ CREATE TABLE public.partners (
   phone text NOT NULL,
   email text,
   operating_hours jsonb,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   accepted_payment_methods ARRAY DEFAULT ARRAY['cash_on_delivery'::payment_method],
   is_approved boolean DEFAULT false,
   is_active boolean DEFAULT true,
@@ -175,31 +150,48 @@ CREATE TABLE public.partners (
   total_earnings numeric DEFAULT 0.00,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  business_logo_url text,
+  business_images ARRAY,
+  store_front_image text,
+  interior_images ARRAY,
+  photo_url text,
+  photos ARRAY NOT NULL DEFAULT ARRAY[]::text[],
+  is_facility boolean NOT NULL DEFAULT false,
   CONSTRAINT partners_pkey PRIMARY KEY (id),
   CONSTRAINT partners_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
+CREATE TABLE public.product_reviews (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  item_id uuid,
+  user_id uuid,
+  rating integer CHECK (rating >= 1 AND rating <= 5),
+  review text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT product_reviews_pkey PRIMARY KEY (id),
+  CONSTRAINT product_reviews_item_id_fkey FOREIGN KEY (item_id) REFERENCES public.shop_items(id),
+  CONSTRAINT product_reviews_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
 CREATE TABLE public.shop_categories (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   shop_id uuid,
   name text NOT NULL,
   icon_url text,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   sort_order integer DEFAULT 0,
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT shop_categories_pkey PRIMARY KEY (id),
   CONSTRAINT shop_categories_shop_id_fkey FOREIGN KEY (shop_id) REFERENCES public.shops(id)
 );
 CREATE TABLE public.shop_items (
-  main_image_url text,
-  product_videos ARRAY,
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   shop_id uuid,
   category_id uuid,
   name text NOT NULL,
   description text,
   price numeric NOT NULL,
   original_price numeric,
-  image_urls ARRAY,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   quantity integer DEFAULT 0,
+  image_urls ARRAY,
   delivery_supported boolean DEFAULT true,
   delivery_fee numeric DEFAULT 0.00,
   is_active boolean DEFAULT true,
@@ -209,54 +201,75 @@ CREATE TABLE public.shop_items (
   rating numeric DEFAULT 0.00,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  main_image_url text,
+  product_videos ARRAY,
+  is_auction boolean DEFAULT false,
+  is_negotiable boolean DEFAULT false,
+  auction_start_price numeric,
+  auction_end_time timestamp with time zone,
+  buy_now_price numeric,
+  brand text,
+  product_attributes jsonb,
+  review_count integer DEFAULT 0,
   CONSTRAINT shop_items_pkey PRIMARY KEY (id),
-  CONSTRAINT shop_items_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.shop_categories(id),
-  CONSTRAINT shop_items_shop_id_fkey FOREIGN KEY (shop_id) REFERENCES public.shops(id)
+  CONSTRAINT shop_items_shop_id_fkey FOREIGN KEY (shop_id) REFERENCES public.shops(id),
+  CONSTRAINT shop_items_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.shop_categories(id)
 );
 CREATE TABLE public.shop_orders (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   shop_id uuid,
   buyer_id uuid,
   item_id uuid,
   quantity integer NOT NULL,
   unit_price numeric NOT NULL,
   total_amount numeric NOT NULL,
-  payment_method USER-DEFINED NOT NULL,
-  parcel_id uuid,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   delivery_fee numeric DEFAULT 0.00,
+  payment_method USER-DEFINED NOT NULL,
   payment_status USER-DEFINED DEFAULT 'pending'::payment_status,
   delivery_method text DEFAULT 'adera_delivery'::text,
   delivery_status USER-DEFINED DEFAULT 'created'::parcel_status,
+  parcel_id uuid,
   order_date timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  negotiation_status USER-DEFINED DEFAULT 'pending'::negotiation_status,
   CONSTRAINT shop_orders_pkey PRIMARY KEY (id),
+  CONSTRAINT shop_orders_buyer_id_fkey FOREIGN KEY (buyer_id) REFERENCES public.users(id),
   CONSTRAINT shop_orders_parcel_id_fkey FOREIGN KEY (parcel_id) REFERENCES public.parcels(id),
   CONSTRAINT shop_orders_item_id_fkey FOREIGN KEY (item_id) REFERENCES public.shop_items(id),
-  CONSTRAINT shop_orders_shop_id_fkey FOREIGN KEY (shop_id) REFERENCES public.shops(id),
-  CONSTRAINT shop_orders_buyer_id_fkey FOREIGN KEY (buyer_id) REFERENCES public.users(id)
+  CONSTRAINT shop_orders_shop_id_fkey FOREIGN KEY (shop_id) REFERENCES public.shops(id)
+);
+CREATE TABLE public.shop_reviews (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  shop_id uuid,
+  user_id uuid,
+  rating integer CHECK (rating >= 1 AND rating <= 5),
+  review text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT shop_reviews_pkey PRIMARY KEY (id),
+  CONSTRAINT shop_reviews_shop_id_fkey FOREIGN KEY (shop_id) REFERENCES public.shops(id),
+  CONSTRAINT shop_reviews_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
 CREATE TABLE public.shop_transactions (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   shop_id uuid,
   order_id uuid,
   amount numeric NOT NULL,
-  payout_date timestamp with time zone,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   commission_amount numeric DEFAULT 0.00,
   status USER-DEFINED DEFAULT 'pending'::payment_status,
+  payout_date timestamp with time zone,
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT shop_transactions_pkey PRIMARY KEY (id),
   CONSTRAINT shop_transactions_shop_id_fkey FOREIGN KEY (shop_id) REFERENCES public.shops(id),
   CONSTRAINT shop_transactions_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.shop_orders(id)
 );
 CREATE TABLE public.shops (
-  shop_images ARRAY,
-  is_featured boolean DEFAULT true,
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   partner_id uuid,
   shop_name text NOT NULL UNIQUE,
   description text,
   banner_url text,
   logo_url text,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   template_type text DEFAULT 'default'::text,
   primary_color text DEFAULT '#3B82F6'::text,
   is_approved boolean DEFAULT false,
@@ -266,27 +279,30 @@ CREATE TABLE public.shops (
   rating numeric DEFAULT 0.00,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  shop_images ARRAY,
+  is_featured boolean DEFAULT true,
+  review_count integer DEFAULT 0,
   CONSTRAINT shops_pkey PRIMARY KEY (id),
   CONSTRAINT shops_partner_id_fkey FOREIGN KEY (partner_id) REFERENCES public.partners(id)
 );
 CREATE TABLE public.system_settings (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   setting_key text NOT NULL UNIQUE,
   setting_value jsonb NOT NULL,
   description text,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT system_settings_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.transactions (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   parcel_id uuid,
   user_id uuid,
   amount numeric NOT NULL,
   payment_method USER-DEFINED NOT NULL,
+  payment_status USER-DEFINED DEFAULT 'pending'::payment_status,
   gateway_transaction_id text,
   gateway_response jsonb,
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  payment_status USER-DEFINED DEFAULT 'pending'::payment_status,
   commission_amount numeric DEFAULT 0.00,
   partner_commission numeric DEFAULT 0.00,
   driver_commission numeric DEFAULT 0.00,
@@ -296,30 +312,49 @@ CREATE TABLE public.transactions (
   CONSTRAINT transactions_parcel_id_fkey FOREIGN KEY (parcel_id) REFERENCES public.parcels(id),
   CONSTRAINT transactions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
+CREATE TABLE public.user_pickup_points (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid,
+  partner_id uuid,
+  label text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT user_pickup_points_pkey PRIMARY KEY (id),
+  CONSTRAINT user_pickup_points_partner_id_fkey FOREIGN KEY (partner_id) REFERENCES public.partners(id),
+  CONSTRAINT user_pickup_points_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
 CREATE TABLE public.users (
-  profile_images ARRAY,
   id uuid NOT NULL,
   email text NOT NULL UNIQUE,
   phone text UNIQUE,
   first_name text NOT NULL,
   last_name text NOT NULL,
-  profile_image_url text,
   role USER-DEFINED NOT NULL DEFAULT 'customer'::user_role,
   language text DEFAULT 'en'::text,
   is_verified boolean DEFAULT false,
   is_active boolean DEFAULT true,
+  profile_image_url text,
   wallet_balance numeric DEFAULT 0.00,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  profile_images ARRAY,
   CONSTRAINT users_pkey PRIMARY KEY (id),
   CONSTRAINT users_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
 );
 CREATE TABLE public.wallets (
-  user_id uuid UNIQUE,
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid UNIQUE,
   balance numeric DEFAULT 0.00,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT wallets_pkey PRIMARY KEY (id),
   CONSTRAINT wallets_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.wishlists (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid,
+  item_id uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT wishlists_pkey PRIMARY KEY (id),
+  CONSTRAINT wishlists_item_id_fkey FOREIGN KEY (item_id) REFERENCES public.shop_items(id),
+  CONSTRAINT wishlists_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );

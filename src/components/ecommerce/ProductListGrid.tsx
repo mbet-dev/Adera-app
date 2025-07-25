@@ -20,6 +20,11 @@ const ProductCardContainer = styled.TouchableOpacity`
   background-color: #fff;
   border-radius: 8px;
   overflow: hidden;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
 `;
 
 const ProductImage = styled.Image`
@@ -34,12 +39,20 @@ const ProductInfo = styled.View`
 const ProductName = styled.Text`
   font-weight: bold;
   font-size: 14px;
+  color: #333;
 `;
 
 const ProductPrice = styled.Text`
   color: #E63946;
   font-weight: bold;
   margin-top: 4px;
+  font-size: 16px;
+`;
+
+const ProductRating = styled.Text`
+  color: #666;
+  font-size: 12px;
+  margin-top: 2px;
 `;
 
 const AddToCartButton = styled.TouchableOpacity`
@@ -49,6 +62,18 @@ const AddToCartButton = styled.TouchableOpacity`
   background-color: #E63946;
   padding: 6px;
   border-radius: 16px;
+`;
+
+const EmptyState = styled.View`
+  padding: 40px 20px;
+  align-items: center;
+`;
+
+const EmptyText = styled.Text`
+  color: #666;
+  font-size: 16px;
+  text-align: center;
+  margin-top: 8px;
 `;
 
 type HomeScreenNavigationProp = StackNavigationProp<CustomerStackParamList, 'Home'>;
@@ -65,22 +90,64 @@ export default function ProductListGrid({ categoryId, search, filter, minPrice, 
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { products, loading, error } = useProducts(categoryId, search, filter, minPrice, maxPrice);
 
+  // Format price with comma separators
+  const formatPrice = (price: number) => {
+    return price.toLocaleString('en-ET');
+  };
+
+  // Format rating display
+  const formatRating = (rating: number) => {
+    return `${rating.toFixed(1)} ★`;
+  };
+
   if (loading) {
-    return <ActivityIndicator style={{ marginVertical: 16 }} />;
+    return (
+      <View style={{ padding: 20, alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#E63946" />
+        <Text style={{ marginTop: 8, color: '#666' }}>Loading products...</Text>
+      </View>
+    );
   }
 
   if (error) {
-    return <Text style={{ textAlign: 'center', marginVertical: 16 }}>Error loading products</Text>;
+    return (
+      <EmptyState>
+        <Feather name="alert-circle" size={48} color="#666" />
+        <EmptyText>Error loading products</EmptyText>
+        <EmptyText>{error}</EmptyText>
+      </EmptyState>
+    );
+  }
+
+  if (!products || products.length === 0) {
+    return (
+      <EmptyState>
+        <Feather name="package" size={48} color="#666" />
+        <EmptyText>No products found</EmptyText>
+        <EmptyText>Try adjusting your filters or search terms</EmptyText>
+      </EmptyState>
+    );
   }
 
   return (
     <Grid>
       {products.map((item) => (
-        <ProductCardContainer key={item.id} onPress={() => navigation.navigate('ProductDetail', { productId: item.id })}>
-          <ProductImage source={{ uri: item.image_urls?.[0] || 'https://via.placeholder.com/160x120?text=Product' }} />
+        <ProductCardContainer 
+          key={item.id} 
+          onPress={() => navigation.navigate('ProductDetail', { itemId: item.id })}
+        >
+          <ProductImage 
+            source={{ 
+              uri: item.image_urls?.[0] || 'https://via.placeholder.com/160x120?text=Product' 
+            }} 
+            resizeMode="cover"
+          />
           <ProductInfo>
-            <ProductName>{item.name}</ProductName>
-            <ProductPrice>ETB {item.price}</ProductPrice>
+            <ProductName numberOfLines={2}>{item.name}</ProductName>
+            <ProductPrice>ETB {formatPrice(item.price)}</ProductPrice>
+            {item.rating > 0 && (
+              <ProductRating>{formatRating(item.rating)}</ProductRating>
+            )}
           </ProductInfo>
           <AddToCartButton>
             <Feather name="plus" size={18} color="#fff" />
