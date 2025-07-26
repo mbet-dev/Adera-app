@@ -724,9 +724,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      calculate_delivery_fee: {
+      calculate_parcel_delivery_fee: {
         Args: {
           p_package_type: 'document' | 'small' | 'medium' | 'large'
+          p_distance_km: number
+        }
+        Returns: number
+      }
+      calculate_shop_delivery_fee: {
+        Args: {
           p_distance_km: number
         }
         Returns: number

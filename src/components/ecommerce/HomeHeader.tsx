@@ -14,6 +14,11 @@ interface ThemedProps {
   };
 }
 
+interface HomeHeaderProps {
+  cartBadgeCount?: number;
+  wishlistBadgeCount?: number;
+}
+
 const HeaderContainer = styled.View<ThemedProps>`
   padding: 16px;
   flex-direction: row;
@@ -33,15 +38,15 @@ const IconContainer = styled.View`
   gap: 20px;
 `;
 
-export default function HomeHeader() {
+export default function HomeHeader({ cartBadgeCount = 0, wishlistBadgeCount = 0 }: HomeHeaderProps) {
   const { colors } = useTheme();
 
   return (
     <HeaderContainer theme={{ colors }}>
       <Title theme={{ colors }}>Discover</Title>
       <IconContainer>
-        <CartButton />
-        <WishlistButton />
+        <CartButton badgeCount={cartBadgeCount} />
+        <WishlistButton badgeCount={wishlistBadgeCount} />
         <OrderHistoryButton />
       </IconContainer>
     </HeaderContainer>

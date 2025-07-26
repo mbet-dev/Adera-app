@@ -150,4 +150,93 @@ This document summarizes all the changes made to address the user's requirements
 - **Comprehensive Testing:** Easy way to test all product types
 - **Future-Proof:** Clean foundation for further development
 
-All changes maintain backward compatibility and include proper error handling and validation. 
+All changes maintain backward compatibility and include proper error handling and validation.
+
+---
+
+## 9. Delivery Fee Function Fix (Latest)
+
+### 9.1 Function Name Conflict Resolution
+**Problem:** PostgreSQL error `function name "calculate_delivery_fee" is not unique`
+- Two functions with same name but different signatures existed
+- One for parcel deliveries: `(p_package_type, p_distance_km)`
+- One for e-commerce: `(p_distance_km, p_base_fee)`
+
+**Solution:**
+- Created separate functions with clear names:
+  - `calculate_parcel_delivery_fee()` for parcel deliveries
+  - `calculate_shop_delivery_fee()` for e-commerce deliveries
+- Updated delivery fee formula: **Base fee (125 ETB) + (Distance × 25 ETB/km)**
+
+### 9.2 Pickup Point Selection Fix
+**Problem:** Pickup point was required for all orders, even when delivery service wasn't needed
+
+**Solution:**
+- **Removed mandatory pickup point requirement** from cart flow
+- **Added optional delivery service checkbox** in checkout
+- **Pickup point only required** when delivery service is enabled
+- **Dynamic delivery fee calculation** based on actual distance
+
+### 9.3 Delivery Fee Calculation Fix
+**Problem:** Delivery fee wasn't calculating correctly due to shop location parsing issues
+
+**Root Cause:**
+- Shop location data structure was object, not array
+- Parsing logic was incorrect
+- Always defaulting to 5km distance
+
+**Solution:**
+- **Fixed shop location parsing** to handle object structure correctly
+- **Enhanced debugging** with comprehensive logging
+- **Added automatic recalculation** when shop location is set
+- **Improved UI feedback** with loading states and distance display
+
+### 9.4 Files Modified
+
+#### **Database Scripts**
+- `Sql Scripts/fix_delivery_fee_functions.sql` - Resolved function name conflict
+- `Sql Scripts/fix_trigger_conflict.sql` - Fixed trigger conflicts
+
+#### **Frontend Code**
+- `src/screens/shop/CheckoutModalScreen.tsx` - Fixed delivery fee calculation and pickup point logic
+- `src/screens/shop/CartModalScreen.tsx` - Updated to pass correct parameters
+- `src/types/supabase.ts` - Updated TypeScript types for new function names
+
+### 9.5 Testing Results
+
+#### **Before Fix:**
+- All pickup points showed same delivery fee (250 ETB)
+- Using default 5km distance
+- Pickup point required for all orders
+
+#### **After Fix:**
+- Different pickup points show different delivery fees based on actual distance
+- Pickup point only required when delivery service is enabled
+- Real-time updates when changing pickup points
+
+#### **Example Calculations:**
+- **Arada Electronics (2.34 km):** 125 + (2.34 × 25) = 183.5 ETB
+- **Lideta Market (2.45 km):** 125 + (2.45 × 25) = 186.25 ETB
+- **Merkato Market (3.12 km):** 125 + (3.12 × 25) = 203 ETB
+
+### 9.6 User Experience Flow
+
+#### **Regular Purchase (No Delivery):**
+1. Add items to cart → Click "Proceed to Checkout"
+2. See order summary (no delivery fee)
+3. Select payment method → Click "Pay" → Order completed
+
+#### **Purchase with Delivery:**
+1. Add items to cart → Click "Proceed to Checkout"
+2. Check "Create delivery order for purchased items"
+3. Select pickup point → Delivery fee appears in summary
+4. Select payment method → Click "Pay" → Order + delivery order created
+
+### 9.7 Benefits
+
+- ✅ **Resolved function name conflicts** in database
+- ✅ **Updated to new pricing structure** (125 ETB base + 25 ETB/km)
+- ✅ **Simplified checkout flow** - pickup point only when needed
+- ✅ **Dynamic delivery fee calculation** based on actual distance
+- ✅ **Real-time updates** in order summary
+- ✅ **Consistent experience** across cart and Buy Now flows 

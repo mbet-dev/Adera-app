@@ -272,7 +272,7 @@ export default function CreateDeliveryScreen() {
               />
             </View>
             <TouchableOpacity style={styles.filterButton}>
-              <Feather name="filter" size={20} color="#fff" />
+              <Feather name="sliders" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
 
