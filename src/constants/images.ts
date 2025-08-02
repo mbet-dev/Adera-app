@@ -1,0 +1,1 @@
+export const PARTNER_PHOTO_PLACEHOLDER = 'https://via.placeholder.com/400x200?text=No+Photo'; 

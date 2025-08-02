@@ -1,0 +1,2 @@
+import RNGestureHandlerButtonNativeComponent from '../specs/RNGestureHandlerButtonNativeComponent';
+export default RNGestureHandlerButtonNativeComponent;
