@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text, ScrollView } from 'react-native';
 import { useAuth } from '../../hooks/useAuth';
-import { Button } from '../../components/ui/Button';
+import { Button } from '../components/ui/Button';
 
 export const ParcelsScreen = ({ navigation }: any) => {
   const { user } = useAuth();

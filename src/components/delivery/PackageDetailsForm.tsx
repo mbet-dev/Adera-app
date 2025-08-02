@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useTheme } from '../../hooks/useTheme';
 import { PackageSize, useDeliveryCreation } from '../../contexts/DeliveryCreationContext';
-import { Button } from '../Button';
+import { Button } from '../ui/Button';
 
 const PACKAGE_SIZES: { label: string; value: PackageSize }[] = [
   { label: 'Document', value: 'document' },

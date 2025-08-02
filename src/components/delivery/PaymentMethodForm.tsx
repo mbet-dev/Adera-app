@@ -10,7 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../hooks/useTheme';
 import { useDeliveryCreation } from '../../contexts/DeliveryCreationContext';
-import { Button } from '../Button';
+import { Button } from '../ui/Button';
 import { PaymentMethod } from '../../types/database';
 
 interface PaymentMethodFormProps {

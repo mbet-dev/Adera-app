@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, ScrollView, StyleSheet, Text, View, Platform, Linking } from 'react-native';
-import { Button } from '../Button';
+import { Button } from '../ui/Button';
 import { useTheme } from '../../hooks/useTheme';
 import { supabase } from '../../lib/supabase';
 
