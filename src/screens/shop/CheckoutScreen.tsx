@@ -98,7 +98,7 @@ export default function CheckoutScreen() {
 
   if (cartState.items.length === 0) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right', 'bottom']}>
         <View style={styles.emptyContainer}>
           <Feather name="shopping-cart" size={64} color={colors.border} />
           <Text style={[styles.emptyTitle, { color: colors.text }]}>Your cart is empty</Text>
@@ -117,7 +117,7 @@ export default function CheckoutScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right', 'bottom']}>
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <TouchableOpacity

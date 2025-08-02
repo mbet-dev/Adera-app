@@ -103,7 +103,7 @@ export default function CartScreen() {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right', 'bottom']}>
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <TouchableOpacity
@@ -141,34 +141,36 @@ export default function CartScreen() {
           />
 
           {/* Order Summary */}
-          <View style={[styles.orderSummary, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
-            <View style={styles.summaryRow}>
-              <Text style={[styles.summaryLabel, { color: colors.text }]}>Subtotal:</Text>
-              <Text style={[styles.summaryValue, { color: colors.text }]}>
-                ETB {formatPrice(cartState.subtotal)}
-              </Text>
-            </View>
-            <View style={styles.summaryRow}>
-              <Text style={[styles.summaryLabel, { color: colors.text }]}>Delivery Fee:</Text>
-              <Text style={[styles.summaryValue, { color: colors.text }]}>
-                ETB {formatPrice(cartState.deliveryFee)}
-              </Text>
-            </View>
-            <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
-            <View style={styles.summaryRow}>
-              <Text style={[styles.totalLabel, { color: colors.text }]}>Total:</Text>
-              <Text style={[styles.totalValue, { color: colors.primary || '#E63946' }]}>
-                ETB {formatPrice(cartState.total)}
-              </Text>
-            </View>
+          <SafeAreaView edges={['bottom']} style={{ backgroundColor: colors.card }}>
+            <View style={[styles.orderSummary, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
+              <View style={styles.summaryRow}>
+                <Text style={[styles.summaryLabel, { color: colors.text }]}>Subtotal:</Text>
+                <Text style={[styles.summaryValue, { color: colors.text }]}>
+                  ETB {formatPrice(cartState.subtotal)}
+                </Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={[styles.summaryLabel, { color: colors.text }]}>Delivery Fee:</Text>
+                <Text style={[styles.summaryValue, { color: colors.text }]}>
+                  ETB {formatPrice(cartState.deliveryFee)}
+                </Text>
+              </View>
+              <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
+              <View style={styles.summaryRow}>
+                <Text style={[styles.totalLabel, { color: colors.text }]}>Total:</Text>
+                <Text style={[styles.totalValue, { color: colors.primary || '#E63946' }]}>
+                  ETB {formatPrice(cartState.total)}
+                </Text>
+              </View>
 
-            <TouchableOpacity
-              style={[styles.checkoutButton, { backgroundColor: colors.primary || '#E63946' }]}
-              onPress={handleCheckout}
-            >
-              <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
-            </TouchableOpacity>
-          </View>
+              <TouchableOpacity
+                style={[styles.checkoutButton, { backgroundColor: colors.primary || '#E63946' }]}
+                onPress={handleCheckout}
+              >
+                <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
         </>
       )}
     </SafeAreaView>

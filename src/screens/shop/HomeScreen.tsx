@@ -26,7 +26,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { ShopItem } from '../../types';
-import { getPlatformStyles } from '../../utils/platform';
+import { getPlatformStyles, isWeb } from '../../utils/platform';
 import { supabase } from '../../lib/supabase';
 
 const { width } = Dimensions.get('window');
@@ -98,9 +98,7 @@ export default function ShopHomeScreen() {
     // Only set wallet balance for authenticated users
     if (isAuthenticated && user) {
       // Simulate wallet balance fetch
-      setWalletBalance(12500);
-    } else {
-      setWalletBalance(0);
+      setWalletBalance(2500);
     }
   }, [isAuthenticated, user]);
 
@@ -391,14 +389,25 @@ export default function ShopHomeScreen() {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }, platformStyles.webContainer]} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView 
+      style={[
+        styles.container, 
+        { backgroundColor: colors.background }, 
+        isWeb && styles.webContainer
+      ]} 
+      edges={['top', 'left', 'right', 'bottom']}
+    >
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <View style={styles.headerLeft}>
           {isGuestMode && (
             <TouchableOpacity
               style={[styles.backButton, { backgroundColor: colors.card }]}
-              onPress={() => (navigation as any).navigate('Auth')}
+              onPress={() => {
+                if (isGuestMode) {
+                  (navigation as any).navigate('Auth');
+                }
+              }}
             >
               <Feather name="arrow-left" size={20} color={colors.text} />
             </TouchableOpacity>
@@ -407,8 +416,15 @@ export default function ShopHomeScreen() {
             <Text style={[styles.headerTitle, { color: colors.text }]}>
               {isGuestMode ? 'Browse Adera Shop' : 'Adera Shop'}
             </Text>
-            <Text style={[styles.headerSubtitleGuest, isGuestMode && styles.headerSubtitleGuestHighlight, { color: isGuestMode ? colors.primary : colors.border }]}>
-              {isGuestMode ? 'Sign in for full access' : 'Discover amazing products'}
+            <Text style={[
+              styles.headerSubtitleGuest, 
+              { 
+                color: isGuestMode ? colors.primary : colors.textSecondary,
+                fontWeight: isGuestMode ? '600' : 'normal',
+                fontSize: isGuestMode ? 15 : 14
+              }
+            ]}>
+              {isGuestMode ? '👋 Sign in for full access & exclusive deals!' : 'Discover amazing products'}
             </Text>
           </View>
         </View>
@@ -499,146 +515,285 @@ export default function ShopHomeScreen() {
         />
       )}
 
-      <FlatList
-        data={[{ key: 'content' }]}
-        renderItem={() => (
-          <>
-            {/* Banner Carousel */}
-            <BannerCarousel onBannerPress={(banner) => {
-              console.log('Banner pressed:', banner.title);
-            }} />
-            
-            {/* Shops Carousel */}
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Featured Shops</Text>
-                <TouchableOpacity>
-                  <Text style={[styles.seeAllText, { color: colors.primary || '#E63946' }]}>See All</Text>
-                </TouchableOpacity>
-              </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.shopsContainer}>
-                {loadingShops ? (
-                  <View style={styles.loadingContainer}>
-                    <Text style={[styles.loadingText, { color: colors.border }]}>Loading shops...</Text>
-                  </View>
-                ) : (
-                  shops.map((shop) => (
-                    <View key={shop.id} style={styles.shopItem}>
-                      <View style={styles.shopImageContainer}>
-                        {shop.logo_url ? (
-                          <Image 
-                            source={{ uri: shop.logo_url }} 
-                            style={styles.shopImage}
-                            resizeMode="cover"
-                          />
-                        ) : (
-                          <View style={[styles.shopLogoPlaceholder, { backgroundColor: shop.primary_color }]}>
-                            <Text style={styles.shopLogoText}>
-                              {shop.shop_name.split(' ').map(word => word.charAt(0)).join('').toUpperCase()}
-                            </Text>
-                          </View>
-                        )}
-                      </View>
-                      <Text style={[styles.shopName, { color: colors.text }]} numberOfLines={1}>
-                        {shop.shop_name}
-                      </Text>
-                      <View style={styles.shopRating}>
-                        <Feather name="star" size={12} color="#FFD700" />
-                        <Text style={[styles.ratingText, { color: colors.text }]}>
-                          {shop.rating.toFixed(1)}
-                        </Text>
-                      </View>
-                    </View>
-                  ))
-                )}
-              </ScrollView>
+      {isWeb ? (
+        <ScrollView 
+          style={[styles.content, styles.webScrollView]}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.webScrollContent}
+        >
+          {/* Banner Carousel */}
+          <BannerCarousel onBannerPress={(banner) => {
+            console.log('Banner pressed:', banner.title);
+          }} />
+          
+          {/* Shops Carousel */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Featured Shops</Text>
+              <TouchableOpacity>
+                <Text style={[styles.seeAllText, { color: colors.primary || '#E63946' }]}>See All</Text>
+              </TouchableOpacity>
             </View>
-
-            {/* Categories */}
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Categories</Text>
-                <TouchableOpacity>
-                  <Text style={[styles.seeAllText, { color: colors.primary || '#E63946' }]}>See All</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.categoriesGrid}>
-                {loadingCategories ? (
-                  <View style={styles.loadingContainer}>
-                    <Text style={[styles.loadingText, { color: colors.border }]}>Loading categories...</Text>
-                  </View>
-                ) : (
-                  categories.map((category) => (
-                    <TouchableOpacity 
-                      key={category.id} 
-                      style={[
-                        styles.categoryItem,
-                        selectedCategory === category.name && { 
-                          backgroundColor: colors.primary || '#E63946',
-                          transform: [{ scale: 1.05 }]
-                        }
-                      ]}
-                      onPress={() => handleCategoryPress(category)}
-                    >
-                      <View style={[
-                        styles.categoryIcon, 
-                        { backgroundColor: selectedCategory === category.name ? '#fff' : category.color }
-                      ]}>
-                        <Feather 
-                          name={category.icon as any} 
-                          size={24} 
-                          color={selectedCategory === category.name ? category.color : '#fff'} 
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.shopsContainer}>
+              {loadingShops ? (
+                <View style={styles.loadingContainer}>
+                  <Text style={[styles.loadingText, { color: colors.border }]}>Loading shops...</Text>
+                </View>
+              ) : (
+                shops.map((shop) => (
+                  <View key={shop.id} style={styles.shopItem}>
+                    <View style={styles.shopImageContainer}>
+                      {shop.logo_url ? (
+                        <Image 
+                          source={{ uri: shop.logo_url }} 
+                          style={styles.shopImage}
+                          resizeMode="cover"
                         />
-                      </View>
-                      <Text style={[
-                        styles.categoryName, 
-                        { color: selectedCategory === category.name ? '#fff' : colors.text }
-                      ]} numberOfLines={1}>
-                        {category.name}
+                      ) : (
+                        <View style={[styles.shopLogoPlaceholder, { backgroundColor: shop.primary_color }]}>
+                          <Text style={styles.shopLogoText}>
+                            {shop.shop_name.split(' ').map(word => word.charAt(0)).join('').toUpperCase()}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={[styles.shopName, { color: colors.text }]} numberOfLines={1}>
+                      {shop.shop_name}
+                    </Text>
+                    <View style={styles.shopRating}>
+                      <Feather name="star" size={12} color="#FFD700" />
+                      <Text style={[styles.ratingText, { color: colors.text }]}>
+                        {shop.rating.toFixed(1)}
                       </Text>
-                    </TouchableOpacity>
-                  ))
-                )}
-              </View>
-            </View>
+                    </View>
+                  </View>
+                ))
+              )}
+            </ScrollView>
+          </View>
 
-            {/* Price Range Filter */}
-            <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Price Range</Text>
-              <PriceRangeSlider
-                minPrice={0}
-                maxPrice={200000}
-                initialMin={priceRange.min}
-                initialMax={priceRange.max}
-                onRangeChange={(min, max) => setPriceRange({ min, max })}
-              />
+          {/* Categories */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Categories</Text>
+              <TouchableOpacity>
+                <Text style={[styles.seeAllText, { color: colors.primary || '#E63946' }]}>See All</Text>
+              </TouchableOpacity>
             </View>
+            <View style={styles.categoriesGrid}>
+              {loadingCategories ? (
+                <View style={styles.loadingContainer}>
+                  <Text style={[styles.loadingText, { color: colors.border }]}>Loading categories...</Text>
+                </View>
+              ) : (
+                categories.map((category) => (
+                  <TouchableOpacity 
+                    key={category.id} 
+                    style={[
+                      styles.categoryItem,
+                      selectedCategory === category.name && { 
+                        backgroundColor: colors.primary || '#E63946',
+                        transform: [{ scale: 1.05 }]
+                      }
+                    ]}
+                    onPress={() => handleCategoryPress(category)}
+                  >
+                    <View style={[
+                      styles.categoryIcon, 
+                      { backgroundColor: selectedCategory === category.name ? '#fff' : category.color }
+                    ]}>
+                      <Feather 
+                        name={category.icon as any} 
+                        size={24} 
+                        color={selectedCategory === category.name ? category.color : '#fff'} 
+                      />
+                    </View>
+                    <Text style={[
+                      styles.categoryName, 
+                      { color: selectedCategory === category.name ? '#fff' : colors.text }
+                    ]} numberOfLines={1}>
+                      {category.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))
+              )}
+            </View>
+          </View>
 
-            {/* Products For You */}
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                  Products For You
-                  {selectedCategory && ` - ${selectedCategory}`}
-                </Text>
-                <TouchableOpacity>
-                  <Text style={[styles.seeAllText, { color: colors.primary || '#E63946' }]}>See All</Text>
-                </TouchableOpacity>
-              </View>
-              <ProductListGrid
-                products={products}
-                loading={loading}
-                error={error}
-                onProductPress={handleProductPress}
-                onAddToCart={handleAddToCart}
-              />
+          {/* Price Range Filter */}
+          <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Price Range</Text>
+            <PriceRangeSlider
+              minPrice={0}
+              maxPrice={200000}
+              initialMin={priceRange.min}
+              initialMax={priceRange.max}
+              onRangeChange={(min, max) => setPriceRange({ min, max })}
+            />
+          </View>
+
+          {/* Products For You */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Products For You
+                {selectedCategory && ` - ${selectedCategory}`}
+              </Text>
+              <TouchableOpacity>
+                <Text style={[styles.seeAllText, { color: colors.primary || '#E63946' }]}>See All</Text>
+              </TouchableOpacity>
             </View>
-          </>
-        )}
-        keyExtractor={(item) => item.key}
-        showsVerticalScrollIndicator={false}
-        style={[styles.content, platformStyles.webScrollView]}
-      />
+            <ProductListGrid
+              products={products}
+              loading={loading}
+              error={error}
+              onProductPress={handleProductPress}
+              onAddToCart={handleAddToCart}
+            />
+          </View>
+        </ScrollView>
+      ) : (
+        <FlatList
+          data={[{ key: 'content' }]}
+          renderItem={() => (
+            <>
+              {/* Banner Carousel */}
+              <BannerCarousel onBannerPress={(banner) => {
+                console.log('Banner pressed:', banner.title);
+              }} />
+              
+              {/* Shops Carousel */}
+              <View style={styles.section}>
+                <View style={styles.sectionHeader}>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>Featured Shops</Text>
+                  <TouchableOpacity>
+                    <Text style={[styles.seeAllText, { color: colors.primary || '#E63946' }]}>See All</Text>
+                  </TouchableOpacity>
+                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.shopsContainer}>
+                  {loadingShops ? (
+                    <View style={styles.loadingContainer}>
+                      <Text style={[styles.loadingText, { color: colors.border }]}>Loading shops...</Text>
+                    </View>
+                  ) : (
+                    shops.map((shop) => (
+                      <View key={shop.id} style={styles.shopItem}>
+                        <View style={styles.shopImageContainer}>
+                          {shop.logo_url ? (
+                            <Image 
+                              source={{ uri: shop.logo_url }} 
+                              style={styles.shopImage}
+                              resizeMode="cover"
+                            />
+                          ) : (
+                            <View style={[styles.shopLogoPlaceholder, { backgroundColor: shop.primary_color }]}>
+                              <Text style={styles.shopLogoText}>
+                                {shop.shop_name.split(' ').map(word => word.charAt(0)).join('').toUpperCase()}
+                              </Text>
+                            </View>
+                          )}
+                        </View>
+                        <Text style={[styles.shopName, { color: colors.text }]} numberOfLines={1}>
+                          {shop.shop_name}
+                        </Text>
+                        <View style={styles.shopRating}>
+                          <Feather name="star" size={12} color="#FFD700" />
+                          <Text style={[styles.ratingText, { color: colors.text }]}>
+                            {shop.rating.toFixed(1)}
+                          </Text>
+                        </View>
+                      </View>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+
+              {/* Categories */}
+              <View style={styles.section}>
+                <View style={styles.sectionHeader}>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>Categories</Text>
+                  <TouchableOpacity>
+                    <Text style={[styles.seeAllText, { color: colors.primary || '#E63946' }]}>See All</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.categoriesGrid}>
+                  {loadingCategories ? (
+                    <View style={styles.loadingContainer}>
+                      <Text style={[styles.loadingText, { color: colors.border }]}>Loading categories...</Text>
+                    </View>
+                  ) : (
+                    categories.map((category) => (
+                      <TouchableOpacity 
+                        key={category.id} 
+                        style={[
+                          styles.categoryItem,
+                          selectedCategory === category.name && { 
+                            backgroundColor: colors.primary || '#E63946',
+                            transform: [{ scale: 1.05 }]
+                          }
+                        ]}
+                        onPress={() => handleCategoryPress(category)}
+                      >
+                        <View style={[
+                          styles.categoryIcon, 
+                          { backgroundColor: selectedCategory === category.name ? '#fff' : category.color }
+                        ]}>
+                          <Feather 
+                            name={category.icon as any} 
+                            size={24} 
+                            color={selectedCategory === category.name ? category.color : '#fff'} 
+                          />
+                        </View>
+                        <Text style={[
+                          styles.categoryName, 
+                          { color: selectedCategory === category.name ? '#fff' : colors.text }
+                        ]} numberOfLines={1}>
+                          {category.name}
+                        </Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </View>
+              </View>
+
+              {/* Price Range Filter */}
+              <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Price Range</Text>
+                <PriceRangeSlider
+                  minPrice={0}
+                  maxPrice={200000}
+                  initialMin={priceRange.min}
+                  initialMax={priceRange.max}
+                  onRangeChange={(min, max) => setPriceRange({ min, max })}
+                />
+              </View>
+
+              {/* Products For You */}
+              <View style={styles.section}>
+                <View style={styles.sectionHeader}>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                    Products For You
+                    {selectedCategory && ` - ${selectedCategory}`}
+                  </Text>
+                  <TouchableOpacity>
+                    <Text style={[styles.seeAllText, { color: colors.primary || '#E63946' }]}>See All</Text>
+                  </TouchableOpacity>
+                </View>
+                <ProductListGrid
+                  products={products}
+                  loading={loading}
+                  error={error}
+                  onProductPress={handleProductPress}
+                  onAddToCart={handleAddToCart}
+                />
+              </View>
+            </>
+          )}
+          keyExtractor={(item) => item.key}
+          showsVerticalScrollIndicator={false}
+          style={styles.content}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -646,6 +801,22 @@ export default function ShopHomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  webContainer: {
+    minHeight: isWeb ? '100vh' as any : undefined,
+    overflow: 'hidden' as any,
+    position: 'relative' as any,
+    display: isWeb ? 'flex' as any : undefined,
+    flexDirection: 'column' as any,
+  },
+  webScrollView: {
+    flex: 1,
+    overflow: isWeb ? 'auto' as any : 'scroll',
+    height: isWeb ? '100%' as any : undefined,
+    maxHeight: isWeb ? '100vh' as any : undefined,
+  },
+  webScrollContent: {
+    paddingBottom: 20,
   },
   header: {
     flexDirection: 'row',
@@ -668,7 +839,8 @@ const styles = StyleSheet.create({
   },
   headerSubtitleGuest: {
     fontSize: 14,
-    marginTop: 2,
+    marginTop: 4,
+    lineHeight: 18,
   },
   headerSubtitleGuestHighlight: {
     fontWeight: 'bold',

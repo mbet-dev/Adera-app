@@ -446,7 +446,7 @@ export default function CheckoutModalScreen({
 
   return (
     <Modal visible={visible} animationType="slide">
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top', 'left', 'right']}> 
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top', 'left', 'right', 'bottom']}>
         {/* Header */}
         <View style={[styles.header, { borderBottomColor: colors.border }]}> 
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
