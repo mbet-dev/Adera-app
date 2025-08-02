@@ -398,87 +398,116 @@ export default function ShopHomeScreen() {
       edges={['top', 'left', 'right', 'bottom']}
     >
       {/* Header */}
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <View style={styles.headerLeft}>
-          {isGuestMode && (
-            <TouchableOpacity
-              style={[styles.backButton, { backgroundColor: colors.card }]}
-              onPress={() => {
-                if (isGuestMode) {
-                  (navigation as any).navigate('Auth');
-                }
-              }}
-            >
-              <Feather name="arrow-left" size={20} color={colors.text} />
-            </TouchableOpacity>
-          )}
-          <View style={isGuestMode ? styles.headerTitleContainer : undefined}>
-            <Text style={[styles.headerTitle, { color: colors.text }]}>
-              {isGuestMode ? 'Browse Adera Shop' : 'Adera Shop'}
-            </Text>
-            <Text style={[
-              styles.headerSubtitleGuest, 
-              { 
-                color: isGuestMode ? colors.primary : colors.textSecondary,
-                fontWeight: isGuestMode ? '600' : 'normal',
-                fontSize: isGuestMode ? 15 : 14
-              }
-            ]}>
-              {isGuestMode ? '👋 Sign in for full access & exclusive deals!' : 'Discover amazing products'}
-            </Text>
+      <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: colors.background }]}>
+        <View style={styles.headerTop}>
+          <View style={styles.headerMainRow}>
+            <View style={styles.headerLeft}>
+              {isGuestMode && (
+                <TouchableOpacity
+                  style={[styles.backButton, { backgroundColor: colors.card }]}
+                  onPress={() => {
+                    if (isGuestMode) {
+                      (navigation as any).navigate('Auth');
+                    }
+                  }}
+                >
+                  <Feather name="arrow-left" size={20} color={colors.text} />
+                </TouchableOpacity>
+              )}
+              <View style={styles.headerTitleWrapper}>
+                <Text style={[styles.headerTitle, { color: colors.text }]}>
+                  {isGuestMode ? 'Browse Adera Shop' : 'Adera Shop'}
+                </Text>
+                {!isGuestMode && (
+                  <Text style={[
+                    styles.headerSubtitleAuthenticated, 
+                    { 
+                      color: colors.textSecondary,
+                      fontWeight: 'normal',
+                      fontSize: 14
+                    }
+                  ]}>
+                    Discover amazing products
+                  </Text>
+                )}
+              </View>
+            </View>
+            <View style={styles.headerRight}>
+              <TouchableOpacity
+                style={[styles.headerButton, { backgroundColor: colors.card }]}
+                onPress={handleSearchPress}
+              >
+                <Feather name="search" size={20} color={colors.text} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.headerButton, { backgroundColor: colors.card }]}
+                onPress={handleWishlistPress}
+              >
+                <View style={styles.iconContainer}>
+                  <Feather name="heart" size={20} color={colors.text} />
+                  {!isGuestMode && wishlistState.items.length > 0 && (
+                    <View style={[styles.badge, { backgroundColor: colors.primary || '#E63946' }]}>
+                      <Text style={styles.badgeText}>
+                        {wishlistState.items.length > 99 ? '99+' : wishlistState.items.length}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.headerButton, { backgroundColor: colors.card }]}
+                onPress={handleOrderHistoryPress}
+              >
+                <View style={styles.iconContainer}>
+                  <Feather name="package" size={20} color={colors.text} />
+                  {!isGuestMode && (
+                    <View style={[styles.badge, { backgroundColor: colors.primary || '#E63946' }]}>
+                      <Text style={styles.badgeText}>3</Text>
+                    </View>
+                  )}
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.headerButton, { backgroundColor: colors.card }]}
+                onPress={handleCartPress}
+              >
+                <View style={styles.cartContainer}>
+                  <Feather name="shopping-cart" size={20} color={colors.text} />
+                  {!isGuestMode && cartState.totalItems > 0 && (
+                    <View style={[styles.cartBadge, { backgroundColor: colors.primary || '#E63946' }]}>
+                      <Text style={styles.cartBadgeText}>
+                        {cartState.totalItems > 99 ? '99+' : cartState.totalItems}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-        <View style={styles.headerRight}>
-          <TouchableOpacity
-            style={[styles.headerButton, { backgroundColor: colors.card }]}
-            onPress={handleSearchPress}
-          >
-            <Feather name="search" size={20} color={colors.text} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.headerButton, { backgroundColor: colors.card }]}
-            onPress={handleWishlistPress}
-          >
-            <View style={styles.iconContainer}>
-              <Feather name="heart" size={20} color={colors.text} />
-              {!isGuestMode && wishlistState.items.length > 0 && (
-                <View style={[styles.badge, { backgroundColor: colors.primary || '#E63946' }]}>
-                  <Text style={styles.badgeText}>
-                    {wishlistState.items.length > 99 ? '99+' : wishlistState.items.length}
-                  </Text>
-                </View>
-              )}
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.headerButton, { backgroundColor: colors.card }]}
-            onPress={handleOrderHistoryPress}
-          >
-            <View style={styles.iconContainer}>
-              <Feather name="package" size={20} color={colors.text} />
-              {!isGuestMode && (
-                <View style={[styles.badge, { backgroundColor: colors.primary || '#E63946' }]}>
-                  <Text style={styles.badgeText}>3</Text>
-                </View>
-              )}
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.headerButton, { backgroundColor: colors.card }]}
-            onPress={handleCartPress}
-          >
-            <View style={styles.cartContainer}>
-              <Feather name="shopping-cart" size={20} color={colors.text} />
-              {!isGuestMode && cartState.totalItems > 0 && (
-                <View style={[styles.cartBadge, { backgroundColor: colors.primary || '#E63946' }]}>
-                  <Text style={styles.cartBadgeText}>
-                    {cartState.totalItems > 99 ? '99+' : cartState.totalItems}
-                  </Text>
-                </View>
-              )}
-            </View>
-          </TouchableOpacity>
-        </View>
+        
+        {/* Guest Sign-in Prompt Row */}
+        {isGuestMode && (
+          <View style={styles.guestPromptRow}>
+            <TouchableOpacity 
+              onPress={() => (navigation as any).navigate('Auth')}
+              style={[styles.signInPrompt, { backgroundColor: colors.primary + '15', borderColor: colors.primary + '30' }]}
+              activeOpacity={0.8}
+            >
+              <Feather name="user" size={16} color={colors.primary} />
+              <Text style={[
+                styles.guestPromptText, 
+                { 
+                  color: colors.primary,
+                  fontWeight: '600'
+                }
+              ]}>
+                👋 Sign in for full access & exclusive deals!
+              </Text>
+              <Feather name="arrow-right" size={14} color={colors.primary} />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       {/* Wallet Balance */}
@@ -491,13 +520,12 @@ export default function ShopHomeScreen() {
         </View>
         <TouchableOpacity 
           style={[styles.walletButton, { 
-            backgroundColor: isGuestMode ? colors.textSecondary : (colors.primary || '#E63946'),
-            opacity: isGuestMode ? 0.6 : 1
+            backgroundColor: isGuestMode ? colors.primary : (colors.primary || '#E63946'),
+            opacity: isGuestMode ? 0.9 : 1
           }]}
-          disabled={isGuestMode}
           onPress={() => {
             if (isGuestMode) {
-              (navigation as any).navigate('AuthPrompt');
+              (navigation as any).navigate('AuthPrompt', { feature: 'wallet' });
             }
           }}
         >
@@ -819,14 +847,25 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   header: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+  },
+  headerTop: {
+    minHeight: 44,
+  },
+  headerMainRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
   },
   headerLeft: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerTitleWrapper: {
     flex: 1,
   },
   headerTitle: {
@@ -1038,5 +1077,33 @@ const styles = StyleSheet.create({
   },
   headerTitleContainer: {
     flex: 1,
+  },
+  guestPromptContainer: {
+    marginTop: 6,
+  },
+  signInPrompt: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    gap: 6,
+  },
+  signInIcon: {
+    marginRight: 2,
+  },
+  headerSubtitleAuthenticated: {
+    fontSize: 14,
+    marginTop: 4,
+    lineHeight: 18,
+  },
+  guestPromptRow: {
+    marginTop: 8,
+    paddingHorizontal: 8,
+  },
+  guestPromptText: {
+    fontSize: 14,
+    flex: 1,
+    textAlign: 'center',
   },
 });

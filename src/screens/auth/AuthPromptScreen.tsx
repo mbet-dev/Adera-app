@@ -3,11 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   Image,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -80,9 +80,9 @@ export default function AuthPromptScreen({ route, navigation }: Props) {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right', 'bottom']}>
+      <View style={[styles.header, { backgroundColor: colors.background }]}>
+        <TouchableOpacity onPress={handleGoBack} style={[styles.backButton, { backgroundColor: colors.card }]}>
           <Feather name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
@@ -154,10 +154,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 20,
+    paddingTop: 12,
+    paddingBottom: 16,
+    minHeight: 60,
   },
   backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 8,
   },
   content: {
