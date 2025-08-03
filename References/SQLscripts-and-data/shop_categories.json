@@ -1,0 +1,226 @@
+[
+  {
+    "id": "e65c14ab-557d-4d02-b643-3832632ab9f9",
+    "shop_id": "7ce6560c-6265-4d11-a577-70d703561e35",
+    "name": "Electronics",
+    "icon_url": null,
+    "sort_order": 1,
+    "created_at": "2025-07-25 23:06:01.972199+00"
+  },
+  {
+    "id": "42b27620-cfa7-4a53-9ad8-1ab9f4248734",
+    "shop_id": "7ce6560c-6265-4d11-a577-70d703561e35",
+    "name": "Fashion",
+    "icon_url": null,
+    "sort_order": 2,
+    "created_at": "2025-07-25 23:06:01.972199+00"
+  },
+  {
+    "id": "2517bdf0-2374-4667-a7ab-c4e4c1d6651b",
+    "shop_id": "7ce6560c-6265-4d11-a577-70d703561e35",
+    "name": "Books",
+    "icon_url": null,
+    "sort_order": 3,
+    "created_at": "2025-07-25 23:06:01.972199+00"
+  },
+  {
+    "id": "a1743363-b709-461f-b7e1-32ba27e9edba",
+    "shop_id": "7ce6560c-6265-4d11-a577-70d703561e35",
+    "name": "Home & Garden",
+    "icon_url": null,
+    "sort_order": 4,
+    "created_at": "2025-07-25 23:06:01.972199+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440101",
+    "shop_id": "9fd41185-f7fc-4631-a86b-2ca9957b9082",
+    "name": "Smartphones",
+    "icon_url": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=100",
+    "sort_order": 1,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440102",
+    "shop_id": "9fd41185-f7fc-4631-a86b-2ca9957b9082",
+    "name": "Laptops",
+    "icon_url": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=100",
+    "sort_order": 2,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440103",
+    "shop_id": "9fd41185-f7fc-4631-a86b-2ca9957b9082",
+    "name": "Accessories",
+    "icon_url": "https://images.unsplash.com/photo-1544866092-1677b00f868b?w=100",
+    "sort_order": 3,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440104",
+    "shop_id": "9fd41185-f7fc-4631-a86b-2ca9957b9082",
+    "name": "Gaming",
+    "icon_url": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=100",
+    "sort_order": 4,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440201",
+    "shop_id": "8833d5d2-a628-41d4-b6d8-ba775e9ed54c",
+    "name": "Men's Clothing",
+    "icon_url": "https://images.unsplash.com/photo-1516257984-b1b4bb07b6b1?w=100",
+    "sort_order": 1,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440202",
+    "shop_id": "8833d5d2-a628-41d4-b6d8-ba775e9ed54c",
+    "name": "Women's Clothing",
+    "icon_url": "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=100",
+    "sort_order": 2,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440203",
+    "shop_id": "8833d5d2-a628-41d4-b6d8-ba775e9ed54c",
+    "name": "Shoes",
+    "icon_url": "https://images.unsplash.com/photo-1549298916-b41d114d2c36?w=100",
+    "sort_order": 3,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440204",
+    "shop_id": "8833d5d2-a628-41d4-b6d8-ba775e9ed54c",
+    "name": "Accessories",
+    "icon_url": "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=100",
+    "sort_order": 4,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440301",
+    "shop_id": "2b95f1c5-9297-474b-a885-b5a8088bcd57",
+    "name": "Men's Shoes",
+    "icon_url": "https://images.unsplash.com/photo-1549298916-b41d114d2c36?w=100",
+    "sort_order": 1,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440302",
+    "shop_id": "2b95f1c5-9297-474b-a885-b5a8088bcd57",
+    "name": "Women's Shoes",
+    "icon_url": "https://images.unsplash.com/photo-1549298916-b41d114d2c36?w=100",
+    "sort_order": 2,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440303",
+    "shop_id": "2b95f1c5-9297-474b-a885-b5a8088bcd57",
+    "name": "Sports Shoes",
+    "icon_url": "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=100",
+    "sort_order": 3,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440304",
+    "shop_id": "2b95f1c5-9297-474b-a885-b5a8088bcd57",
+    "name": "Formal Shoes",
+    "icon_url": "https://images.unsplash.com/photo-1549298916-b41d114d2c36?w=100",
+    "sort_order": 4,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440401",
+    "shop_id": "73b68bf7-e216-4739-afa9-72dd84a360cb",
+    "name": "Fresh Produce",
+    "icon_url": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=100",
+    "sort_order": 1,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440402",
+    "shop_id": "73b68bf7-e216-4739-afa9-72dd84a360cb",
+    "name": "Dairy & Eggs",
+    "icon_url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=100",
+    "sort_order": 2,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440403",
+    "shop_id": "73b68bf7-e216-4739-afa9-72dd84a360cb",
+    "name": "Beverages",
+    "icon_url": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=100",
+    "sort_order": 3,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440404",
+    "shop_id": "73b68bf7-e216-4739-afa9-72dd84a360cb",
+    "name": "Snacks",
+    "icon_url": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=100",
+    "sort_order": 4,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440501",
+    "shop_id": "43e1f798-0fb4-448b-a4c3-5aa2e21ad31e",
+    "name": "Furniture",
+    "icon_url": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=100",
+    "sort_order": 1,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440502",
+    "shop_id": "43e1f798-0fb4-448b-a4c3-5aa2e21ad31e",
+    "name": "Electronics",
+    "icon_url": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=100",
+    "sort_order": 2,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440503",
+    "shop_id": "43e1f798-0fb4-448b-a4c3-5aa2e21ad31e",
+    "name": "Home Decor",
+    "icon_url": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=100",
+    "sort_order": 3,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440504",
+    "shop_id": "43e1f798-0fb4-448b-a4c3-5aa2e21ad31e",
+    "name": "Collectibles",
+    "icon_url": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=100",
+    "sort_order": 4,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440601",
+    "shop_id": "17cb61b3-932b-47aa-9df8-0cf90ac59bfe",
+    "name": "Smartphones",
+    "icon_url": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=100",
+    "sort_order": 1,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440602",
+    "shop_id": "17cb61b3-932b-47aa-9df8-0cf90ac59bfe",
+    "name": "Laptops",
+    "icon_url": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=100",
+    "sort_order": 2,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440603",
+    "shop_id": "17cb61b3-932b-47aa-9df8-0cf90ac59bfe",
+    "name": "Cameras",
+    "icon_url": "https://images.unsplash.com/photo-1544866092-1677b00f868b?w=100",
+    "sort_order": 3,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440604",
+    "shop_id": "17cb61b3-932b-47aa-9df8-0cf90ac59bfe",
+    "name": "Vintage Tech",
+    "icon_url": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=100",
+    "sort_order": 4,
+    "created_at": "2025-07-28 00:07:41.029014+00"
+  }
+]

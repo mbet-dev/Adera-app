@@ -1,0 +1,1568 @@
+[
+  {
+    "id": "109743cd-2cf5-4c43-b6b0-85e525f1ed9e",
+    "user_id": "8daa232e-c2a3-4407-8b99-dfa2f97f67b4",
+    "business_name": "Kirkos Pharmacy",
+    "business_license": null,
+    "business_category": "pharmacy",
+    "address": "Kirkos, Addis Ababa",
+    "latitude": "9.03670000",
+    "longitude": "38.72560000",
+    "phone": "+251911100019",
+    "email": "kirkos.pharmacy@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "monday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "sunday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "tuesday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "saturday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "thursday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "wednesday": {
+        "open": "07:00",
+        "close": "21:00"
+      }
+    },
+    "accepted_payment_methods": "{cash_at_dropoff,pos}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/5472.avif",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "6c0834cd-fdc2-4ac9-925e-516d613433dd",
+    "user_id": "eb715561-e3fa-478d-bdae-5463e9d9d7cd",
+    "business_name": "Kazanchis Shop",
+    "business_license": null,
+    "business_category": "retail",
+    "address": "Kazanchis, Addis Ababa",
+    "latitude": "9.01230000",
+    "longitude": "38.74560000",
+    "phone": "+251911100004",
+    "email": "kazanchis.shop@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "monday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "sunday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "tuesday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "saturday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "thursday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "wednesday": {
+        "open": "06:00",
+        "close": "22:00"
+      }
+    },
+    "accepted_payment_methods": "{}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/istockphoto-644073584-612x612.jpg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "89a946a4-7526-41b1-95bc-fb87fdf54084",
+    "user_id": "10e9b116-c471-4326-b9d8-c9f0b5042c83",
+    "business_name": "Nifas Silk Electronics",
+    "business_license": null,
+    "business_category": "electronics",
+    "address": "Nifas Silk, Addis Ababa",
+    "latitude": "8.98980000",
+    "longitude": "38.79120000",
+    "phone": "+251911100021",
+    "email": "nifas.electronics@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "monday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "tuesday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "saturday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "wednesday": {
+        "open": "08:00",
+        "close": "20:00"
+      }
+    },
+    "accepted_payment_methods": "{cash_at_dropoff}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/small-town-antiques-store-or-storefront-with-a-going-out-of-business-sign-in-the-window-in-warm-springs-georgia-usa-R9TTA6.jpg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "92d1dc7c-e214-4d83-aa3b-1be903510cf3",
+    "user_id": "129749fb-1dce-45dd-a439-74d9a8523a45",
+    "business_name": "Yeka Shop",
+    "business_license": null,
+    "business_category": "retail",
+    "address": "Yeka, Addis Ababa",
+    "latitude": "9.01230000",
+    "longitude": "38.78900000",
+    "phone": "+251911100014",
+    "email": "yeka.shop@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "monday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "sunday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "tuesday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "saturday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "thursday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "wednesday": {
+        "open": "07:00",
+        "close": "22:00"
+      }
+    },
+    "accepted_payment_methods": "{}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/Small-Businesses-scaled-2560x1280 (1).jpg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "97127493-6bda-4bb0-ab43-c2949c701525",
+    "user_id": "19deb30a-e8ef-4054-b18c-3a0e56fb66a3",
+    "business_name": "Kolfe Pharmacy",
+    "business_license": null,
+    "business_category": "pharmacy",
+    "address": "Kolfe, Addis Ababa",
+    "latitude": "8.98980000",
+    "longitude": "38.72560000",
+    "phone": "+251911100013",
+    "email": "kolfe.pharmacy@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "monday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "sunday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "tuesday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "saturday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "thursday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "wednesday": {
+        "open": "07:00",
+        "close": "21:00"
+      }
+    },
+    "accepted_payment_methods": "{cash_at_dropoff,pos}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/images (1).jpeg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "ad143d96-c32f-48b4-b507-91d95906d438",
+    "user_id": "197f53dc-dd28-4582-bc94-6d491523ce6e",
+    "business_name": "Lideta Market Shop",
+    "business_license": null,
+    "business_category": "retail",
+    "address": "Lideta, Addis Ababa",
+    "latitude": "9.01230000",
+    "longitude": "38.75670000",
+    "phone": "+251911100022",
+    "email": "lideta.shop@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "06:00",
+        "close": "21:00"
+      },
+      "monday": {
+        "open": "06:00",
+        "close": "21:00"
+      },
+      "sunday": {
+        "open": "06:00",
+        "close": "21:00"
+      },
+      "tuesday": {
+        "open": "06:00",
+        "close": "21:00"
+      },
+      "saturday": {
+        "open": "06:00",
+        "close": "21:00"
+      },
+      "thursday": {
+        "open": "06:00",
+        "close": "21:00"
+      },
+      "wednesday": {
+        "open": "06:00",
+        "close": "21:00"
+      }
+    },
+    "accepted_payment_methods": "{}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/Small-Businesses-scaled-2560x1280 (1).jpg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "afad72bc-8d7b-441a-a74e-729bd48e5a34",
+    "user_id": "ad469c72-7181-46e9-bc3b-a3a0d5c505d7",
+    "business_name": "Yeka Internet Cafe",
+    "business_license": null,
+    "business_category": "cafe",
+    "address": "Yeka, Addis Ababa",
+    "latitude": "9.01450000",
+    "longitude": "38.79120000",
+    "phone": "+251911100015",
+    "email": "yeka.cafe@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "monday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "sunday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "tuesday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "saturday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "thursday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "wednesday": {
+        "open": "06:00",
+        "close": "23:00"
+      }
+    },
+    "accepted_payment_methods": "{cash_at_dropoff}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/images (5).jpeg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "bc6d511c-14a2-422d-91ba-8a8b8c98d8bc",
+    "user_id": "94aa1f8f-93ae-4c02-bc25-8c0d0211fa46",
+    "business_name": "Kirkos Mini Market",
+    "business_license": null,
+    "business_category": "retail",
+    "address": "Kirkos, Addis Ababa",
+    "latitude": "9.03450000",
+    "longitude": "38.72340000",
+    "phone": "+251911100018",
+    "email": "kirkos.mini@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "monday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "sunday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "tuesday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "saturday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "thursday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "wednesday": {
+        "open": "06:00",
+        "close": "22:00"
+      }
+    },
+    "accepted_payment_methods": "{}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/1214812484.webp",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "c0bc318a-32ac-478b-90f3-75798cdbb097",
+    "user_id": "b8c2f298-52ce-4883-9201-51e9f78f3f8e",
+    "business_name": "Addis Ketema Pharmacy",
+    "business_license": null,
+    "business_category": "pharmacy",
+    "address": "Addis Ketema, Addis Ababa",
+    "latitude": "9.02560000",
+    "longitude": "38.72560000",
+    "phone": "+251911100025",
+    "email": "addisketema.pharmacy@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "monday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "sunday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "tuesday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "saturday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "thursday": {
+        "open": "07:00",
+        "close": "21:00"
+      },
+      "wednesday": {
+        "open": "07:00",
+        "close": "21:00"
+      }
+    },
+    "accepted_payment_methods": "{cash_at_dropoff,pos}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/Coronavirus-Lockdown-Forces-Londons-Small-Businesses-To-Make-Hard-Choices-1220780371-1.webp",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "1b5cd85c-dec1-48e6-93c6-af4f73240ec1",
+    "user_id": "31879791-a6e7-4e9d-9bf8-9d6aff346876",
+    "business_name": "Arada Electronics",
+    "business_license": null,
+    "business_category": "electronics",
+    "address": "Arada, Addis Ababa",
+    "latitude": "9.02560000",
+    "longitude": "38.75890000",
+    "phone": "+251911100017",
+    "email": "arada.electronics@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "monday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "tuesday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "saturday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "wednesday": {
+        "open": "08:00",
+        "close": "20:00"
+      }
+    },
+    "accepted_payment_methods": "{cash_at_dropoff}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/images (6).jpeg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "5e8d3681-86a6-48fc-907f-0dd26a43eef7",
+    "user_id": "1fbea0de-c24f-4972-8d3f-3e4eba78fc2c",
+    "business_name": "Arada Bookstore",
+    "business_license": null,
+    "business_category": "books",
+    "address": "Arada, Addis Ababa",
+    "latitude": "9.02340000",
+    "longitude": "38.75670000",
+    "phone": "+251911100016",
+    "email": "arada.books@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "monday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "sunday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "tuesday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "saturday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "thursday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "wednesday": {
+        "open": "09:00",
+        "close": "19:00"
+      }
+    },
+    "accepted_payment_methods": "{cash_at_dropoff}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/0_Forsyths-music-shop-is-one-of-the-oldest-local-businesses-in-Manchester.webp",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "ae0afff0-2b32-49f3-85e5-49e154c25c3e",
+    "user_id": "06f6058b-f43c-4ad8-9605-a04149e4a639",
+    "business_name": "Piazza Bookstore",
+    "business_license": null,
+    "business_category": "books",
+    "address": "Piazza, Addis Ababa",
+    "latitude": "9.03450000",
+    "longitude": "38.75670000",
+    "phone": "+251911100006",
+    "email": "piazza.books@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "monday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "sunday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "tuesday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "saturday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "thursday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "wednesday": {
+        "open": "09:00",
+        "close": "19:00"
+      }
+    },
+    "accepted_payment_methods": "{cash_at_dropoff,pos}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/Small-Businesses-scaled-2560x1280 (1).jpg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "d4ea0fb3-07d6-4201-a7cd-3de5200e1d35",
+    "user_id": "56348af5-a77b-44fe-983d-bd6704ff143d",
+    "business_name": "Kazanchis Stationery",
+    "business_license": null,
+    "business_category": "stationery",
+    "address": "Kazanchis, Addis Ababa",
+    "latitude": "9.01450000",
+    "longitude": "38.74780000",
+    "phone": "+251911100005",
+    "email": "kazanchis.stationery@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "monday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "tuesday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "saturday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "wednesday": {
+        "open": "08:00",
+        "close": "20:00"
+      }
+    },
+    "accepted_payment_methods": "{cash_at_dropoff}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/images.jpeg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "e1740af4-a5cf-40bc-80f9-069f33d0ce83",
+    "user_id": "4f58bcc3-6b19-4a09-92a7-3ee28673e9d3",
+    "business_name": "Kolfe Mini Market",
+    "business_license": null,
+    "business_category": "retail",
+    "address": "Kolfe, Addis Ababa",
+    "latitude": "8.98760000",
+    "longitude": "38.72340000",
+    "phone": "+251911100012",
+    "email": "kolfe.mini@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "monday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "sunday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "tuesday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "saturday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "thursday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "wednesday": {
+        "open": "06:00",
+        "close": "22:00"
+      }
+    },
+    "accepted_payment_methods": "{pos}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/Small-Businesses-scaled-2560x1280 (1).jpg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "user_id": "e6109577-7f71-4f01-ba0a-80eaada429dd",
+    "business_name": "Bole Branch",
+    "business_license": null,
+    "business_category": null,
+    "address": "Bole, Addis Ababa",
+    "latitude": "8.98060000",
+    "longitude": "38.75780000",
+    "phone": "+251911111111",
+    "email": null,
+    "operating_hours": null,
+    "accepted_payment_methods": "{cash_on_delivery}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-29 15:53:11.436128+00",
+    "updated_at": "2025-07-29 15:53:11.436128+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": null,
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "660e8400-e29b-41d4-a716-446655440001",
+    "user_id": "a653c3e0-da76-4db1-aec7-32e18a2cadee",
+    "business_name": "Kazanchis Hub",
+    "business_license": null,
+    "business_category": null,
+    "address": "Kazanchis, Addis Ababa",
+    "latitude": "9.00540000",
+    "longitude": "38.76360000",
+    "phone": "+251922222222",
+    "email": null,
+    "operating_hours": null,
+    "accepted_payment_methods": "{cash_on_delivery}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-29 15:53:11.436128+00",
+    "updated_at": "2025-07-29 15:53:11.436128+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": null,
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "4c8047a4-242e-4d0b-bf18-50fde6b757f1",
+    "user_id": "dc7d00e3-c5aa-4fb7-8cb4-95542980920f",
+    "business_name": "Merkato Electronics",
+    "business_license": null,
+    "business_category": "electronics",
+    "address": "Merkato, Addis Ababa",
+    "latitude": "9.02900000",
+    "longitude": "38.73890000",
+    "phone": "+251911100011",
+    "email": "merkato.electronics@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "monday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "tuesday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "saturday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "wednesday": {
+        "open": "08:00",
+        "close": "20:00"
+      }
+    },
+    "accepted_payment_methods": "{}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/Small-Businesses-scaled-2560x1280 (1).jpg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "a670b94e-34d3-4938-8e60-46587eca540a",
+    "user_id": "5658f426-5df1-4a6b-8d9d-392ecfa3804e",
+    "business_name": "Meskel Pharmacy",
+    "business_license": null,
+    "business_category": "pharmacy",
+    "address": "Meskel Square, Addis Ababa",
+    "latitude": "9.02560000",
+    "longitude": "38.74780000",
+    "phone": "+251911100009",
+    "email": "meskel.pharmacy@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "monday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "sunday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "tuesday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "saturday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "thursday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "wednesday": {
+        "open": "07:00",
+        "close": "22:00"
+      }
+    },
+    "accepted_payment_methods": "{cash_at_dropoff}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/images (15).jpeg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "b65514a4-eb62-44e6-a426-90a56af4c4aa",
+    "user_id": "f4590342-5b63-45b6-b81d-0cdfa3ca7769",
+    "business_name": "Meskel Square Shop",
+    "business_license": null,
+    "business_category": "retail",
+    "address": "Meskel Square, Addis Ababa",
+    "latitude": "9.02340000",
+    "longitude": "38.74560000",
+    "phone": "+251911100008",
+    "email": "meskel.shop@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "monday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "sunday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "tuesday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "saturday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "thursday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "wednesday": {
+        "open": "06:00",
+        "close": "23:00"
+      }
+    },
+    "accepted_payment_methods": "{pos}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/istockphoto-915082340-612x612.jpg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "e89cb078-45f3-4229-9692-47512148471a",
+    "user_id": "539078c1-423a-4ec8-be99-6ea97392dd9f",
+    "business_name": "Piazza Electronics",
+    "business_license": null,
+    "business_category": "electronics",
+    "address": "Piazza, Addis Ababa",
+    "latitude": "9.03670000",
+    "longitude": "38.75890000",
+    "phone": "+251911100007",
+    "email": "piazza.electronics@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "monday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "tuesday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "saturday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "wednesday": {
+        "open": "08:00",
+        "close": "20:00"
+      }
+    },
+    "accepted_payment_methods": "{cash_at_dropoff,pos}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/images (15).jpeg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "fe1dd363-f209-4bf4-8547-4e1099516fcb",
+    "user_id": "470176a3-1801-4187-86e3-45b2bd27facd",
+    "business_name": "Merkato Market Shop",
+    "business_license": null,
+    "business_category": "retail",
+    "address": "Merkato, Addis Ababa",
+    "latitude": "9.02780000",
+    "longitude": "38.73670000",
+    "phone": "+251911100010",
+    "email": "merkato.shop@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "06:00",
+        "close": "21:00"
+      },
+      "monday": {
+        "open": "06:00",
+        "close": "21:00"
+      },
+      "sunday": {
+        "open": "06:00",
+        "close": "21:00"
+      },
+      "tuesday": {
+        "open": "06:00",
+        "close": "21:00"
+      },
+      "saturday": {
+        "open": "06:00",
+        "close": "21:00"
+      },
+      "thursday": {
+        "open": "06:00",
+        "close": "21:00"
+      },
+      "wednesday": {
+        "open": "06:00",
+        "close": "21:00"
+      }
+    },
+    "accepted_payment_methods": "{pos}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/images (10).jpeg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "5fce19f1-ad89-48da-8dc3-85f301a2167f",
+    "user_id": "2a986b36-b201-461e-9895-e68b8801ca9c",
+    "business_name": "Lideta Internet Cafe",
+    "business_license": null,
+    "business_category": "cafe",
+    "address": "Lideta, Addis Ababa",
+    "latitude": "9.01450000",
+    "longitude": "38.75890000",
+    "phone": "+251911100023",
+    "email": "lideta.cafe@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "monday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "sunday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "tuesday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "saturday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "thursday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "wednesday": {
+        "open": "06:00",
+        "close": "23:00"
+      }
+    },
+    "accepted_payment_methods": "{pos}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/astoria-queens-ny-may-3-600nw-1049920259.webp",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "8d4bd4d5-c2bc-46bc-a60c-77f8ce455ef5",
+    "user_id": "7ea9d2f2-8fcd-46ef-9da0-3f0fdf07f972",
+    "business_name": "Addis Ketema Mini Market",
+    "business_license": null,
+    "business_category": "retail",
+    "address": "Addis Ketema, Addis Ababa",
+    "latitude": "9.02340000",
+    "longitude": "38.72340000",
+    "phone": "+251911100024",
+    "email": "addisketema.mini@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "monday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "sunday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "tuesday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "saturday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "thursday": {
+        "open": "06:00",
+        "close": "22:00"
+      },
+      "wednesday": {
+        "open": "06:00",
+        "close": "22:00"
+      }
+    },
+    "accepted_payment_methods": "{pos}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/images (11).jpeg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "fc035948-7fac-437e-9f43-bd3fe975a4fe",
+    "user_id": "5417046d-ee4e-45fb-8efc-c783e5c215e9",
+    "business_name": "Nifas Silk Shop",
+    "business_license": null,
+    "business_category": "retail",
+    "address": "Nifas Silk, Addis Ababa",
+    "latitude": "8.98760000",
+    "longitude": "38.78900000",
+    "phone": "+251911100020",
+    "email": "nifas.shop@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "monday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "sunday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "tuesday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "saturday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "thursday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "wednesday": {
+        "open": "07:00",
+        "close": "22:00"
+      }
+    },
+    "accepted_payment_methods": "{cash_at_dropoff}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/0_Forsyths-music-shop-is-one-of-the-oldest-local-businesses-in-Manchester.webp",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "79a49573-14dd-47ff-a8ec-acfb04ca8d1b",
+    "user_id": null,
+    "business_name": "Adera Sorting Hub - Merkato",
+    "business_license": null,
+    "business_category": "sorting_facility",
+    "address": "Merkato, Addis Ababa, Ethiopia",
+    "latitude": "9.02720000",
+    "longitude": "38.73690000",
+    "phone": "+251911000002",
+    "email": "merkato.hub@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "00:00",
+        "close": "23:59"
+      },
+      "monday": {
+        "open": "00:00",
+        "close": "23:59"
+      },
+      "sunday": {
+        "open": "00:00",
+        "close": "23:59"
+      },
+      "tuesday": {
+        "open": "00:00",
+        "close": "23:59"
+      },
+      "saturday": {
+        "open": "00:00",
+        "close": "23:59"
+      },
+      "thursday": {
+        "open": "00:00",
+        "close": "23:59"
+      },
+      "wednesday": {
+        "open": "00:00",
+        "close": "23:59"
+      }
+    },
+    "accepted_payment_methods": "{cash_at_dropoff,pos}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:47:45.075241+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/0_Forsyths-music-shop-is-one-of-the-oldest-local-businesses-in-Manchester.webp",
+    "photos": [],
+    "is_facility": true
+  },
+  {
+    "id": "ac574da8-eb4b-41bc-8102-9b0f63ac6f6f",
+    "user_id": null,
+    "business_name": "Adera Sorting Hub - Bole",
+    "business_license": null,
+    "business_category": "sorting_facility",
+    "address": "Bole, Addis Ababa, Ethiopia",
+    "latitude": "8.98060000",
+    "longitude": "38.75780000",
+    "phone": "+251911000001",
+    "email": "bole.hub@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "00:00",
+        "close": "23:59"
+      },
+      "monday": {
+        "open": "00:00",
+        "close": "23:59"
+      },
+      "sunday": {
+        "open": "00:00",
+        "close": "23:59"
+      },
+      "tuesday": {
+        "open": "00:00",
+        "close": "23:59"
+      },
+      "saturday": {
+        "open": "00:00",
+        "close": "23:59"
+      },
+      "thursday": {
+        "open": "00:00",
+        "close": "23:59"
+      },
+      "wednesday": {
+        "open": "00:00",
+        "close": "23:59"
+      }
+    },
+    "accepted_payment_methods": "{pos}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:47:45.075241+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/placeholder-1a.jpeg",
+    "photos": [],
+    "is_facility": true
+  },
+  {
+    "id": "3480817c-23d5-4294-8a54-094f959267af",
+    "user_id": "aa925b26-a37e-4bc9-822c-a3e33528c5ce",
+    "business_name": "Bole Internet Cafe",
+    "business_license": null,
+    "business_category": "cafe",
+    "address": "Bole Atlas, Addis Ababa",
+    "latitude": "8.98450000",
+    "longitude": "38.75890000",
+    "phone": "+251911100003",
+    "email": "bole.cafe@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "monday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "sunday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "tuesday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "saturday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "thursday": {
+        "open": "06:00",
+        "close": "23:00"
+      },
+      "wednesday": {
+        "open": "06:00",
+        "close": "23:00"
+      }
+    },
+    "accepted_payment_methods": "{pos}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/Hub - istockphoto-175407605-612x612.jpg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "4cbd396e-4d47-435b-bf62-3b20d1cb24c2",
+    "user_id": "a651438c-9c1f-4f6c-831f-25c00b3dbef8",
+    "business_name": "Bole Pharmacy",
+    "business_license": null,
+    "business_category": "pharmacy",
+    "address": "Bole Atlas, Addis Ababa",
+    "latitude": "8.98720000",
+    "longitude": "38.76120000",
+    "phone": "+251911100002",
+    "email": "bole.pharmacy@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "08:00",
+        "close": "21:00"
+      },
+      "monday": {
+        "open": "08:00",
+        "close": "21:00"
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "21:00"
+      },
+      "tuesday": {
+        "open": "08:00",
+        "close": "21:00"
+      },
+      "saturday": {
+        "open": "08:00",
+        "close": "21:00"
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "21:00"
+      },
+      "wednesday": {
+        "open": "08:00",
+        "close": "21:00"
+      }
+    },
+    "accepted_payment_methods": "{cash_at_dropoff,pos}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/small-town-antiques-store-or-storefront-with-a-going-out-of-business-sign-in-the-window-in-warm-springs-georgia-usa-R9TTA6.jpg",
+    "photos": [],
+    "is_facility": false
+  },
+  {
+    "id": "e5745fce-e33e-45f0-a8b6-d43ca27a3327",
+    "user_id": "da4757ec-a029-4e1a-9dbd-1468b6554e3c",
+    "business_name": "Bole Mini Market",
+    "business_license": null,
+    "business_category": "retail",
+    "address": "Bole Atlas, Addis Ababa",
+    "latitude": "8.98560000",
+    "longitude": "38.75980000",
+    "phone": "+251911100001",
+    "email": "bole.mini@adera.et",
+    "operating_hours": {
+      "friday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "monday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "sunday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "tuesday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "saturday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "thursday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "wednesday": {
+        "open": "07:00",
+        "close": "22:00"
+      }
+    },
+    "accepted_payment_methods": "{}",
+    "is_approved": true,
+    "is_active": true,
+    "commission_rate": "5.00",
+    "total_earnings": "0.00",
+    "created_at": "2025-07-19 02:50:42.08294+00",
+    "updated_at": "2025-07-24 21:36:29.355132+00",
+    "business_logo_url": null,
+    "business_images": null,
+    "store_front_image": null,
+    "interior_images": null,
+    "photo_url": "https://kptwtlrpgkcrrhbolouv.supabase.co/storage/v1/object/public/partner-photos/images (5).jpeg",
+    "photos": [],
+    "is_facility": false
+  }
+]
