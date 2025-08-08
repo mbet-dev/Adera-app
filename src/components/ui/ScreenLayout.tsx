@@ -1,5 +1,6 @@
 import React from 'react';
-import { SafeAreaView, View, StyleSheet, ViewStyle, StatusBar, Platform } from 'react-native';
+import { View, StyleSheet, ViewStyle, StatusBar, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../contexts/ThemeContext';
 
 interface ScreenLayoutProps {
@@ -16,10 +17,19 @@ export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
   const { colors } = useTheme();
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+    <SafeAreaView 
+      style={[
+        styles.safe, 
+        { 
+          backgroundColor: colors.background,
+        }
+      ]}
+      edges={['top', 'bottom']}
+    >
       <StatusBar
         barStyle={colors.text === '#000000' ? 'dark-content' : 'light-content'}
         backgroundColor={colors.background}
+        translucent={false}
       />
       <View
         style={[
@@ -38,8 +48,6 @@ export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    // Add extra top padding for Android to avoid notch overlap
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   container: {
     flex: 1,
@@ -47,4 +55,4 @@ const styles = StyleSheet.create({
   horizontalPadding: {
     paddingHorizontal: 16,
   },
-}); 
+});

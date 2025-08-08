@@ -7,6 +7,7 @@ import { View } from 'react-native';
 import { LoadingIndicator } from '../components/ui/LoadingIndicator';
 import { useAuth } from '../contexts/AuthContext';
 import { ApiService } from '../services/core';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Customer Screens
 import HomeScreen from '../screens/customer/HomeScreen';
@@ -33,6 +34,7 @@ import InventoryScreen from '../screens/partner/InventoryScreen';
 import ReportsScreen from '../screens/partner/ReportsScreen';
 import ManageDeliveriesScreen from '../screens/partner/ManageDeliveriesScreen';
 import StatisticsScreen from '../screens/partner/StatisticsScreen';
+import ShopSetupScreen from '../screens/partner/ShopSetupScreen';
 
 // Driver Screens
 import DriverHomeScreen from '../screens/driver/HomeScreen';
@@ -122,6 +124,7 @@ const CustomerStackNavigator = () => (
 
 const CustomerTabNavigator = () => {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <CustomerTab.Navigator
@@ -130,6 +133,8 @@ const CustomerTabNavigator = () => {
         tabBarStyle: {
           backgroundColor: colors.card,
           borderTopColor: colors.border,
+          paddingBottom: insets.bottom,
+          height: 60 + insets.bottom,
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.text,
@@ -206,9 +211,109 @@ export const CustomerNavigator = () => {
   return <CustomerStackNavigator />;
 };
 
-export const PartnerNavigator = () => {
+// New Stack for Partner Business Flow (Shop Management)
+type PartnerBusinessStackParamList = {
+    BusinessHome: undefined;
+    Inventory: undefined;
+    Reports: undefined;
+    Statistics: undefined;
+};
+const PartnerBusinessStack = createStackNavigator<PartnerBusinessStackParamList>();
+
+const PartnerBusinessStackNavigator = () => {
+  const { colors } = useTheme();
+  
+  return (
+    <PartnerBusinessStack.Navigator 
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.card,
+        },
+        headerTintColor: colors.text,
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}
+    >
+      <PartnerBusinessStack.Screen 
+        name="BusinessHome" 
+        component={PartnerHomeScreen} 
+        options={{ title: 'Business Overview' }}
+      />
+      <PartnerBusinessStack.Screen 
+        name="Inventory" 
+        component={InventoryScreen} 
+        options={{ title: 'Manage Inventory' }}
+      />
+      <PartnerBusinessStack.Screen 
+        name="Reports" 
+        component={ReportsScreen} 
+        options={{ title: 'Business Reports' }}
+      />
+      <PartnerBusinessStack.Screen 
+        name="Statistics" 
+        component={StatisticsScreen} 
+        options={{ title: 'Statistics' }}
+      />
+    </PartnerBusinessStack.Navigator>
+  );
+};
+
+// New Stack for Partner Delivery Operations
+type PartnerDeliveryStackParamList = {
+    DeliveryHome: undefined;
+    ManageDeliveries: undefined;
+    ScanProcess: undefined;
+};
+const PartnerDeliveryStack = createStackNavigator<PartnerDeliveryStackParamList>();
+
+const PartnerDeliveryStackNavigator = () => {
+  const { colors } = useTheme();
+  
+  return (
+    <PartnerDeliveryStack.Navigator 
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.card,
+        },
+        headerTintColor: colors.text,
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}
+    >
+      <PartnerDeliveryStack.Screen 
+        name="DeliveryHome" 
+        component={ManageDeliveriesScreen} 
+        options={{ title: 'Manage Deliveries' }}
+      />
+      <PartnerDeliveryStack.Screen 
+        name="ScanProcess" 
+        component={ScanProcessScreen} 
+        options={{ title: 'QR Scan & Process' }}
+      />
+    </PartnerDeliveryStack.Navigator>
+  );
+};
+
+// Create Partner Main Stack Navigator to handle ShopSetup screen
+type PartnerStackParamListLocal = {
+  PartnerMainTabs: undefined;
+  ShopSetup: undefined;
+};
+const PartnerStack = createStackNavigator<PartnerStackParamListLocal>();
+
+const PartnerStackNavigator = () => (
+  <PartnerStack.Navigator screenOptions={{ headerShown: false }}>
+    <PartnerStack.Screen name="PartnerMainTabs" component={PartnerTabNavigator} />
+    <PartnerStack.Screen name="ShopSetup" component={ShopSetupScreen} />
+  </PartnerStack.Navigator>
+);
+
+const PartnerTabNavigator = () => {
   const { colors } = useTheme();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const [hasShop, setHasShop] = useState<boolean | null>(null);
 
   // Check if partner has a shop
@@ -243,74 +348,81 @@ export const PartnerNavigator = () => {
         tabBarStyle: {
           backgroundColor: colors.card,
           borderTopColor: colors.border,
+          paddingBottom: insets.bottom,
+          paddingTop: 8,
+          height: 65 + insets.bottom,
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.text,
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+        },
       }}
     >
       <PartnerTab.Screen
         name="Home"
         component={PartnerHomeScreen}
         options={{
+          title: 'Home',
           tabBarIcon: ({ color, size }: TabIconProps) => (
             <Feather name="home" size={size} color={color} />
           ),
         }}
       />
-      <PartnerTab.Screen
-        name="ScanProcess"
-        component={ScanProcessScreen}
-        options={{
-          tabBarIcon: ({ color, size }: TabIconProps) => (
-            <Feather name="search" size={size} color={color} />
-          ),
-        }}
-      />
-      {/* Only show shop-related tabs if partner has a shop */}
+      
+      {/* Show Business tab only if partner has a shop */}
       {hasShop && (
-        <>
-          <PartnerTab.Screen
-            name="Inventory"
-            component={InventoryScreen}
-            options={{
-              tabBarIcon: ({ color, size }: TabIconProps) => (
-                <Feather name="package" size={size} color={color} />
-              ),
-            }}
-          />
-          <PartnerTab.Screen
-            name="Reports"
-            component={ReportsScreen}
-            options={{
-              tabBarIcon: ({ color, size }: TabIconProps) => (
-                <Feather name="bar-chart-2" size={size} color={color} />
-              ),
-            }}
-          />
-        </>
+        <PartnerTab.Screen
+          name="Business"
+          component={PartnerBusinessStackNavigator}
+          options={{
+            title: 'Business',
+            tabBarIcon: ({ color, size }: TabIconProps) => (
+              <Feather name="briefcase" size={size} color={color} />
+            ),
+          }}
+        />
       )}
+      
       <PartnerTab.Screen
-        name="ManageDeliveries"
-        component={ManageDeliveriesScreen}
+        name="Deliveries"
+        component={PartnerDeliveryStackNavigator}
         options={{
+          title: 'Deliveries',
           tabBarIcon: ({ color, size }: TabIconProps) => (
             <Feather name="truck" size={size} color={color} />
           ),
         }}
       />
+      
+      <PartnerTab.Screen
+        name="Scan"
+        component={ScanProcessScreen}
+        options={{
+          title: 'QR Scan',
+          tabBarIcon: ({ color, size }: TabIconProps) => (
+            <Feather name="camera" size={size} color={color} />
+          ),
+        }}
+      />
+      
       <PartnerTab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
+          title: 'Profile',
           tabBarIcon: ({ color, size }: TabIconProps) => (
             <Feather name="user" size={size} color={color} />
           ),
         }}
       />
+      
       <PartnerTab.Screen
         name="Settings"
         component={SettingsScreen}
         options={{
+          title: 'Settings',
           tabBarIcon: ({ color, size }: TabIconProps) => (
             <Feather name="settings" size={size} color={color} />
           ),
@@ -320,8 +432,13 @@ export const PartnerNavigator = () => {
   );
 };
 
+export const PartnerNavigator = () => {
+  return <PartnerStackNavigator />;
+};
+
 export const DriverNavigator = () => {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <DriverTab.Navigator
@@ -330,6 +447,8 @@ export const DriverNavigator = () => {
         tabBarStyle: {
           backgroundColor: colors.card,
           borderTopColor: colors.border,
+          paddingBottom: insets.bottom,
+          height: 60 + insets.bottom,
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.text,
@@ -395,6 +514,7 @@ export const DriverNavigator = () => {
 
 export const AdminNavigator = () => {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <AdminTab.Navigator
@@ -403,6 +523,8 @@ export const AdminNavigator = () => {
         tabBarStyle: {
           backgroundColor: colors.card,
           borderTopColor: colors.border,
+          paddingBottom: insets.bottom,
+          height: 60 + insets.bottom,
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.text,

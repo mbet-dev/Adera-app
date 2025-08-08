@@ -8,7 +8,8 @@ import {
   TextInput,
   Alert,
   Modal,
-  Dimensions
+  Dimensions,
+  SafeAreaView
 } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -438,7 +439,7 @@ export default function ScanProcessScreen() {
         onRequestClose={() => setShowManualInput(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+          <SafeAreaView style={[styles.modalContent, { backgroundColor: colors.background }]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>
                 Manual Input
@@ -481,7 +482,7 @@ export default function ScanProcessScreen() {
                 disabled={!manualInput.trim()}
               />
             </View>
-          </View>
+          </SafeAreaView>
         </View>
       </Modal>
     </ScreenLayout>

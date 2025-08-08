@@ -6,14 +6,17 @@ import {
   FlatList, 
   TouchableOpacity, 
   Image, 
-  ActivityIndicator 
+  ActivityIndicator,
+  Dimensions 
 } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Feather } from '@expo/vector-icons';
 import { ShopItem } from '../../types';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
-import { getWebShadow } from '../../utils/platform';
+import { getWebShadow, isWeb } from '../../utils/platform';
+
+const { width } = Dimensions.get('window');
 
 interface ProductListGridProps {
   products: ShopItem[];
@@ -183,15 +186,31 @@ export default function ProductListGrid({
     );
   }
 
+  // Calculate responsive columns and item width
+  const getNumColumns = () => {
+    if (isWeb) {
+      if (width >= 1200) return 4; // Desktop
+      if (width >= 768) return 3;  // Tablet
+      return 2; // Mobile
+    }
+    return 2; // Native mobile
+  };
+
+  const numColumns = getNumColumns();
+  const itemMargin = 8;
+  const containerPadding = 16;
+  const itemWidth = (width - containerPadding * 2 - itemMargin * (numColumns - 1)) / numColumns;
+
   return (
     <FlatList
       data={products}
       renderItem={renderProduct}
       keyExtractor={(item) => item.id}
-      numColumns={2}
-      columnWrapperStyle={styles.row}
-      contentContainerStyle={styles.container}
+      numColumns={numColumns}
+      columnWrapperStyle={numColumns > 1 ? styles.row : undefined}
+      contentContainerStyle={[styles.container, { paddingHorizontal: containerPadding }]}
       showsVerticalScrollIndicator={false}
+      key={numColumns} // Force re-render when columns change
     />
   );
 }
@@ -214,12 +233,14 @@ const styles = StyleSheet.create({
   },
   productImageContainer: {
     position: 'relative',
-    height: 120,
+    height: isWeb ? 120 : 140, // Smaller on web for better proportion in responsive grid
   },
   productImage: {
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
   },
   imagePlaceholder: {
     width: '100%',

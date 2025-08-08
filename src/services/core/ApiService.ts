@@ -678,27 +678,35 @@ export class ApiService {
       }
 
       // First get the partner record to find the partner_id
-      const { data: partner, error: partnerError } = await supabase
+      const { data: partners, error: partnerError } = await supabase
         .from('partners')
         .select('id')
-        .eq('user_id', partnerId)
-        .single();
+        .eq('user_id', partnerId);
 
       if (partnerError) throw partnerError;
-      if (!partner) {
+      if (!partners || partners.length === 0) {
         throw new ApiError('Partner not found', ApiErrorType.NOT_FOUND);
       }
 
+      // Use the first partner if multiple exist
+      const partner = partners[0];
+
       // Now get the shop using the partner_id
-      const { data, error } = await supabase
+      const { data: shops, error } = await supabase
         .from('shops')
         .select('*')
-        .eq('partner_id', partner.id)
-        .single();
+        .eq('partner_id', partner.id);
 
       if (error) throw error;
-      await this.cacheData(`shop_${partnerId}`, data);
-      return { data, error: null, success: true };
+      if (!shops || shops.length === 0) {
+        throw new ApiError('Shop not found for this partner', ApiErrorType.NOT_FOUND);
+      }
+
+      // Use the first shop if multiple exist (though ideally there should be only one)
+      const shop = shops[0];
+      
+      await this.cacheData(`shop_${partnerId}`, shop);
+      return { data: shop, error: null, success: true };
     } catch (error) {
       const apiError = this.handleApiError(error, 'getShopByPartnerId');
       return { data: null, error: apiError.message, success: false };
@@ -1135,11 +1143,65 @@ export class ApiService {
     }
   }
 
-  // Shop Analytics
-  static async getShopAnalytics(shopId: string, period: 'daily' | 'weekly' | 'monthly' = 'monthly'): Promise<ApiResponse<any>> {
+  // =====================================================
+  // PARTNER-SPECIFIC ANALYTICS & PARCEL METHODS
+  // =====================================================
+
+  static async getPartnerParcels(partnerId: string, limit: number = 20, status?: ParcelStatus): Promise<ApiResponse<any[]>> {
     try {
       const isOnline = await this.isOnline();
-      const cacheKey = `analytics_${shopId}_${period}`;
+      const cacheKey = status ? `partner_parcels_${partnerId}_${status}` : `partner_parcels_${partnerId}`;
+      
+      if (!isOnline) {
+        const cached = await this.getCachedData<any[]>(cacheKey);
+        if (cached) {
+          return { data: cached, error: null, success: true, cached: true };
+        }
+        throw new ApiError('No internet connection', ApiErrorType.OFFLINE_ERROR);
+      }
+
+      // Get parcels where this partner is either dropoff or pickup partner
+      let query = supabase
+        .from('parcels')
+        .select(`
+          id,
+          tracking_id,
+          status,
+          recipient_name,
+          recipient_phone,
+          recipient_email,
+          total_amount,
+          payment_status,
+          created_at,
+          pickup_code,
+          package_description,
+          dropoff_partner:partners!dropoff_partner_id(business_name, address),
+          pickup_partner:partners!pickup_partner_id(business_name, address),
+          sender:users!sender_id(first_name, last_name, phone)
+        `)
+        .or(`dropoff_partner_id.eq.${partnerId},pickup_partner_id.eq.${partnerId}`)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (status) {
+        query = query.eq('status', status);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      await this.cacheData(cacheKey, data || []);
+      return { data: data || [], error: null, success: true };
+    } catch (error) {
+      const apiError = this.handleApiError(error, 'getPartnerParcels');
+      return { data: null, error: apiError.message, success: false };
+    }
+  }
+
+  static async getPartnerAnalytics(partnerId: string, period: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'monthly'): Promise<ApiResponse<any>> {
+    try {
+      const isOnline = await this.isOnline();
+      const cacheKey = `partner_analytics_${partnerId}_${period}`;
       
       if (!isOnline) {
         const cached = await this.getCachedData<any>(cacheKey);
@@ -1149,55 +1211,188 @@ export class ApiService {
         throw new ApiError('No internet connection', ApiErrorType.OFFLINE_ERROR);
       }
 
-      // Get orders for the period
-      const startDate = new Date();
+      // Get date range for the period
+      const now = new Date();
+      let startDate: Date;
+      
       switch (period) {
         case 'daily':
-          startDate.setDate(startDate.getDate() - 1);
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
           break;
         case 'weekly':
-          startDate.setDate(startDate.getDate() - 7);
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
           break;
         case 'monthly':
-          startDate.setMonth(startDate.getMonth() - 1);
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
           break;
+        case 'yearly':
+          startDate = new Date(now.getFullYear(), 0, 1);
+          break;
+        default:
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
       }
 
-      const { data: orders, error: ordersError } = await supabase
-        .from('shop_orders')
-        .select('total_amount, delivery_status, order_date')
-        .eq('shop_id', shopId)
-        .gte('order_date', startDate.toISOString());
+      // Get parcels data for analytics
+      const { data: parcels, error: parcelsError } = await supabase
+        .from('parcels')
+        .select('*')
+        .or(`dropoff_partner_id.eq.${partnerId},pickup_partner_id.eq.${partnerId}`)
+        .gte('created_at', startDate.toISOString());
 
-      if (ordersError) throw ordersError;
+      if (parcelsError) throw parcelsError;
 
       // Calculate analytics
-      const totalSales = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0;
-      const totalOrders = orders?.length || 0;
-      const completedOrders = orders?.filter(order => order.delivery_status === ParcelStatus.DELIVERED).length || 0;
-      const pendingOrders = orders?.filter(order => 
-        [ParcelStatus.CREATED, ParcelStatus.FACILITY_RECEIVED, ParcelStatus.IN_TRANSIT_TO_FACILITY_HUB].includes(order.delivery_status)
-      ).length || 0;
+      const totalParcels = parcels?.length || 0;
+      const deliveredParcels = parcels?.filter(p => p.status === ParcelStatus.DELIVERED).length || 0;
+      const totalEarnings = parcels?.reduce((sum, p) => sum + (p.total_amount * 0.1), 0) || 0; // 10% commission
+      const avgDeliveryTime = 24; // Mock data - would need actual calculation
+      const successRate = totalParcels > 0 ? (deliveredParcels / totalParcels) * 100 : 0;
 
-      const analytics = {
-        totalSales,
-        totalOrders,
-        completedOrders,
-        pendingOrders,
-        completionRate: totalOrders > 0 ? (completedOrders / totalOrders) * 100 : 0,
-        averageOrderValue: totalOrders > 0 ? totalSales / totalOrders : 0,
-        period,
-        startDate: startDate.toISOString(),
-        endDate: new Date().toISOString()
+      // Group by status for distribution
+      const parcelsByStatus = parcels?.reduce((acc: any[], parcel) => {
+        const existingStatus = acc.find(item => item.status === parcel.status);
+        if (existingStatus) {
+          existingStatus.count += 1;
+        } else {
+          acc.push({ status: parcel.status, count: 1, percentage: 0 });
+        }
+        return acc;
+      }, []) || [];
+
+      // Calculate percentages
+      parcelsByStatus.forEach(item => {
+        item.percentage = totalParcels > 0 ? (item.count / totalParcels) * 100 : 0;
+      });
+
+      const analyticsData = {
+        overview: {
+          totalParcels,
+          totalEarnings,
+          avgDeliveryTime,
+          successRate
+        },
+        parcelsByStatus,
+        earningsOverTime: [] // Would need more complex query for time series data
       };
 
-      await this.cacheData(cacheKey, analytics);
-      return { data: analytics, error: null, success: true };
+      await this.cacheData(cacheKey, analyticsData);
+      return { data: analyticsData, error: null, success: true };
+    } catch (error) {
+      const apiError = this.handleApiError(error, 'getPartnerAnalytics');
+      return { data: null, error: apiError.message, success: false };
+    }
+  }
+
+  static async getShopAnalytics(shopId: string, period: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'monthly'): Promise<ApiResponse<any>> {
+    try {
+      const isOnline = await this.isOnline();
+      const cacheKey = `shop_analytics_${shopId}_${period}`;
+      
+      if (!isOnline) {
+        const cached = await this.getCachedData<any>(cacheKey);
+        if (cached) {
+          return { data: cached, error: null, success: true, cached: true };
+        }
+        throw new ApiError('No internet connection', ApiErrorType.OFFLINE_ERROR);
+      }
+
+      // Get date range for the period
+      const now = new Date();
+      let startDate: Date;
+      
+      switch (period) {
+        case 'daily':
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          break;
+        case 'weekly':
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case 'monthly':
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          break;
+        case 'yearly':
+          startDate = new Date(now.getFullYear(), 0, 1);
+          break;
+        default:
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      }
+
+      // Get shop orders and items for analytics
+      const [ordersResponse, itemsResponse] = await Promise.all([
+        supabase
+          .from('shop_orders')
+          .select(`
+            *,
+            item:shop_items(name, price)
+          `)
+          .eq('shop_id', shopId)
+          .gte('order_date', startDate.toISOString()),
+        
+        supabase
+          .from('shop_items')
+          .select('*')
+          .eq('shop_id', shopId)
+      ]);
+
+      if (ordersResponse.error) throw ordersResponse.error;
+      if (itemsResponse.error) throw itemsResponse.error;
+
+      const orders = ordersResponse.data || [];
+      const items = itemsResponse.data || [];
+
+      // Calculate analytics
+      const totalOrders = orders.length;
+      const totalRevenue = orders.reduce((sum, order) => sum + order.total_amount, 0);
+      const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+      // Get top products
+      const productSales: { [itemId: string]: { name: string; orders: number; revenue: number } } = {};
+      orders.forEach(order => {
+        const itemName = order.item?.name || 'Unknown Product';
+        if (!productSales[order.item_id]) {
+          productSales[order.item_id] = { name: itemName, orders: 0, revenue: 0 };
+        }
+        productSales[order.item_id].orders += 1;
+        productSales[order.item_id].revenue += order.total_amount;
+      });
+
+      const topProducts = Object.values(productSales)
+        .sort((a, b) => b.revenue - a.revenue)
+        .slice(0, 5);
+
+      const analyticsData = {
+        totalOrders,
+        totalRevenue,
+        avgOrderValue,
+        topProducts,
+        totalSales: totalRevenue // Alias for compatibility
+      };
+
+      await this.cacheData(cacheKey, analyticsData);
+      return { data: analyticsData, error: null, success: true };
     } catch (error) {
       const apiError = this.handleApiError(error, 'getShopAnalytics');
       return { data: null, error: apiError.message, success: false };
     }
   }
+
+  static async createShopTransaction(transactionData: Partial<ShopTransaction>): Promise<ApiResponse<ShopTransaction>> {
+    try {
+      const { data, error } = await supabase
+        .from('shop_transactions')
+        .insert(transactionData)
+        .select()
+        .single();
+
+      if (error) throw error;
+      await this.clearCache(); // Clear transaction-related cache
+      return { data, error: null, success: true };
+    } catch (error) {
+      const apiError = this.handleApiError(error, 'createShopTransaction');
+      return { data: null, error: apiError.message, success: false };
+    }
+  }
+
 
   // Search and Discovery
   static async searchShopItems(query: string, shopId?: string): Promise<ApiResponse<ShopItem[]>> {

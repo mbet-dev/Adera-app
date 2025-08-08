@@ -20,6 +20,7 @@ import { LoadingIndicator } from '../../components/ui/LoadingIndicator';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { PartnerStackParamList } from '../../types/navigation';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { ApiService } from '../../services/core';
 import { ParcelStatus, PaymentStatus, UserRole } from '../../types';
 
@@ -68,7 +69,7 @@ interface RecentOrder {
 export default function PartnerHomeScreen() {
   const { colors } = useTheme();
   const { user } = useAuth();
-  const navigation = useNavigation<StackNavigationProp<PartnerStackParamList>>();
+  const navigation = useNavigation<any>();
   
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -84,6 +85,7 @@ export default function PartnerHomeScreen() {
   const [recentParcels, setRecentParcels] = useState<RecentParcel[]>([]);
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [hasShop, setHasShop] = useState<boolean>(false);
 
   const quickActions: QuickAction[] = [
     {
@@ -170,6 +172,9 @@ export default function PartnerHomeScreen() {
 
       const completedParcels = parcels.filter(p => p.status === ParcelStatus.DELIVERED).length;
 
+      // Set hasShop state
+      setHasShop(!!hasShop);
+
       setStats({
         totalParcels: parcels.length,
         pendingParcels,
@@ -212,7 +217,52 @@ export default function PartnerHomeScreen() {
   };
 
   const handleQuickAction = (action: QuickAction) => {
-    navigation.navigate(action.route as any);
+    switch (action.id) {
+      case 'scan-process':
+        navigation.navigate('Scan');
+        break;
+      case 'inventory':
+        if (hasShop) {
+          // Navigate to Business tab, then to Inventory screen
+          navigation.navigate('Business', { screen: 'Inventory' });
+        } else {
+          // Show alert for shop setup
+          Alert.alert(
+            'Shop Setup Required',
+            'You need to set up your shop first to manage inventory.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Set Up Shop', onPress: () => handleShopSetup() }
+            ]
+          );
+        }
+        break;
+      case 'deliveries':
+        navigation.navigate('Deliveries');
+        break;
+      case 'reports':
+        if (hasShop) {
+          // Navigate to Business tab, then to Reports screen
+          navigation.navigate('Business', { screen: 'Reports' });
+        } else {
+          // Show alert for shop setup
+          Alert.alert(
+            'Shop Setup Required',
+            'You need to set up your shop first to view reports.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Set Up Shop', onPress: () => handleShopSetup() }
+            ]
+          );
+        }
+        break;
+      default:
+        navigation.navigate(action.route as any);
+    }
+  };
+
+  const handleShopSetup = () => {
+    navigation.navigate('ShopSetup');
   };
 
   const handleParcelPress = (parcel: RecentParcel) => {
@@ -264,7 +314,7 @@ export default function PartnerHomeScreen() {
     >
       <View style={[styles.quickActionIcon, { backgroundColor: item.color + '20' }]}>
         <Icon name={item.icon} size={24} color={item.color} />
-        {item.badge && item.badge > 0 && (
+        {item.badge != null && item.badge > 0 && (
           <View style={[styles.badge, { backgroundColor: colors.error }]}>
             <Text style={[styles.badgeText, { color: colors.card }]}>
               {item.badge > 99 ? '99+' : item.badge}
@@ -374,7 +424,7 @@ export default function PartnerHomeScreen() {
   }
 
   return (
-    <ScreenLayout>
+    <ScreenLayout noHorizontalPadding>
       <ScrollView
         style={styles.container}
         refreshControl={
@@ -432,7 +482,7 @@ export default function PartnerHomeScreen() {
                 Completed
               </Text>
             </Card>
-            {stats.shopOrders > 0 && (
+            {stats.shopOrders != null && stats.shopOrders > 0 && (
               <Card style={{ ...styles.statCard, backgroundColor: colors.card }}>
                 <Icon name="shopping" size={24} color={colors.primary} />
                 <Text style={[styles.statValue, { color: colors.text }]}>
@@ -443,7 +493,7 @@ export default function PartnerHomeScreen() {
                 </Text>
               </Card>
             )}
-            {stats.shopOrders === 0 && (
+            {stats.shopOrders != null && stats.shopOrders === 0 && (
               <Card style={{ ...styles.statCard, backgroundColor: colors.card }}>
                 <Icon name="currency-usd" size={24} color={colors.success} />
                 <Text style={[styles.statValue, { color: colors.text }]}>
@@ -509,7 +559,7 @@ export default function PartnerHomeScreen() {
         </View>
 
         {/* Recent Shop Orders - Only show if partner has shop */}
-        {stats.shopOrders > 0 && (
+        {stats.shopOrders != null && stats.shopOrders > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -541,7 +591,7 @@ export default function PartnerHomeScreen() {
         )}
 
         {/* Shop Setup Prompt for Delivery-Only Partners */}
-        {stats.shopOrders === 0 && stats.activeItems === 0 && (
+        {stats.shopOrders != null && stats.activeItems != null && stats.shopOrders === 0 && stats.activeItems === 0 && (
           <View style={styles.section}>
             <Card style={{ ...styles.setupCard, backgroundColor: colors.card }}>
               <Icon name="store-plus" size={48} color={colors.primary} />
@@ -553,7 +603,7 @@ export default function PartnerHomeScreen() {
               </Text>
               <Button
                 title="Set Up Shop"
-                onPress={() => navigation.navigate('Inventory')}
+                onPress={handleShopSetup}
                 style={styles.setupButton}
               />
             </Card>

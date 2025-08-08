@@ -1038,24 +1038,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: 16,
-    gap: 16,
+    gap: isWeb ? 8 : 12, // Smaller gap on web for better use of space
   },
   categoryItem: {
-    width: (width - 64) / 3,
+    width: isWeb && width >= 768 
+      ? (width - 64) / 4  // 4 columns on tablet/desktop
+      : (width - 64) / 3, // 3 columns on mobile
     alignItems: 'center',
-    paddingVertical: 8,
-    borderRadius: 12,
+    paddingVertical: isWeb ? 6 : 8, // Smaller padding on web
+    borderRadius: 8, // Smaller border radius
   },
   categoryIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: isWeb ? 45 : 50, // Smaller icons on web
+    height: isWeb ? 45 : 50,
+    borderRadius: isWeb ? 22.5 : 25,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: isWeb ? 6 : 8,
   },
   categoryName: {
-    fontSize: 12,
+    fontSize: isWeb ? 11 : 12, // Smaller text on web
     fontWeight: '500',
     textAlign: 'center',
   },

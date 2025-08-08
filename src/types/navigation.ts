@@ -47,6 +47,10 @@ export type PartnerStackParamList = {
   Settings: undefined;
   ManageDeliveries: undefined;
   Statistics: undefined;
+  Business: { screen: 'Inventory' | 'Reports' | 'Statistics' } | undefined;
+  Deliveries: undefined;
+  Scan: undefined;
+  ShopSetup: undefined;
 };
 
 export type DriverStackParamList = {

@@ -11,7 +11,8 @@ import {
   Modal,
   TextInput,
   Dimensions,
-  Image
+  Image,
+  SafeAreaView
 } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -317,36 +318,85 @@ export default function InventoryScreen() {
   );
 
   const renderItemCard = ({ item }: { item: ShopItem }) => (
-    <Card style={{ backgroundColor: colors.card, marginBottom: 12, padding: 16 }}>
+    <Card style={{ backgroundColor: colors.card, marginBottom: 12, padding: 16, borderRadius: 12 }}>
+      {/* Item Header */}
       <View style={styles.itemHeader}>
         <View style={styles.itemInfo}>
-          <Text style={[styles.itemName, { color: colors.text }]}>
-            {item.name}
-          </Text>
-          <Text style={[styles.itemDescription, { color: colors.textSecondary }]}>
-            {item.description}
-          </Text>
-          <View style={styles.itemMeta}>
-            <Text style={[styles.itemPrice, { color: colors.primary }]}>
-              {formatCurrency(item.price)}
+          <View style={styles.itemTitleRow}>
+            <Text style={[styles.itemName, { color: colors.text }]}>
+              {item.name}
             </Text>
-            <Text style={[styles.itemStock, { color: item.quantity <= 5 ? colors.error : colors.textSecondary }]}>
-              Stock: {item.quantity}
-            </Text>
+            {item.is_featured && (
+              <View style={[styles.featuredBadge, { backgroundColor: colors.primary + '20' }]}>
+                <Icon name="star" size={12} color={colors.primary} />
+                <Text style={[styles.featuredText, { color: colors.primary }]}>Featured</Text>
+              </View>
+            )}
+          </View>
+          <Text style={[styles.itemDescription, { color: colors.textSecondary }]} numberOfLines={2}>
+            {item.description || 'No description available'}
+          </Text>
+          
+          {/* Item Details Grid */}
+          <View style={styles.itemDetailsGrid}>
+            <View style={styles.detailItem}>
+              <Icon name="currency-usd" size={16} color={colors.primary} />
+              <Text style={[styles.detailText, { color: colors.primary }]}>
+                {formatCurrency(item.price)}
+              </Text>
+            </View>
+            
+            <View style={styles.detailItem}>
+              <Icon name="package-variant" size={16} color={item.quantity <= 5 ? colors.error : colors.success} />
+              <Text style={[styles.detailText, { color: item.quantity <= 5 ? colors.error : colors.textSecondary }]}>
+                {item.quantity} in stock
+              </Text>
+            </View>
+            
+            {item.delivery_supported && (
+              <View style={styles.detailItem}>
+                <Icon name="truck-delivery" size={16} color={colors.success} />
+                <Text style={[styles.detailText, { color: colors.textSecondary }]}>
+                  {formatCurrency(item.delivery_fee)} delivery
+                </Text>
+              </View>
+            )}
+            
+            <View style={styles.detailItem}>
+              <Icon name={item.is_active ? 'check-circle' : 'close-circle'} size={16} color={item.is_active ? colors.success : colors.error} />
+              <Text style={[styles.detailText, { color: item.is_active ? colors.success : colors.error }]}>
+                {item.is_active ? 'Active' : 'Inactive'}
+              </Text>
+            </View>
           </View>
         </View>
-        {item.image_urls && item.image_urls.length > 0 && (
-          <Image
-            source={{ uri: item.image_urls[0] }}
-            style={styles.itemImage}
-            resizeMode="cover"
-          />
-        )}
+        
+        {/* Item Image or Placeholder */}
+        <View style={styles.itemImageContainer}>
+          {item.image_urls && item.image_urls.length > 0 ? (
+            <Image
+              source={{ uri: item.image_urls[0] }}
+              style={styles.itemImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={[styles.itemImagePlaceholder, { backgroundColor: colors.border + '40' }]}>
+              <Icon name="image" size={24} color={colors.textSecondary} />
+            </View>
+          )}
+          
+          {item.quantity <= 5 && (
+            <View style={[styles.lowStockIndicator, { backgroundColor: colors.error }]}>
+              <Icon name="alert" size={10} color="white" />
+            </View>
+          )}
+        </View>
       </View>
 
+      {/* Quick Actions */}
       <View style={styles.itemActions}>
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: colors.primary + '20' }]}
+          style={[styles.actionButton, { backgroundColor: colors.primary + '15' }]}
           onPress={() => handleEditItem(item)}
         >
           <Icon name="pencil" size={16} color={colors.primary} />
@@ -356,11 +406,11 @@ export default function InventoryScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: colors.warning + '20' }]}
+          style={[styles.actionButton, { backgroundColor: colors.warning + '15' }]}
           onPress={() => {
             Alert.prompt(
               'Update Stock',
-              `Enter new quantity for ${item.name}:`,
+              `Current stock: ${item.quantity}\nEnter new quantity for ${item.name}:`,
               [
                 { text: 'Cancel', style: 'cancel' },
                 {
@@ -369,6 +419,8 @@ export default function InventoryScreen() {
                     const quantity = parseInt(newQuantity || '0');
                     if (!isNaN(quantity) && quantity >= 0) {
                       handleUpdateStock(item, quantity);
+                    } else {
+                      Alert.alert('Error', 'Please enter a valid quantity (0 or greater)');
                     }
                   }
                 }
@@ -378,14 +430,49 @@ export default function InventoryScreen() {
             );
           }}
         >
-          <Icon name="package-variant" size={16} color={colors.warning} />
+          <Icon name="package-variant-closed" size={16} color={colors.warning} />
           <Text style={[styles.actionButtonText, { color: colors.warning }]}>
             Stock
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: colors.error + '20' }]}
+          style={[styles.actionButton, { backgroundColor: colors.textSecondary + '15' }]}
+          onPress={() => {
+            Alert.alert(
+              'Toggle Status',
+              `Do you want to ${item.is_active ? 'deactivate' : 'activate'} this item?`,
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: item.is_active ? 'Deactivate' : 'Activate',
+                  onPress: async () => {
+                    try {
+                      const response = await ApiService.updateShopItem(item.id, {
+                        ...item,
+                        is_active: !item.is_active
+                      });
+                      if (response.success) {
+                        await loadInventoryData();
+                        Alert.alert('Success', `Item ${!item.is_active ? 'activated' : 'deactivated'} successfully`);
+                      }
+                    } catch (error) {
+                      Alert.alert('Error', 'Failed to update item status');
+                    }
+                  }
+                }
+              ]
+            );
+          }}
+        >
+          <Icon name={item.is_active ? 'eye-off' : 'eye'} size={16} color={colors.textSecondary} />
+          <Text style={[styles.actionButtonText, { color: colors.textSecondary }]}>
+            {item.is_active ? 'Hide' : 'Show'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: colors.error + '15' }]}
           onPress={() => handleDeleteItem(item)}
         >
           <Icon name="delete" size={16} color={colors.error} />
@@ -550,15 +637,16 @@ export default function InventoryScreen() {
         onRequestClose={() => setShowAddModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: colors.text }]}>
-                {editingItem ? 'Edit Item' : 'Add New Item'}
-              </Text>
-              <TouchableOpacity onPress={() => setShowAddModal(false)}>
-                <Icon name="close" size={24} color={colors.text} />
-              </TouchableOpacity>
-            </View>
+          <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+              <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>
+                  {editingItem ? 'Edit Item' : 'Add New Item'}
+                </Text>
+                <TouchableOpacity onPress={() => setShowAddModal(false)}>
+                  <Icon name="close" size={24} color={colors.text} />
+                </TouchableOpacity>
+              </View>
 
             <ScrollView style={styles.formContainer}>
               <TextInput
@@ -670,7 +758,8 @@ export default function InventoryScreen() {
                 disabled={isSaving}
               />
             </View>
-          </View>
+            </View>
+          </SafeAreaView>
         </View>
       </Modal>
     </ScreenLayout>
@@ -949,5 +1038,61 @@ const styles = StyleSheet.create({
   modalButton: {
     flex: 1,
     marginHorizontal: 8,
+  },
+  // Enhanced item card styles
+  itemTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  featuredBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    gap: 4,
+  },
+  featuredText: {
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  itemDetailsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+  },
+  detailItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginRight: 12,
+  },
+  detailText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  itemImageContainer: {
+    position: 'relative',
+    marginLeft: 12,
+  },
+  itemImagePlaceholder: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  lowStockIndicator: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 }); 

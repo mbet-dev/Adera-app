@@ -8,7 +8,8 @@ import {
   Image, 
   Alert,
   Dimensions,
-  ActivityIndicator
+  ActivityIndicator,
+  Modal
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
@@ -20,6 +21,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { supabase } from '../../lib/supabase';
 import { ShopItem } from '../../types';
+import { isWeb, getPlatformStyles } from '../../utils/platform';
 
 type ProductDetailRouteProp = RouteProp<CustomerStackParamList, 'ProductDetail'>;
 type ProductDetailNavigationProp = StackNavigationProp<CustomerStackParamList, 'ProductDetail'>;
@@ -39,6 +41,8 @@ export default function ProductDetailScreen() {
   const [error, setError] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [imageModalVisible, setImageModalVisible] = useState(false);
+  const [zoomImageIndex, setZoomImageIndex] = useState(0);
 
   useEffect(() => {
     fetchProductDetails();
@@ -197,13 +201,25 @@ export default function ProductDetailScreen() {
         {/* Product Images */}
         <View style={styles.imageContainer}>
           {product.image_urls && product.image_urls.length > 0 ? (
-            <Image 
-              source={{ uri: product.image_urls[selectedImageIndex] }} 
-              style={styles.mainImage}
-              resizeMode="cover"
-            />
+            <TouchableOpacity 
+              onPress={() => {
+                setZoomImageIndex(selectedImageIndex);
+                setImageModalVisible(true);
+              }}
+              activeOpacity={0.9}
+            >
+              <Image 
+                source={{ uri: product.image_urls[selectedImageIndex] }} 
+                style={[styles.mainImage, isWeb && styles.webMainImage]}
+                resizeMode="cover"
+              />
+              {/* Zoom indicator */}
+              <View style={styles.zoomIndicator}>
+                <Feather name="maximize" size={20} color="white" />
+              </View>
+            </TouchableOpacity>
           ) : (
-            <View style={[styles.imagePlaceholder, { backgroundColor: colors.border }]}>
+            <View style={[styles.imagePlaceholder, { backgroundColor: colors.border }, isWeb && styles.webMainImage]}>
               <Feather name="image" size={48} color={colors.text} />
             </View>
           )}
@@ -214,6 +230,7 @@ export default function ProductDetailScreen() {
               horizontal 
               showsHorizontalScrollIndicator={false}
               style={styles.imageGallery}
+              contentContainerStyle={styles.imageGalleryContent}
             >
               {product.image_urls.map((imageUrl, index) => (
                 <TouchableOpacity
@@ -224,12 +241,57 @@ export default function ProductDetailScreen() {
                   ]}
                   onPress={() => setSelectedImageIndex(index)}
                 >
-                  <Image source={{ uri: imageUrl }} style={styles.thumbnailImage} />
+                  <Image source={{ uri: imageUrl }} style={styles.thumbnailImage} resizeMode="cover" />
                 </TouchableOpacity>
               ))}
             </ScrollView>
           )}
         </View>
+
+        {/* Image Zoom Modal */}
+        <Modal
+          visible={imageModalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setImageModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={[styles.modalBackground, { backgroundColor: colors.background + 'E6' }]}>
+              <TouchableOpacity 
+                style={styles.closeButton}
+                onPress={() => setImageModalVisible(false)}
+              >
+                <Feather name="x" size={24} color={colors.text} />
+              </TouchableOpacity>
+              
+              {product.image_urls && product.image_urls[zoomImageIndex] && (
+                <ScrollView 
+                  horizontal 
+                  showsHorizontalScrollIndicator={false}
+                  pagingEnabled
+                  style={styles.modalScrollView}
+                >
+                  {product.image_urls.map((imageUrl, index) => (
+                    <View key={index} style={styles.modalImageContainer}>
+                      <Image 
+                        source={{ uri: imageUrl }} 
+                        style={styles.modalImage}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  ))}
+                </ScrollView>
+              )}
+              
+              {/* Image counter */}
+              <View style={styles.imageCounter}>
+                <Text style={[styles.imageCounterText, { color: colors.text }]}>
+                  {zoomImageIndex + 1} of {product.image_urls?.length || 0}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </Modal>
 
         {/* Product Info */}
         <View style={styles.productInfo}>
@@ -426,20 +488,38 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     marginBottom: 16,
+    position: 'relative',
   },
   mainImage: {
     width: width,
-    height: width * 0.75,
+    height: isWeb ? Math.min(400, width * 0.75) : width * 0.75,
+  },
+  webMainImage: {
+    width: isWeb ? Math.min(600, width) : width,
+    height: isWeb ? Math.min(400, width * 0.75) : width * 0.75,
+    maxWidth: '100%',
+    alignSelf: 'center',
   },
   imagePlaceholder: {
     width: width,
-    height: width * 0.75,
+    height: isWeb ? Math.min(400, width * 0.75) : width * 0.75,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  zoomIndicator: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 20,
+    padding: 8,
   },
   imageGallery: {
     paddingHorizontal: 16,
     marginTop: 12,
+  },
+  imageGalleryContent: {
+    alignItems: 'center',
   },
   thumbnail: {
     width: 60,
@@ -566,4 +646,54 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-}); 
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalBackground: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 25,
+    padding: 12,
+  },
+  modalScrollView: {
+    flex: 1,
+    width: '100%',
+  },
+  modalImageContainer: {
+    width: width,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+  },
+  modalImage: {
+    width: width - 40,
+    height: width - 40,
+    maxHeight: '80%',
+  },
+  imageCounter: {
+    position: 'absolute',
+    bottom: 50,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 15,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  imageCounterText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+});
